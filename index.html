@@ -11,10 +11,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Xanh+Mono:ital@0;1&display=swap" rel="stylesheet">
+
     <title>Monish RJ</title>
 </head>
 
 <body>
+    <canvas class="darkveil-canvas" id="darkVeilCanvas"></canvas>
+
     <div class="background-circle"></div>
 
     <div>
@@ -43,19 +46,18 @@
 
         <section class="current-project">
             <div class="project-inner">
-                <div class="text">
-                    <h2>☂︎ what i'm working on</h2>
-                    <h3>ASL Interpreter</h3>
-                    <p>
-                        a basic idea to detect ASL (American Sign Language) alphabet with hand poses,
-                        using MediaPipe + Python + TensorFlow.
-                        <br><br>
-                        currently in the learning phase and planning the basic idea for the project.
-                    </p>
-                </div>
-                <div class="image">
+                <div class="current-image">
                     <img src="https://www.researchgate.net/profile/Praveena-Akki/publication/382146609/figure/fig2/AS:11431281259844311@1720673477163/Tracking-and-analyzing-hand-using-mediapipe_Q320.jpg"
                         alt="Placeholder Img" />
+                </div>
+                <div class="current-txt">
+                    <h2>☂ what i'm working on.</h2>
+                    <h3>ASL Interpreter</h3>
+                    <p>
+                        <b>ML project to detect ASL (American Sign Language) alphabet and symbols and translate to text,
+                            using MediaPipe + Python + TensorFlow.</b>
+                        Currently in the learning phase and planning the basic idea for the project.
+                    </p>
                 </div>
             </div>
         </section>
@@ -78,6 +80,7 @@
             <p>© 2025 Monish Ramesh Jayakumar</p>
         </footer>
 
+        <script src="darkveil.js"></script>
     </div>
 </body>
 
