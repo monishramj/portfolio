@@ -1,0 +1,31 @@
+* {
+    font-family: "Helvetica", sans-serif;
+    padding: 10px;
+    margin: 0;
+}
+
+h1 {
+    font-size: 50px;
+}
+
+header {
+    text-align: center;
+}
+
+footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* center horizontally */
+    justify-content: center;
+    /* optional: for vertical alignment if footer has height */
+    text-align: center;
+    padding: 20px;
+}
+
+.contacts {
+    display: flex;
+    gap: 15px;
+    /* space between icons */
+    margin-bottom: 10px;
+}
