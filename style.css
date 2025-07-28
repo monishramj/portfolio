@@ -14,6 +14,10 @@
     font-weight: 100;
 }
 
+b {
+    font-weight: 300;
+}
+
 .darkveil-canvas {
     position: absolute;
     top: 0;
@@ -25,22 +29,6 @@ body {
     padding: 10px 20%;
     background-color: black;
     color: rgba(255, 255, 255, 0.933);
-}
-
-.background-circle {
-    position: absolute;
-    top: 30px;
-    right: 60px;
-    width: 400px;
-    height: 400px;
-    background-image: url('https://avatars.githubusercontent.com/u/160821533?v=4');
-    background-size: cover;
-    background-position: center;
-    border-radius: 50%;
-    opacity: .2;
-    z-index: -1;
-    pointer-events: none;
-    filter: blur(.5px);
 }
 
 h1,
@@ -58,7 +46,7 @@ h1 {
 
 h2 {
     font-weight: 300;
-    padding-bottom: 20px;
+    padding-bottom: 10px;
     letter-spacing: -1px;
 }
 
@@ -75,7 +63,7 @@ h3 {
 }
 
 nav {
-    background-color: #ff4141;
+    background-color: #00000084;
     padding: 7px 25px;
     border-radius: 10px;
     margin-top: 7px;
@@ -87,16 +75,18 @@ nav {
 }
 
 nav a {
-    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.551);
+
+    font-weight: 600;
+    text-decoration: none;
     display: inline-block;
-    color: aliceblue;
+    color: white;
     transition: color 0.3s ease;
 }
 
 
 nav a:hover {
-    color: #1a1a1a;
-    transform: translateY(-1px);
+    color: #ff4141;
 }
 
 .intro {
@@ -118,9 +108,6 @@ hr {
 }
 
 .box-element {
-    background-color: #000000;
-
-    align-self: center;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -129,9 +116,8 @@ hr {
     width: 100%;
 
     margin: 30px auto;
-    border-left: 5px solid #ff4141;
-    border-radius: 20px;
 
+    align-items: stretch;
     transition: transform 0.3s ease;
 }
 
@@ -141,12 +127,23 @@ hr {
 
 .box-txt {
     padding: 20px;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
 }
 
 .box-img {
     border-radius: 20px;
     object-fit: cover;
+    max-width: 300px;
+
+    border-radius: 50%;
+    aspect-ratio: 1;
+
+    transition: transform .5s ease;
+}
+
+.box-img:hover {
+    transform: translateX(-4px);
 }
 
 footer {
@@ -181,7 +178,7 @@ footer p {
 }
 
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
     body {
         padding: 10px 10%;
     }
@@ -196,9 +193,6 @@ footer p {
         flex-direction: column;
         align-items: center;
         text-align: center;
-
-        border-top: 5px solid #ff4141;
-        border-left: 0px;
     }
 
     .box-element:hover {
@@ -206,9 +200,15 @@ footer p {
     }
 
     .box-img {
-
+        max-width: none;
         width: 100%;
         max-height: 300px;
+
+        border-radius: 60px;
+    }
+
+    .box-img:hover {
+        transform: translateY(-4px);
     }
 
     .box-txt {
