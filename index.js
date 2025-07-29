@@ -1,9 +1,17 @@
 function changePage(page) {
     var content = document.getElementById('content');
 
+    content.classList.remove('fade-in');
+
+    content.innerHTML = '';
+
+    let wrapper = document.createElement('div');
+    wrapper.classList.add('fade-in');
+
+
     switch (page) {
         case 'home':
-            content.innerHTML = `
+            wrapper.innerHTML = `
                 <div class="intro">
                     <p>
                         <b>hello! i'm monish, welcome to my homepage.</b>
@@ -51,7 +59,7 @@ function changePage(page) {
         `;
             break;
         case 'about':
-            content.innerHTML = `
+            wrapper.innerHTML = `
                 <section class="intro">
                     <br>
                     <h3>my story.</h3>
@@ -88,7 +96,9 @@ function changePage(page) {
             break;
 
         default:
-            content.innerHTML = '<h2 class="intro">page not found.</h2>';
-
+            wrapper.innerHTML = '<h2 class="intro">page not found.</h2>';
     }
+
+    content.appendChild(wrapper);
+
 }

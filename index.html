@@ -19,29 +19,19 @@
     <canvas class="darkveil-canvas" id="darkVeilCanvas"></canvas>
 
     <header>
-        <h1>Monish Ramesh Jayakumar</h1>
-        <h2>Class of '29 ・ Purdue CS</h2>
-        <nav>
+        <h1 class="stagger-fade delay-0">Monish Ramesh Jayakumar</h1>
+        <h2 class="stagger-fade delay-1">Class of '29 ・ Purdue CS</h2>
+        <nav class="stagger-fade delay-2">
             <a href="#" onclick="changePage('home')">home</a> ・
             <a href="#" onclick="changePage('about')">about</a> ・
             <a href="#" onclick="changePage('projects')">projects</a>
-
         </nav>
     </header>
 
     <div id="content">
-        <div class="intro">
-            <p>
-                <b>hello! i'm monish, welcome to my homepage.</b>
-                i build things at the intersection of engineering and human-computer interaction.
-
-            </p>
-        </div>
-
-
     </div>
 
-    <footer>
+    <footer class="stagger-fade delay-3">
         <div class="contacts">
             <a href="https://github.com/monishramj" target="_blank" title="GitHub">
                 <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg" alt="GitHub" width="30" />
@@ -61,7 +51,9 @@
     <script src="index.js"></script>
     <script>
         window.onload = () => {
-            changePage('home');
+            setTimeout(() => {
+                changePage('home');
+            }, 600);
         };
     </script>
 
