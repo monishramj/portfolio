@@ -63,24 +63,22 @@ function changePage(page) {
                 <section class="intro">
                     <br>
                     <h3>my story.</h3>
-                    <p><b>i'll be starting my Computer Science degree at Purdue University this fall.</b> i'd love to study some
-                        secondary education, perhaps a double major in Math or Physics.
-                        i come from an engineering background: i've worked as President and Lead Payload Engineer for my Aerial
-                        Robotics team. CS: i've worked with robotics, human-computer interaction, vr/ar and machine
-                        learning.
-                        my work aims to make digital solutions to real technical problems.
+                    <p><b>hi! i'm monish.</b></p>
+                    <p><b>i'll be pursuing Computer Science at Purdue University this fall.</b> 
+                        my foundation lies in engineering: i've lead as President and Lead Payload Engineer for my Aerial
+                        Robotics team. beyond robotics being my main passion, i've worked with human-computer interaction, virtual reality systems and machine
+                        learning through <b> mobile development, simulation platforms, and embedded systems programming.</b> 
+                        i aim to make digital yet human-centric solutions to real technical problems. i'm especially drawn to interdisciplinary challenges, 
+                        threading design, software, and hardware.
                     </p>
                     <p>
                         <b>i love to learn and get immersed in whatever creative realm i find.</b> in my spare time, you can
-                        find
-                        me
-                        watching movies (attempting to be a film connoisseur), drawing characters in my sketchbook, and being
+                        find me watching movies - attempting to be a film connoisseur, drawing characters in my sketchbook, and being
                         with my family. i also have an origami collection of miscellaneous sorts: Star Wars, animals, random
                         cool shapes.
                     </p>
                     <p>
-                        currently, i'm working on an ASL translator with Google's Mediapipe library for real-time hand gesture
-                        detection and tracking, experimenting with OpenCV and other Python libraries.
+                        i'm always open to meeting new people and communicating. feel free to reach out!
                     </p>
                 </section>
 
