@@ -61,7 +61,6 @@ function changePage(page) {
         case 'about':
             wrapper.innerHTML = `
                 <section class="intro">
-                    <br>
                     <h3>my story.</h3>
                     <p><b>hi! i'm monish.</b></p>
                     <p><b>i'll be pursuing Computer Science at Purdue University this fall.</b> 
