@@ -10,8 +10,8 @@ class DarkVeil {
         }
 
         this.options = {
-            hueShift: -116,
-            noiseIntensity: .05,
+            hueShift: -120,
+            noiseIntensity: 0,
             scanlineIntensity: 0,
             speed: 0.5,
             scanlineFrequency: 0,
