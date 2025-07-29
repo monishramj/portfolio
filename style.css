@@ -19,10 +19,12 @@ b {
 }
 
 .darkveil-canvas {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     z-index: -1;
+    height: 100vh;
+    pointer-events: none;
 }
 
 body {
@@ -32,24 +34,23 @@ body {
 
 }
 
+/* 
 .content {
     opacity: 0;
     transform: translateY(30px);
-    /* starts slightly lower */
+    
     transition: opacity 1s ease, transform 1s ease;
 }
 
 .content.page-loaded {
     opacity: 1;
     transform: translateY(0);
-    /* final position */
 }
 
 .content.fade-out {
     opacity: 0;
     transform: translateY(-20px);
-    /* slight shift upward for exit */
-}
+} */
 
 h1,
 h3 {
