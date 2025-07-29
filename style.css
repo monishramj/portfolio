@@ -54,11 +54,11 @@
   * {
       font-family: "Geist", monospace;
       margin: 0;
-      font-weight: 100;
+      font-weight: 200;
   }
 
   b {
-      font-weight: 300;
+      font-weight: 500;
   }
 
   .darkveil-canvas {
@@ -146,10 +146,6 @@
 
   .intro p {
       margin-bottom: 15px;
-  }
-
-  .intro b {
-      font-weight: 300;
   }
 
   hr {
@@ -265,7 +261,7 @@
           width: 100%;
           max-height: 300px;
 
-          border-radius: 60px;
+          border-radius: 90px;
       }
 
 
@@ -279,7 +275,7 @@
       }
 
       h1 {
-          font-size: 29.5vw;
+          font-size: 27vw;
           line-height: .8;
           padding-bottom: 10px;
       }

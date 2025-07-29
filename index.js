@@ -14,7 +14,7 @@ function changePage(page) {
             wrapper.innerHTML = `
                 <div class="intro">
                     <p>
-                        <b>hello! i'm monish, and welcome to my homepage.</b>
+                        <b>hi! i'm monish.</b>
                         i build things at the intersection of engineering and human-computer interaction.
 
                     </p>
@@ -30,8 +30,8 @@ function changePage(page) {
                         <h2>☂ currently building</h2>
                         <h3>ASL Interpreter</h3>
                         <p>
-                            <b>ML project to detect ASL (American Sign Language) alphabet and symbols and translate to text,
-                                using MediaPipe + Python + TensorFlow.</b>
+                            ML project to detect ASL (American Sign Language) alphabet and symbols and translate to text,
+                                using <b>MediaPipe + Python + TensorFlow.</b>
                             Currently in the learning phase and planning the basic idea for the project.
                         </p>
                     </div>
@@ -44,21 +44,21 @@ function changePage(page) {
                 <section class="intro">
                     <h3>my story.</h3>
                     <p><b>hi! i'm monish.</b></p>
-                    <p><b>i'll be pursuing Computer Science at Purdue University this fall.</b> 
+                    <p>i'll be pursuing <b>Computer Science @ Purdue University</b> this fall. 
                         my foundation lies in engineering: i've lead as President and Lead Payload Engineer for my Aerial
-                        Robotics team. beyond robotics being my main passion, i've worked with human-computer interaction, virtual reality systems and machine
-                        learning through <b> mobile development, simulation platforms, and embedded systems programming.</b> 
+                        Robotics team. beyond robotics, i've worked with human-computer interaction, virtual reality systems and machine
+                        learning through <b> mobile development, simulation/game development, and embedded systems programming.</b> 
                         i aim to make digital yet human-centric solutions to real technical problems. i'm especially drawn to interdisciplinary challenges, 
                         threading design, software, and hardware.
                     </p>
                     <p>
                         <b>i love to learn and get immersed in whatever creative realm i find.</b> in my spare time, you can
-                        find me watching movies - attempting to be a film connoisseur, drawing characters in my sketchbook, and being
+                        find me watching movies and attempting to be a film connoisseur, drawing characters in my sketchbook, and being
                         with my family. i also have an origami collection of miscellaneous sorts: Star Wars, animals, random
                         cool shapes.
                     </p>
                     <p>
-                        i'm always open to meeting new people and communicating. feel free to reach out!
+                        i'm always open to meeting new people and communicating. <em>feel free to reach out!</em>
                     </p>
                 </section>
 
