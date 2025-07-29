@@ -164,7 +164,7 @@ class DarkVeil {
     resize() {
         const parent = this.canvas.parentElement || document.body;
         const w = parent.clientWidth;
-        const h = parent.clientHeight;
+        const h = 700;
 
         this.canvas.width = w * this.options.resolutionScale;
         this.canvas.height = h * this.options.resolutionScale;
