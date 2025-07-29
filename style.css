@@ -187,7 +187,6 @@
   }
 
   .box-img {
-      border-radius: 20px;
       object-fit: cover;
       max-width: 300px;
 
@@ -207,7 +206,6 @@
 
   footer p {
       opacity: .4;
-      font-family: "Geist";
       font-weight: 100;
       font-size: 15px;
   }

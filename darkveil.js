@@ -1,5 +1,5 @@
 class DarkVeil {
-    // React Bit component translated to JS
+    // React Bit component translated to JS bcuz i ain't tryna do allat
     constructor(canvas, options = {}) {
         this.canvas = canvas;
         this.gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
