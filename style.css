@@ -16,7 +16,7 @@
 
   .fade-in {
       opacity: 0;
-      transform: translateY(15px);
+      transform: translateY(10px);
       animation: fadeIn var(--ease-time) ease-out forwards;
   }
 
@@ -28,6 +28,8 @@
   }
 
   .stagger-fade {
+      transform: translateY(10px);
+
       opacity: 0;
       animation: fadeIn var(--ease-time) ease-out forwards;
   }
@@ -72,7 +74,6 @@
       padding: 10px 20%;
       background-color: black;
       color: rgba(255, 255, 255, 0.933);
-
   }
 
   h1,
@@ -99,7 +100,6 @@
   }
 
   h3 {
-      font-style: italic;
       letter-spacing: 1px;
       font-size: 60px;
       font-weight: 700;
@@ -111,6 +111,7 @@
       padding: 7px 25px;
       border-radius: 10px;
       margin-top: 7px;
+      margin-bottom: 0px;
       position: relative;
       overflow: hidden;
 
@@ -146,7 +147,7 @@
   }
 
   .intro p {
-      margin-bottom: 10px;
+      margin-bottom: 15px;
   }
 
   .intro b {
@@ -233,6 +234,7 @@
   @media (max-width: 800px) {
       body {
           padding: 10px 10%;
+          text-align: center;
       }
 
       .intro {
