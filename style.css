@@ -29,6 +29,26 @@ body {
     padding: 10px 20%;
     background-color: black;
     color: rgba(255, 255, 255, 0.933);
+
+}
+
+.content {
+    opacity: 0;
+    transform: translateY(30px);
+    /* starts slightly lower */
+    transition: opacity 1s ease, transform 1s ease;
+}
+
+.content.page-loaded {
+    opacity: 1;
+    transform: translateY(0);
+    /* final position */
+}
+
+.content.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
+    /* slight shift upward for exit */
 }
 
 h1,
