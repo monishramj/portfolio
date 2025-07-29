@@ -14,7 +14,7 @@ function changePage(page) {
             wrapper.innerHTML = `
                 <div class="intro">
                     <p>
-                        <b>hello! i'm monish, welcome to my homepage.</b>
+                        <b>hello! i'm monish, and welcome to my homepage.</b>
                         i build things at the intersection of engineering and human-computer interaction.
 
                     </p>
@@ -36,6 +36,7 @@ function changePage(page) {
                         </p>
                     </div>
                 </div>
+                
         `;
             break;
         case 'about':

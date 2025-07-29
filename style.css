@@ -83,9 +83,8 @@
 
   h1 {
       font-size: 200px;
-      font-weight: 800;
-      padding-top: 60px;
-      line-height: 160px;
+      padding-top: 70px;
+      line-height: .8;
   }
 
   h2 {
@@ -227,6 +226,13 @@
       transform: translateY(-4px) rotate(10deg);
   }
 
+  @media (max-width: 1390px) {
+      header h2 {
+          padding-top: 18px;
+          font-size: 30px;
+      }
+  }
+
   /* mobile fix */
   @media (max-width: 800px) {
       body {
@@ -273,8 +279,14 @@
       }
 
       h1 {
-          font-size: 25vw;
-          line-height: 20vw;
+          font-size: 29.5vw;
+          line-height: .8;
+          padding-bottom: 10px;
+      }
+
+      header h2 {
+          padding-top: 0px;
+          font-size: 30px;
       }
 
       nav {
