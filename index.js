@@ -36,26 +36,6 @@ function changePage(page) {
                         </p>
                     </div>
                 </div>
-
-                <div class="box-element">
-                    <img class="box-img"
-                        src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                        alt="Books and learning" />
-
-                    <div class="box-txt">
-
-                        <h2>⛳︎ currently learning</h2>
-                        <h3>Deep Dive Topics</h3>
-                        <p>
-                            <b>Computer Vision & ML:</b> exploring advanced techniques in image processing and neural networks.
-                            <br>
-                            <b>System Design:</b> understanding scalable architecture patterns.
-                            <br>
-                            <b>Algorithms & Data Structures:</b> strengthening problem-solving fundamentals through practice.
-                        </p>
-                    </div>
-
-                </div>
         `;
             break;
         case 'about':
@@ -88,8 +68,20 @@ function changePage(page) {
                         <b>here's what i've worked with.</b>
                         my strongest suites are Java and Python. all technologies listed are not in any specific order.
                     </p>
+                    <p>
+                    <b>work in progress.</b>
+                    </p>
                 </section>
                 `;
+            break;
+        case 'projects':
+            wrapper.innerHTML = `
+                <div class="intro">
+                    <p>
+                        this page is a work in progress.
+                    </p>
+                </div>
+            `
             break;
 
         default:
