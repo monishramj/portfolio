@@ -12,17 +12,17 @@ function changePage(page) {
     switch (page) {
         case 'home':
             wrapper.innerHTML = `
-                <div class="intro">
+                <section class="intro">
                     <p>
                         <b>hi! i'm monish.</b>
                         i build things at the intersection of engineering and human-computer interaction.
 
                     </p>
-                </div>
+                </section>
 
                 <hr>
 
-                <div class="box-element">
+                <section class="box-element">
                     <img class="box-img"
                         src="https://www.researchgate.net/profile/Praveena-Akki/publication/382146609/figure/fig2/AS:11431281259844311@1720673477163/Tracking-and-analyzing-hand-using-mediapipe_Q320.jpg"
                         alt="Placeholder Img" />
@@ -35,7 +35,7 @@ function changePage(page) {
                             Currently in the learning phase and planning the basic idea for the project.
                         </p>
                     </div>
-                </div>
+                </section>
                 
         `;
             break;
@@ -62,16 +62,120 @@ function changePage(page) {
                     </p>
                 </section>
 
-                <section class="intro">
-                    <br>
+               <section class="toolbox">
                     <h3>my toolbox.</h3>
-                    <p>
-                        <b>here's what i've worked with.</b>
-                        my strongest suites are Java and Python. all technologies listed are not in any specific order.
-                    </p>
-                    <p>
-                    <b>work in progress.</b>
-                    </p>
+                    <div class="tools-showcase">
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png" alt="Python" />
+                            </div>
+                            <div class="tool-name">Python</div>
+                        </div>
+                        <div class="tool-desc">ML, robotics</div>
+                        </div>
+
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java" />
+                            </div>
+                            <div class="tool-name">Java</div>
+                        </div>
+                        <div class="tool-desc">proficient OOP</div>
+                        </div>
+
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://cdn.iconscout.com/icon/free/png-256/free-flutter-logo-icon-download-in-svg-png-gif-file-formats--technology-social-media-vol-3-pack-logos-icons-2944876.png" alt="Flutter" />
+                            </div>
+                            <div class="tool-name">Flutter</div>
+                        </div>
+                        <div class="tool-desc">mobile dev.</div>
+                        </div>
+
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML" />
+                            </div>
+                            <div class="tool-name">HTML</div>
+                        </div>
+                        <div class="tool-desc">basic sites</div>
+                        </div>
+
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS" />
+                            </div>
+                            <div class="tool-name">CSS</div>
+                        </div>
+                        <div class="tool-desc">styling</div>
+                        </div>
+
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" />
+                            </div>
+                            <div class="tool-name">JS</div>
+                        </div>
+                        <div class="tool-desc">frontend (novice)</div>
+                        </div>
+
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/unity/unity-original.svg" alt="Unity" />
+                            </div>
+                            <div class="tool-name">Unity</div>
+                        </div>
+                        <div class="tool-desc">VR simulations</div>
+                        </div>
+
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/arduino/arduino-original.svg" alt="Arduino" />
+                            </div>
+                            <div class="tool-name">Arduino</div>
+                        </div>
+                        <div class="tool-desc">IoT, sensors</div>
+                        </div>
+
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" />
+                            </div>
+                            <div class="tool-name">Git</div>
+                        </div>
+                        <div class="tool-desc">version control</div>
+                        </div>
+
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Raspberry_Pi_Logo.svg/1200px-Raspberry_Pi_Logo.svg.png" alt="RPi" />
+                            </div>
+                            <div class="tool-name">RPi</div>
+                        </div>
+                        <div class="tool-desc">version control</div>
+                        </div>
+
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code" />
+                            </div>
+                            <div class="tool-name">VS Code</div>
+                        </div>
+                        <div class="tool-desc">code editor</div>
+                        </div>
+
+                    </div>
                 </section>
                 `;
             break;
