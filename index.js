@@ -122,7 +122,7 @@ function changePage(page) {
                             </div>
                             <div class="tool-name">JS</div>
                         </div>
-                        <div class="tool-desc">frontend (novice)</div>
+                        <div class="tool-desc">basic frontend</div>
                         </div>
 
                         <div class="tool">
@@ -138,7 +138,7 @@ function changePage(page) {
                         <div class="tool">
                         <div class="tool-left">
                             <div class="tool-icon">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/arduino/arduino-original.svg" alt="Arduino" />
+                            <img src="https://cdn.worldvectorlogo.com/logos/arduino-1.svg" alt="Arduino" />
                             </div>
                             <div class="tool-name">Arduino</div>
                         </div>
@@ -168,11 +168,21 @@ function changePage(page) {
                         <div class="tool">
                         <div class="tool-left">
                             <div class="tool-icon">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" alt="VS Code" />
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/2048px-Visual_Studio_Code_1.35_icon.svg.png" alt="VS Code" />
                             </div>
                             <div class="tool-name">VS Code</div>
                         </div>
                         <div class="tool-desc">code editor</div>
+                        </div>
+
+                        <div class="tool">
+                        <div class="tool-left">
+                            <div class="tool-icon">
+                            <img src="https://cdn.freebiesupply.com/logos/large/2x/eclipse-11-logo-svg-vector.svg" alt="Eclipse" />
+                            </div>
+                            <div class="tool-name">Eclipse</div>
+                        </div>
+                        <div class="tool-desc">Java IDE</div>
                         </div>
 
                     </div>
