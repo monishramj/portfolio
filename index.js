@@ -36,7 +36,6 @@ function changePage(page) {
                         </p>
                     </div>
                 </section>
-                
         `;
             break;
         case 'about':
@@ -148,11 +147,11 @@ function changePage(page) {
                         <div class="tool">
                         <div class="tool-left">
                             <div class="tool-icon">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" alt="Git" />
+                            <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/github-white-icon.png" alt="Git" />
                             </div>
-                            <div class="tool-name">Git</div>
+                            <div class="tool-name">Github</div>
                         </div>
-                        <div class="tool-desc">version control</div>
+                        <div class="tool-desc">VCS + repos</div>
                         </div>
 
                         <div class="tool">
@@ -162,7 +161,7 @@ function changePage(page) {
                             </div>
                             <div class="tool-name">RPi</div>
                         </div>
-                        <div class="tool-desc">version control</div>
+                        <div class="tool-desc"></div>
                         </div>
 
                         <div class="tool">
@@ -194,6 +193,23 @@ function changePage(page) {
                 <div class="intro">
                     <p>
                         this page is a work in progress.
+
+                        <section class="box-element">
+                            <img class="box-img"
+                                src="https://www.researchgate.net/profile/Praveena-Akki/publication/382146609/figure/fig2/AS:11431281259844311@1720673477163/Tracking-and-analyzing-hand-using-mediapipe_Q320.jpg"
+                                alt="Placeholder Img" />
+                            <div class="box-txt">
+                                <h2>featured project</h2>
+                                <h3>VR Haptic Glove</h3>
+                                <p class="box-date">aug. 2024. - april. 2025</p>
+                                <p>
+                                    Wearable glove that simulates touch, using <b>Arduino + Unity + C#</b>. Includes real-time finger tracking via potentiometers and haptic feedback using servo motors.  
+                                    The glove was integrated with a custom Unity simulation, paired with the Oculus Quest systems. 
+                                    <br>
+                                    This project was created for the Engineering Design and Development PLTW course at Neuqua Valley High school.
+                                </p>
+                            </div>
+                        </section>
                     </p>
                 </div>
             `

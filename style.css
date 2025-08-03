@@ -56,6 +56,7 @@ h3 {
     padding-bottom: 10px;
 }
 
+
 nav {
     background-color: #ff000084;
     padding: 7px 25px;
@@ -104,6 +105,8 @@ hr {
     opacity: .2;
 }
 
+/* ! BOX ELEMENT */
+
 .box-element {
     display: flex;
     flex-direction: row;
@@ -144,6 +147,12 @@ hr {
     filter: grayscale();
 
     transition: transform .7s ease;
+}
+
+.box-date {
+    opacity: .7;
+    font-weight: 100;
+    font-size: .8em;
 }
 
 /* ! FOOTER */
