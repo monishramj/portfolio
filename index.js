@@ -211,6 +211,9 @@ function changePage(page) {
                             </div>
                         </section>
                     </p>
+                    <hr>
+
+
                 </div>
             `
             break;
