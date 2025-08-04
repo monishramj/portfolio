@@ -196,7 +196,7 @@ function changePage(page) {
 
                         <section class="box-element">
                             <img class="box-img"
-                                src="https://www.researchgate.net/profile/Praveena-Akki/publication/382146609/figure/fig2/AS:11431281259844311@1720673477163/Tracking-and-analyzing-hand-using-mediapipe_Q320.jpg"
+                                src="assets/images/vrglove.jpg"
                                 alt="Placeholder Img" />
                             <div class="box-txt">
                                 <h2>featured project</h2>

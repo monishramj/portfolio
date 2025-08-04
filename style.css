@@ -112,8 +112,6 @@ hr {
     flex-direction: row;
     flex-wrap: nowrap;
 
-    cursor: pointer;
-
     max-width: 1200px;
     width: 100%;
 
@@ -144,7 +142,7 @@ hr {
     border-radius: 50%;
     aspect-ratio: 1;
 
-    filter: grayscale();
+    filter: grayscale(.5);
 
     transition: transform .7s ease;
 }
