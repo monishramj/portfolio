@@ -157,6 +157,7 @@ hr {
     display: inline-block;
 
     border: 1px solid #ffffff36;
+    background-color: #00000079;
 
     padding: 4px 12px;
     margin: 2px 10px 2px 0;
@@ -168,7 +169,6 @@ hr {
 }
 
 .tech-badge:hover {
-    background-color: #ff000011;
     border-color: #ffffff7e;
     color: #ff4141;
     transform: translateY(-2px);

@@ -154,7 +154,6 @@ function createTool(project) {
     `
 }
 
-const projectsHTML = projectsData.map(createProject).join('');
 const toolsHTML = toolsData.map(createTool).join('');
 
 
@@ -230,6 +229,8 @@ function changePage(page) {
                 `;
             break;
         case 'projects':
+            const projectsHTML = projectsData.map(createProject).join('');
+
             wrapper.innerHTML = `
                 <div class="intro">
                     <p>
