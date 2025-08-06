@@ -2,12 +2,26 @@ const projectsData = [
     {
         title: "VR Haptic Glove",
         subtitle: "featured project",
-        date: "aug. 2024 - april 2025",
+        date: "aug. 2024 - apr. 2025",
         img: "assets/images/vrglove.jpg",
         img_alt: "photo of VR glove",
         desc: "Wearable glove that simulates touch, using <b>Arduino + Unity + C#</b>. Includes real-time finger tracking via potentiometers and haptic feedback using servo motors. The glove was integrated with a custom Unity simulation, paired with the Oculus Quest systems.",
         context: "This project was created for the Engineering Design and Development PLTW course at Neuqua Valley High school.",
-        tech: ["Arduino", "Unity", "C#", "Oculus Quest"],
+        tech: ["VR", "Arduino", "Unity", "C#"],
+        orientation: "left"
+    },
+
+    {
+        title: "DiabFit",
+        subtitle: "",
+        date: "aug. 2023 --",
+        img: "assets/images/diabfit.jpg",
+        img_alt: "diabfit",
+        desc: "Insulin-management app for diabetics that offers personalized medical insights and calculated insulin doses. The app uses Edamam API serivces for food and nutrition info. Users can input their current meal, insulin-based medical info, and it'll calculate relevant information such as their insulin sensitivity factor, total daily insulin dose, and approximate insulin doses based on diet and glucose levels. Made with <b>Flutter</b> and currently in closed testing on Google Play Services.",
+        context: "",
+        tech: ["Flutter", "Dart", "Google Play Services", "REST APIs"],
+        orientation: "right"
+
     },
 ]
 
@@ -80,26 +94,50 @@ function createProject(project) {
         `<span class="tech-badge">${tech}</span>`
     ).join('');
 
-    return `
-        <section class="box-element">
-            <img class="box-img"
-                src="${project.img}"
-                alt="${project.img_alt}" />
-            <div class="box-txt">
-                <h2>${project.subtitle}</h2>
-                <h3>${project.title}</h3>
-                <p class="box-date">${project.date}</p>
-                <p>
-                    ${project.desc}
-                    <br>
-                    ${project.context}
-                </p>
-                <div>
-                    ${techStack}
+    if (project.orientation === "right" && window.innerWidth <= 800) {
+        return `
+            <section class="box-element">
+                <div class="box-txt">
+                    <h2>${project.subtitle}</h2>
+                    <h3>${project.title}</h3>
+                    <p class="box-date">${project.date}</p>
+                    <p>
+                        ${project.desc}
+                        <br>
+                        ${project.context}
+                    </p>
+                    <div>
+                        ${techStack}
+                    </div>
                 </div>
-            </div>
-        </section>
-    `
+                <img class="box-img"
+                    src="${project.img}"
+                    alt="${project.img_alt}" />
+            </section>
+        `
+    } else {
+        return `
+            <section class="box-element">
+                <img class="box-img"
+                    src="${project.img}"
+                    alt="${project.img_alt}" />
+                <div class="box-txt">
+                    <h2>${project.subtitle}</h2>
+                    <h3>${project.title}</h3>
+                    <p class="box-date">${project.date}</p>
+                    <p>
+                        ${project.desc}
+                        <br>
+                        ${project.context}
+                    </p>
+                    <div>
+                        ${techStack}
+                    </div>
+                </div>
+            </section>
+        `
+    }
+
 }
 
 function createTool(project) {
