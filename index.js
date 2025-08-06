@@ -17,8 +17,8 @@ const projectsData = [
         date: "aug. 2023 --",
         img: "assets/images/diabfit.jpg",
         img_alt: "diabfit",
-        desc: "Insulin-management app for diabetics that offers personalized medical insights and calculated insulin doses. The app uses Edamam API serivces for food and nutrition info. Users can input their current meal, insulin-based medical info, and it'll calculate relevant information such as their insulin sensitivity factor, total daily insulin dose, and approximate insulin doses based on diet and glucose levels. Made with <b>Flutter</b> and currently in closed testing on Google Play Services.",
-        context: "",
+        desc: "Insulin-management app for diabetics that offers personalized medical insights and calculated insulin doses. The app uses <b>Edamam API serivces</b> for food nutrition info. Made with <b>Flutter</b> and currently in closed testing on Google Play Services.",
+        context: "This app aims to simplify insulin health, espiecally for children, seniors, or recently affected persons. Users can input their current meal, insulin-based medical info, and it'll calculate relevant information such as their insulin sensitivity factor, total daily insulin dose, and approximate insulin doses based on diet and glucose levels. ",
         tech: ["Flutter", "Dart", "Google Play Services", "REST APIs"],
         orientation: "right"
 
