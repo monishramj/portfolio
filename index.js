@@ -12,6 +12,18 @@ const projectsData = [
     },
 
     {
+        title: "Computer Vision Drone",
+        subtitle: "",
+        date: "may 2025 - july 2025",
+        img: "assets/images/drone.jpeg",
+        img_alt: "photo of drone with RPi5 and gimbal w/ camera",
+        desc: "A computer vision algorithm that allows an aerial 'drone' vehicle to survey a field and identify ground Points of Interest (POIs) for the UAS4STEM Beginner Division competition. Features real-time identification and GPS coordinate mapping using <b>OpenCV</b> and <b>DroneKit/pymavlink Python</b>. Built on the Holybro X500 V2 drone with Raspberry Pi 5.",
+        context: "This project aimed for a completely hands-off solution that combines autonomous flight control with image recognition and homography calculations. The drone can survey a designated field (inputted in Mission Planner software), identify POIs through image recognition, and calculate precise GPS coordinates of ground targets. Demonstrates practicality of UAS in STEM fields while maintaining safety through waypoint override capabilities.",
+        tech: ["Python", "OpenCV", "DroneKit", "RPi 5",],
+        orientation: "left"
+    },
+
+    {
         title: "DiabFit",
         subtitle: "",
         date: "aug. 2023 --",
@@ -23,18 +35,6 @@ const projectsData = [
         orientation: "right"
 
     },
-
-    {
-        title: "Computer Vision Drone",
-        subtitle: "",
-        date: "may 2025 - july 2025",
-        img: "assets/images/drone.jpeg",
-        img_alt: "photo of drone with RPi5 and gimbal w/ camera",
-        desc: "A computer vision algorithm that allows an aerial 'drone' vehicle to survey a field and identify ground Points of Interest (POIs) for the UAS4STEM Beginner Division competition. Features real-time identification and GPS coordinate mapping using <b>OpenCV</b> and <b>DroneKit/pymavlink Python</b>. Built on the Holybro X500 V2 drone with Raspberry Pi 5.",
-        context: "This project aimed for a completely hands-off solution that combines autonomous flight control with image recognition and homography calculations. The drone can survey a designated field (inputted in Mission Planner software), identify POIs through image recognition, and calculate precise GPS coordinates of ground targets. Demonstrates practicality of UAS in STEM fields while maintaining safety through waypoint override capabilities.",
-        tech: ["Python", "OpenCV", "DroneKit", "RPi 5",],
-        orientation: "left"
-    }
 ]
 
 const toolsData = [
@@ -167,7 +167,7 @@ function createTool(project) {
 }
 
 const toolsHTML = toolsData.map(createTool).join('');
-
+const projectsHTML = projectsData.map(createProject).join('');
 
 function changePage(page) {
     var content = document.getElementById('content');
@@ -234,15 +234,15 @@ function changePage(page) {
 
                <section class="toolbox">
                     <h3>my toolbox.</h3>
+                    <p> my experience spans various languages, frameworks, and tools. these are the ones i know best (in no particular order).</p>
                     <div class="tools-showcase">
+                    
                         ${toolsHTML}
                     </div>
                 </section>
                 `;
             break;
         case 'projects':
-            const projectsHTML = projectsData.map(createProject).join('');
-
             wrapper.innerHTML = `
                 <div class="intro">
                     <p>
