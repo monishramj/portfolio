@@ -7,7 +7,7 @@ const projectsData = [
         img_alt: "photo of VR glove",
         desc: "Wearable glove that simulates touch, using <b>Arduino + Unity + C#</b>. Includes real-time finger tracking via potentiometers and haptic feedback using servo motors. The glove was integrated with a custom Unity simulation, paired with the Oculus Quest systems.",
         context: "This project was created for the Engineering Design and Development PLTW course at Neuqua Valley High school.",
-        tech: ["VR", "Arduino", "Unity", "C#"],
+        tech: ["VR", "Arduino", "Unity", "C#", "C++"],
         orientation: "left"
     },
 
@@ -23,6 +23,18 @@ const projectsData = [
         orientation: "right"
 
     },
+
+    {
+        title: "Computer Vision Drone",
+        subtitle: "",
+        date: "may 2025 - july 2025",
+        img: "assets/images/drone.jpeg",
+        img_alt: "photo of drone with RPi5 and gimbal w/ camera",
+        desc: "A computer vision algorithm that allows an aerial 'drone' vehicle to survey a field and identify ground Points of Interest (POIs) for the UAS4STEM Beginner Division competition. Features real-time identification and GPS coordinate mapping using <b>OpenCV</b> and <b>DroneKit/pymavlink Python</b>. Built on the Holybro X500 V2 drone with Raspberry Pi 5.",
+        context: "This project aimed for a completely hands-off solution that combines autonomous flight control with image recognition and homography calculations. The drone can survey a designated field (inputted in Mission Planner software), identify POIs through image recognition, and calculate precise GPS coordinates of ground targets. Demonstrates practicality of UAS in STEM fields while maintaining safety through waypoint override capabilities.",
+        tech: ["Python", "OpenCV", "DroneKit", "RPi 5",],
+        orientation: "left"
+    }
 ]
 
 const toolsData = [
@@ -94,7 +106,7 @@ function createProject(project) {
         `<span class="tech-badge">${tech}</span>`
     ).join('');
 
-    if (project.orientation === "right" && window.innerWidth <= 800) {
+    if (project.orientation === "right") {
         return `
             <section class="box-element">
                 <div class="box-txt">
