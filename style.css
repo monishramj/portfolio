@@ -154,6 +154,27 @@ hr {
     font-size: .8em;
 }
 
+.tech-badge {
+    display: inline-block;
+
+    border: 1px solid #ffffff36;
+
+    padding: 4px 12px;
+    margin: 2px 10px 2px 0;
+    border-radius: 15px;
+
+    font-size: 0.85em;
+
+    transition: all 0.3s ease;
+}
+
+.tech-badge:hover {
+    background-color: #ff000011;
+    border-color: #ffffff7e;
+    color: #ff4141;
+    transform: translateY(-2px);
+}
+
 /* ! FOOTER */
 
 footer {

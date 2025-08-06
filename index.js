@@ -1,3 +1,125 @@
+const projectsData = [
+    {
+        title: "VR Haptic Glove",
+        subtitle: "featured project",
+        date: "aug. 2024 - april 2025",
+        img: "assets/images/vrglove.jpg",
+        img_alt: "photo of VR glove",
+        desc: "Wearable glove that simulates touch, using <b>Arduino + Unity + C#</b>. Includes real-time finger tracking via potentiometers and haptic feedback using servo motors. The glove was integrated with a custom Unity simulation, paired with the Oculus Quest systems.",
+        context: "This project was created for the Engineering Design and Development PLTW course at Neuqua Valley High school.",
+        tech: ["Arduino", "Unity", "C#", "Oculus Quest"],
+    },
+]
+
+const toolsData = [
+    {
+        name: "Python",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png",
+        desc: "ML, robotics",
+    },
+    {
+        name: "Java",
+        img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+        desc: "proficient OOP",
+    },
+    {
+        name: "Flutter",
+        img: "https://cdn.iconscout.com/icon/free/png-256/free-flutter-logo-icon-download-in-svg-png-gif-file-formats--technology-social-media-vol-3-pack-logos-icons-2944876.png",
+        desc: "mobile dev.",
+    },
+    {
+        name: "HTML",
+        img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+        desc: "basic sites",
+    },
+    {
+        name: "CSS",
+        img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
+        desc: "styling",
+    },
+    {
+        name: "JS",
+        img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+        desc: "basic frontend",
+    },
+    {
+        name: "Unity",
+        img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/unity/unity-original.svg",
+        desc: "VR simulations",
+    },
+    {
+        name: "Arduino",
+        img: "https://cdn.worldvectorlogo.com/logos/arduino-1.svg",
+        desc: "IoT, sensors",
+    },
+    {
+        name: "GitHub",
+        img: "https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/github-white-icon.png",
+        desc: "VCS + repos",
+    },
+    {
+        name: "RPi",
+        img: "https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Raspberry_Pi_Logo.svg/1200px-Raspberry_Pi_Logo.svg.png",
+        desc: "IoT, automation",
+    },
+    {
+        name: "VS Code",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/2048px-Visual_Studio_Code_1.35_icon.svg.png",
+        desc: "code editor",
+    },
+    {
+        name: "Eclipse",
+        img: "https://cdn.freebiesupply.com/logos/large/2x/eclipse-11-logo-svg-vector.svg",
+        desc: "Java IDE",
+    },
+];
+
+
+function createProject(project) {
+    const techStack = project.tech.map(tech =>
+        `<span class="tech-badge">${tech}</span>`
+    ).join('');
+
+    return `
+        <section class="box-element">
+            <img class="box-img"
+                src="${project.img}"
+                alt="${project.img_alt}" />
+            <div class="box-txt">
+                <h2>${project.subtitle}</h2>
+                <h3>${project.title}</h3>
+                <p class="box-date">${project.date}</p>
+                <p>
+                    ${project.desc}
+                    <br>
+                    ${project.context}
+                </p>
+                <div>
+                    ${techStack}
+                </div>
+            </div>
+        </section>
+    `
+}
+
+function createTool(project) {
+    return `
+        <div class="tool">
+            <div class="tool-left">
+                <div class="tool-icon">
+                <img src="${project.img}" alt="${project.name}" />
+                </div>
+                <div class="tool-name">${project.name}</div>
+            </div>
+            <div class="tool-desc">${project.desc}</div>
+        </div>
+    `
+}
+
+const projectsHTML = projectsData.map(createProject).join('');
+const toolsHTML = toolsData.map(createTool).join('');
+
+
 function changePage(page) {
     var content = document.getElementById('content');
 
@@ -64,126 +186,7 @@ function changePage(page) {
                <section class="toolbox">
                     <h3>my toolbox.</h3>
                     <div class="tools-showcase">
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Python-logo-notext.svg/1200px-Python-logo-notext.svg.png" alt="Python" />
-                            </div>
-                            <div class="tool-name">Python</div>
-                        </div>
-                        <div class="tool-desc">ML, robotics</div>
-                        </div>
-
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" alt="Java" />
-                            </div>
-                            <div class="tool-name">Java</div>
-                        </div>
-                        <div class="tool-desc">proficient OOP</div>
-                        </div>
-
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://cdn.iconscout.com/icon/free/png-256/free-flutter-logo-icon-download-in-svg-png-gif-file-formats--technology-social-media-vol-3-pack-logos-icons-2944876.png" alt="Flutter" />
-                            </div>
-                            <div class="tool-name">Flutter</div>
-                        </div>
-                        <div class="tool-desc">mobile dev.</div>
-                        </div>
-
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML" />
-                            </div>
-                            <div class="tool-name">HTML</div>
-                        </div>
-                        <div class="tool-desc">basic sites</div>
-                        </div>
-
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS" />
-                            </div>
-                            <div class="tool-name">CSS</div>
-                        </div>
-                        <div class="tool-desc">styling</div>
-                        </div>
-
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript" />
-                            </div>
-                            <div class="tool-name">JS</div>
-                        </div>
-                        <div class="tool-desc">basic frontend</div>
-                        </div>
-
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/unity/unity-original.svg" alt="Unity" />
-                            </div>
-                            <div class="tool-name">Unity</div>
-                        </div>
-                        <div class="tool-desc">VR simulations</div>
-                        </div>
-
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://cdn.worldvectorlogo.com/logos/arduino-1.svg" alt="Arduino" />
-                            </div>
-                            <div class="tool-name">Arduino</div>
-                        </div>
-                        <div class="tool-desc">IoT, sensors</div>
-                        </div>
-
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/github-white-icon.png" alt="Git" />
-                            </div>
-                            <div class="tool-name">Github</div>
-                        </div>
-                        <div class="tool-desc">VCS + repos</div>
-                        </div>
-
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/c/cb/Raspberry_Pi_Logo.svg/1200px-Raspberry_Pi_Logo.svg.png" alt="RPi" />
-                            </div>
-                            <div class="tool-name">RPi</div>
-                        </div>
-                        <div class="tool-desc"></div>
-                        </div>
-
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/Visual_Studio_Code_1.35_icon.svg/2048px-Visual_Studio_Code_1.35_icon.svg.png" alt="VS Code" />
-                            </div>
-                            <div class="tool-name">VS Code</div>
-                        </div>
-                        <div class="tool-desc">code editor</div>
-                        </div>
-
-                        <div class="tool">
-                        <div class="tool-left">
-                            <div class="tool-icon">
-                            <img src="https://cdn.freebiesupply.com/logos/large/2x/eclipse-11-logo-svg-vector.svg" alt="Eclipse" />
-                            </div>
-                            <div class="tool-name">Eclipse</div>
-                        </div>
-                        <div class="tool-desc">Java IDE</div>
-                        </div>
-
+                        ${toolsHTML}
                     </div>
                 </section>
                 `;
@@ -192,29 +195,14 @@ function changePage(page) {
             wrapper.innerHTML = `
                 <div class="intro">
                     <p>
-                        this page is a work in progress.
-
-                        <section class="box-element">
-                            <img class="box-img"
-                                src="assets/images/vrglove.jpg"
-                                alt="Placeholder Img" />
-                            <div class="box-txt">
-                                <h2>featured project</h2>
-                                <h3>VR Haptic Glove</h3>
-                                <p class="box-date">aug. 2024. - april. 2025</p>
-                                <p>
-                                    Wearable glove that simulates touch, using <b>Arduino + Unity + C#</b>. Includes real-time finger tracking via potentiometers and haptic feedback using servo motors.  
-                                    The glove was integrated with a custom Unity simulation, paired with the Oculus Quest systems. 
-                                    <br>
-                                    This project was created for the Engineering Design and Development PLTW course at Neuqua Valley High school.
-                                </p>
-                            </div>
-                        </section>
+                        a collection of things i've built and am currently working on. this page is a work in progress.
                     </p>
                     <hr>
 
-
+                ${projectsHTML}
                 </div>
+
+                
             `
             break;
 
@@ -225,3 +213,5 @@ function changePage(page) {
     content.appendChild(wrapper);
 
 }
+
+
