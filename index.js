@@ -1,6 +1,6 @@
 const projectsData = [
     {
-        title: "VR Haptic Glove",
+        title: "MedVR Haptic Glove",
         subtitle: "featured project",
         date: "aug. 2024 - apr. 2025",
         img: "assets/images/vrglove.jpg",
@@ -8,7 +8,9 @@ const projectsData = [
         desc: "Wearable glove that simulates touch, using <b>Arduino + Unity + C#</b>. Includes real-time finger tracking via potentiometers and haptic feedback using servo motors. The glove was integrated with a custom Unity simulation, paired with the Oculus Quest systems.",
         context: "This project was created for the Engineering Design and Development PLTW course at Neuqua Valley High school.",
         tech: ["VR", "Arduino", "Unity", "C#", "C++"],
-        orientation: "left"
+        orientation: "left",
+
+        github: "https://github.com/monishramj/medvr-haptic-glove"
     },
 
     {
@@ -20,7 +22,9 @@ const projectsData = [
         desc: "A computer vision algorithm that allows an aerial 'drone' vehicle to survey a field and identify ground Points of Interest (POIs) for the UAS4STEM Beginner Division competition. Features real-time identification and GPS coordinate mapping using <b>OpenCV</b> and <b>DroneKit/pymavlink Python</b>. Built on the Holybro X500 V2 drone with Raspberry Pi 5.",
         context: "This project aimed for a completely hands-off solution that combines autonomous flight control with image recognition and homography calculations. The drone can survey a designated field (inputted in Mission Planner software), identify POIs through image recognition, and calculate precise GPS coordinates of ground targets. Demonstrates practicality of UAS in STEM fields while maintaining safety through waypoint override capabilities.",
         tech: ["Python", "OpenCV", "DroneKit", "RPi 5",],
-        orientation: "left"
+        orientation: "right",
+
+        github: "https://github.com/monishramj/uas4stem-survey-mission"
     },
 
     {
@@ -32,8 +36,9 @@ const projectsData = [
         desc: "Insulin-management app for diabetics that offers personalized medical insights and calculated insulin doses. The app uses <b>Edamam API serivces</b> for food nutrition info. Made with <b>Flutter</b> and currently in closed testing on Google Play Services.",
         context: "This app aims to simplify idiabetes management, especially for children, seniors, and newly diagnosed individuals. Users can input their current meal, insulin-based medical info, and it'll calculate relevant information such as their insulin sensitivity factor, total daily insulin dose, and approximate insulin doses based on diet and glucose levels. ",
         tech: ["Flutter", "Dart", "Google Play Services", "REST APIs"],
-        orientation: "right"
+        orientation: "left",
 
+        github: "https://github.com/monishramj/DiabFit"
     },
 ]
 
@@ -111,7 +116,16 @@ function createProject(project) {
             <section class="box-element">
                 <div class="box-txt">
                     <h2>${project.subtitle}</h2>
-                    <h3>${project.title}</h3>
+                    <h3>
+                        ${project.title} 
+                    </h3>
+                    ${project.github ? `
+                        <a href="${project.github}" target="_blank" title="link to ${project.title}'s repository">
+                            <span class="box-link">
+                                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg" alt="GitHub repo" />
+                                view code!
+                            </span>
+                        </a>` : ''}
                     <p class="box-date">${project.date}</p>
                     <p>
                         ${project.desc}
@@ -135,7 +149,16 @@ function createProject(project) {
                     alt="${project.img_alt}" />
                 <div class="box-txt">
                     <h2>${project.subtitle}</h2>
-                    <h3>${project.title}</h3>
+                    <h3>
+                        ${project.title}
+                    </h3>
+                    ${project.github ? `
+                        <a href="${project.github}" target="_blank" title="link to ${project.title}'s repository">
+                            <span class="box-link">
+                                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg" alt="GitHub repo" />
+                                view code!
+                            </span>
+                        </a>` : ''}
                     <p class="box-date">${project.date}</p>
                     <p>
                         ${project.desc}

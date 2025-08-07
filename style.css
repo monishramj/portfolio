@@ -157,6 +157,39 @@ hr {
     font-size: .8em;
 }
 
+.box-link {
+    display: inline-flex;
+    align-items: center;
+
+    border: 1px solid #ffffff36;
+    background-color: #00000079;
+
+    padding: 4px 12px;
+    margin-bottom: 15px;
+
+
+    border-radius: 15px;
+    font-size: 0.9em;
+    color: #ccc;
+
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.box-link img {
+    filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(90%) contrast(100%);
+    height: 16px;
+    width: 16px;
+}
+
+.box-link:hover {
+    border-color: #ffffff7e;
+    color: #ff4141;
+
+    transform: translateX(4px);
+
+}
+
 .tech-badge {
     display: inline-block;
 
@@ -376,9 +409,14 @@ footer p {
         border-radius: 90px;
     }
 
-
     .box-txt {
         padding: 15px 10px;
+    }
+
+
+    .box-link:hover {
+        transform: translateY(-4px);
+
     }
 
     footer {
