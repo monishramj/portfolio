@@ -257,7 +257,7 @@ function changePage(page) {
 
                <section class="toolbox">
                     <h3>my toolbox.</h3>
-                    <p> my experience spans various languages, frameworks, and tools. these are the ones i know best (in no particular order).</p>
+                    <p> my experience spans various languages, frameworks, and skills. here's some i know.</p>
                     <div class="tools-showcase">
                     
                         ${toolsHTML}
