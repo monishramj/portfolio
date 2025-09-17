@@ -75,7 +75,7 @@ const toolsData = [
     },
     {
         name: "Unity",
-        img: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/unity/unity-original.svg",
+        img: "https://img.icons8.com/ios_filled/512/FFFFFF/unity.png",
         desc: "VR simulations",
     },
     {
