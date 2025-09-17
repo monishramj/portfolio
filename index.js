@@ -99,9 +99,9 @@ const toolsData = [
         desc: "code editor",
     },
     {
-        name: "Eclipse",
-        img: "https://cdn.freebiesupply.com/logos/large/2x/eclipse-11-logo-svg-vector.svg",
-        desc: "Java IDE",
+        name: "Ubuntu",
+        img: "https://cdn.freebiesupply.com/logos/large/2x/ubuntu-4-logo-svg-vector.svg",
+        desc: "simulations, robotics",
     },
 ];
 
@@ -237,7 +237,7 @@ function changePage(page) {
                 <section class="intro">
                     <h3>my story.</h3>
                     <p><b>hi! i'm monish.</b></p>
-                    <p>i'll be pursuing <b>Computer Science @ Purdue University</b> this fall. 
+                    <p>i'm currently a first-year pursuing a degree in <b>Computer Science @ Purdue University</b>. 
                         my foundation lies in engineering: i've lead as President and Lead Payload Engineer for my Aerial
                         Robotics team. beyond robotics, i've worked with human-computer interaction, virtual reality systems and machine
                         learning through <b> mobile development, simulation/game development, and embedded systems programming.</b> 
@@ -269,7 +269,7 @@ function changePage(page) {
             wrapper.innerHTML = `
                 <div class="intro">
                     <p>
-                        a collection of things i've built and am currently working on. this page is a work in progress.
+                        a collection of things i've built and am currently working on.
                     </p>
                     <hr>
 
