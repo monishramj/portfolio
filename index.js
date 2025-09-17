@@ -5,8 +5,8 @@ const projectsData = [
         date: "aug. 2024 - apr. 2025",
         img: "assets/images/vrglove.jpg",
         img_alt: "photo of VR glove",
-        desc: "Wearable glove that simulates touch, using <b>Arduino + Unity + C#</b>. Includes real-time finger tracking via potentiometers and haptic feedback using servo motors. The glove was integrated with a custom Unity simulation, paired with the Oculus Quest systems.",
-        context: "This project was created for the Engineering Design and Development PLTW course at Neuqua Valley High school.",
+        desc: "Wearable glove that simulates touch, using <b>Arduino + Unity + C#</b>. Includes real-time finger tracking with ±2∘ accuracy, via potentiometers and servo-based touch feedback. The glove was integrated with a custom Unity simulation, paired with the Oculus Quest VR systems.",
+        context: "This project was created for the Engineering Design and Development PLTW course at Neuqua Valley High School. Presented to the Thales VisionX engineering division as the first student team invited to their facilities. The project involved asynchronous communication between Unity and Arduino, updating the simulation in real-time to user hand movements.",
         tech: ["VR", "Arduino", "Unity", "C#", "C++"],
         orientation: "left",
 
@@ -19,8 +19,8 @@ const projectsData = [
         date: "may 2025 - july 2025",
         img: "assets/images/drone.jpeg",
         img_alt: "photo of drone with RPi5 and gimbal w/ camera",
-        desc: "A computer vision algorithm that allows an aerial 'drone' vehicle to survey a field and identify ground Points of Interest (POIs) for the UAS4STEM Beginner Division competition. Features real-time identification and GPS coordinate mapping using <b>OpenCV</b> and <b>DroneKit/pymavlink Python</b>. Built on the Holybro X500 V2 drone with Raspberry Pi 5.",
-        context: "This project aimed for a completely hands-off solution that combines autonomous flight control with image recognition and homography calculations. The drone can survey a designated field (inputted in Mission Planner software), identify POIs through image recognition, and calculate precise GPS coordinates of ground targets. Demonstrates practicality of UAS in STEM fields while maintaining safety through waypoint override capabilities.",
+        desc: "Computer vision algorithm that allows an aerial 'drone' vehicle to survey a field and identify ground Points of Interest (POIs) for the UAS4STEM Beginner Division competition, using <b>OpenCV</b> and <b>DroneKit/pymavlink Python</b>. Built on the Holybro X500 V2 drone with Raspberry Pi 5.",
+        context: "This project aimed for complete autonomy with flight control, image recognition, homography calculations, and safety measrues. The drone surveys a designated field via pre-loaded coordinates, identify POIs, and calculates the GPS coordinates of ground targets. ",
         tech: ["Python", "OpenCV", "DroneKit", "RPi 5",],
         orientation: "right",
 
@@ -30,11 +30,11 @@ const projectsData = [
     {
         title: "DiabFit",
         subtitle: "",
-        date: "aug. 2023 --",
+        date: "aug. 2024 - dec. 2024",
         img: "assets/images/diabfit.jpg",
         img_alt: "diabfit",
-        desc: "Insulin-management app for diabetics that offers personalized medical insights and calculated insulin doses. The app uses <b>Edamam API serivces</b> for food nutrition info. Made with <b>Flutter</b> and currently in closed testing on Google Play Services.",
-        context: "This app aims to simplify idiabetes management, especially for children, seniors, and newly diagnosed individuals. Users can input their current meal, insulin-based medical info, and it'll calculate relevant information such as their insulin sensitivity factor, total daily insulin dose, and approximate insulin doses based on diet and glucose levels. ",
+        desc: "Insulin-management app for diabetics that offers personalized medical insights and calculated insulin doses. The app uses <b>Edamam API serivces</b> for food nutrition info. Made with <b>Flutter</b> and currently available on Google Play.",
+        context: "This app aims to simplify diabetes management, especially for children, seniors, and newly diagnosed individuals. Users can input their current meal, insulin-based medical info, and it'll calculate relevant information such as their insulin sensitivity factor, total daily insulin dose, and approximate insulin doses based on diet and glucose levels.",
         tech: ["Flutter", "Dart", "Google Play Services", "REST APIs"],
         orientation: "left",
 
@@ -76,7 +76,7 @@ const toolsData = [
     {
         name: "Unity",
         img: "https://img.icons8.com/ios_filled/512/FFFFFF/unity.png",
-        desc: "VR simulations",
+        desc: "VR sims",
     },
     {
         name: "Arduino",
@@ -101,7 +101,7 @@ const toolsData = [
     {
         name: "Ubuntu",
         img: "https://cdn.freebiesupply.com/logos/large/2x/ubuntu-4-logo-svg-vector.svg",
-        desc: "simulations, robotics",
+        desc: "robotics sims",
     },
 ];
 
@@ -130,7 +130,7 @@ function createProject(project) {
                     <p>
                         ${project.desc}
                         <br>
-                        ${project.context}
+                        <span style="opacity:.85;"> ${project.context} </span>
                     </p>
                     <div>
                         ${techStack}
@@ -163,7 +163,7 @@ function createProject(project) {
                     <p>
                         ${project.desc}
                         <br>
-                        ${project.context}
+                       <span style="opacity:.85;"> ${project.context} </span>
                     </p>
                     <div>
                         ${techStack}
@@ -237,15 +237,14 @@ function changePage(page) {
                 <section class="intro">
                     <h3>my story.</h3>
                     <p><b>hi! i'm monish.</b></p>
-                    <p>i'm currently a first-year pursuing a degree in <b>Computer Science @ Purdue University</b>. 
+                    <p>i'm a first-year student pursuing a degree in <b>Computer Science @ Purdue University</b>. 
                         my foundation lies in engineering: i've lead as President and Lead Payload Engineer for my Aerial
                         Robotics team. beyond robotics, i've worked with human-computer interaction, virtual reality systems and machine
                         learning through <b> mobile development, simulation/game development, and embedded systems programming.</b> 
-                        i aim to make digital yet human-centric solutions to real technical problems. i'm especially drawn to interdisciplinary challenges, 
-                        threading design, software, and hardware.
+                        i aim to make digital yet human-centric solutions to real technical problems.
                     </p>
                     <p>
-                        <b>i love to learn and get immersed in whatever creative realm i find.</b> in my spare time, you can
+                        <b>i love to learn and get immersed in any creative endeavors.</b> in my spare time, you can
                         find me watching movies and attempting to be a film connoisseur, drawing characters in my sketchbook, and being
                         with my family. i also have an origami collection of miscellaneous sorts: Star Wars, animals, random
                         cool shapes.
