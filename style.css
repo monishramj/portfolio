@@ -333,7 +333,7 @@ footer p {
 }
 
 .tool:hover .tool-icon {
-    transform: scale(1.75);
+    transform: scale(1.75) rotate(4deg);
     border-radius: 50%;
 
 }

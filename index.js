@@ -210,7 +210,6 @@ function changePage(page) {
                     <p>
                         <b>hi! i'm monish.</b>
                         i build things at the intersection of engineering and human-computer interaction.
-
                     </p>
                 </section>
 
@@ -218,19 +217,45 @@ function changePage(page) {
 
                 <section class="box-element">
                     <img class="box-img"
-                        src="https://www.researchgate.net/profile/Praveena-Akki/publication/382146609/figure/fig2/AS:11431281259844311@1720673477163/Tracking-and-analyzing-hand-using-mediapipe_Q320.jpg"
-                        alt="Placeholder Img" />
+                        src="https://images.stockcake.com/public/d/2/b/d2bced95-ccf8-44c0-8e91-189ae30edfaa_large/sunlit-chess-knight-stockcake.jpg"
+                        alt="Basic photo of chess board" />
+                  
+                    
                     <div class="box-txt">
-                        <h2>☂ currently building</h2>
+                        <h2>♟ currently building</h2>
+                        <h3>Chess Engine</h3>
+                        <a href="https://github.com/monishramj/chess-engine" target="_blank" title="link to Chess Engine's repository">
+                            <span class="box-link">
+                                <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg" alt="GitHub repo" />
+                                view code!
+                            </span>
+                        </a>
+                        <p>
+                            Building a basic chess engine from scratch, implementing core game logic and a
+                            <b>minimax-based search</b>, then extending it with <b>ML using PyTorch</b>.
+                            Currently working on point systems for decision-making. Project is to learn basic data structures and ML fundementals.
+                        </p>
+                        
+                    </div>
+                </section>
+
+                <hr>
+
+                <section class="box-element">
+                    <img class="box-img"
+                        src="https://www.researchgate.net/profile/Praveena-Akki/publication/382146609/figure/fig2/AS:11431281259844311@1720673477163/Tracking-and-analyzing-hand-using-mediapipe_Q320.jpg"
+                        alt="ASL Interpreter" />
+                    <div class="box-txt">
+                        <h2>☂ other workings</h2>
                         <h3>ASL Interpreter</h3>
                         <p>
                             ML project to detect ASL (American Sign Language) alphabet and symbols and translate to text,
-                                using <b>MediaPipe + Python + TensorFlow.</b>
-                            Currently in the learning phase and planning the basic idea for the project.
+                            using <b>MediaPipe + Python + TensorFlow.</b>
+                            Currently in the data preprocessing phase.
                         </p>
                     </div>
                 </section>
-        `;
+            `;
             break;
         case 'about':
             wrapper.innerHTML = `
@@ -238,9 +263,8 @@ function changePage(page) {
                     <h3>my story.</h3>
                     <p><b>hi! i'm monish.</b></p>
                     <p>i'm a first-year student pursuing a degree in <b>Computer Science @ Purdue University</b>. 
-                        my foundation lies in engineering: i've lead as President and Lead Payload Engineer for my Aerial
-                        Robotics team. beyond robotics, i've worked with human-computer interaction, virtual reality systems and machine
-                        learning through <b> mobile development, simulation/game development, and embedded systems programming.</b> 
+                        i'm taking part in Purdue Lunabotics, and Purdue Hackers. beyond robotics, i've worked with human-computer interaction,
+                        virtual reality systems and ML through <b> mobile development, simulation/game development, and embedded systems programming.</b> 
                         i aim to make digital yet human-centric solutions to real technical problems.
                     </p>
                     <p>
