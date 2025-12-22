@@ -232,8 +232,8 @@ function changePage(page) {
                         </a>
                         <p>
                             Building a basic chess engine from scratch, implementing core game logic and a
-                            <b>minimax-based search</b>, then extending it with <b>ML using PyTorch</b>.
-                            Currently working on point systems for decision-making. Project is to learn basic data structures and ML fundementals.
+                            <b>minimax-based search</b>, the overall idea being to learn data structures and ML fundementals.
+                            Currently working on optimizing piece move checks. 
                         </p>
                         
                     </div>
