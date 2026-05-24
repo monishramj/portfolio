@@ -52,6 +52,7 @@ const ModelInner = ({
   url, pivot, initYaw, initPitch, defaultZoom, minZoom, maxZoom,
   enableMouseParallax, enableManualRotation, enableHoverRotation, enableManualZoom,
   autoFrame, fadeIn, autoRotate, autoRotateSpeed, onLoaded, placeholderSrc,
+  modelXOffset, modelYOffset,
 }) => {
   const { scene } = useGLTF(url);
   const content = useMemo(() => scene.clone(), [scene]);
@@ -89,7 +90,7 @@ const ModelInner = ({
     if (autoFrame && camera.isPerspectiveCamera) {
       // defaultZoom scales the fit distance: 1.5 (default) = comfortable padding, 1 = tight fit
       const d = (0.5 * defaultZoom) / Math.sin((camera.fov * Math.PI) / 180 / 2);
-      camera.position.set(0, 0, d);
+      camera.position.set(modelXOffset ?? 0, modelYOffset ?? 0, d);
       camera.near = d / 20;
       camera.far  = d * 20;
       camera.updateProjectionMatrix();
@@ -105,6 +106,9 @@ const ModelInner = ({
         }
       }
     });
+
+    ready.current = true;
+    invalidate();
 
     if (fadeIn) {
       let t = 0;
@@ -124,9 +128,6 @@ const ModelInner = ({
     } else {
       onLoaded?.();
     }
-
-    ready.current = true;
-    invalidate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content]);
 
@@ -268,6 +269,29 @@ const ModelInner = ({
   );
 };
 
+const NullBackground = () => {
+  const { scene } = useThree();
+  useLayoutEffect(() => {
+    Object.defineProperty(scene, 'background', {
+      get: () => null,
+      set: () => {},
+      configurable: true,
+    });
+    return () => {
+      // Atomically swap back to a plain null value — avoids a 1-frame window
+      // where background is `undefined`, which makes THREE skip the clear call
+      // and lets the previous HDRI frame bleed through.
+      Object.defineProperty(scene, 'background', {
+        value: null,
+        writable: true,
+        configurable: true,
+        enumerable: true,
+      });
+    };
+  }, [scene]);
+  return null;
+};
+
 const ModelViewer = ({
   url,
   width = 400,
@@ -345,11 +369,11 @@ const ModelViewer = ({
           cameraRef.current   = camera;
           gl.toneMapping      = THREE.ACESFilmicToneMapping;
           gl.outputColorSpace = THREE.SRGBColorSpace;
-          scene.background    = null; // prevent environment from ever flashing as a skybox
         }}
         camera={{ fov: 50, position: [0, 0, camZ], near: 0.01, far: 100 }}
         style={{ touchAction: 'pan-y pinch-zoom' }}
       >
+        <NullBackground />
         {environmentPreset !== 'none' && <Environment preset={environmentPreset} background={false} />}
         <ambientLight intensity={ambientIntensity} />
         <directionalLight position={[5, 5, 5]}  intensity={keyLightIntensity} castShadow />
@@ -375,6 +399,8 @@ const ModelViewer = ({
             autoRotateSpeed={autoRotateSpeed}
             onLoaded={onModelLoaded}
             placeholderSrc={placeholderSrc}
+            modelXOffset={modelXOffset}
+            modelYOffset={modelYOffset}
           />
         </Suspense>
         {!isTouch && (
