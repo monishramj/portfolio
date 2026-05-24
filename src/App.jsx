@@ -3,6 +3,7 @@ import Frame from './components/layout/Frame';
 import InterFrame from './components/layout/InterFrame';
 import ModelViewer from './components/ModelViewer';
 import Button, { DocIcon } from './components/Button';
+import ProjectCard from './components/ProjectCard';
 
 const GhIcon = ({ size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -22,6 +23,23 @@ const MailIcon = ({ size = 16 }) => (
     <path d="M2 7l10 7 10-7"/>
   </svg>
 );
+
+const PROJECTS = [
+  {
+    title: 'MedVR Haptic Glove',
+    desc: 'Wearable glove that simulates touch using Arduino + Unity + C#. Includes real-time finger tracking with ±2° accuracy via potentiometers and servo-based touch feedback, integrated with a custom Unity simulation paired with Oculus Quest VR. (AI slop for now)',
+    tech: ['Arduino', 'Unity', 'C#', 'C++'],
+    img: '/images/vrglove.jpg',
+    github: 'https://github.com/monishramj/medvr-haptic-glove',
+  },
+  {
+    title: 'Monkish: Chess Engine',
+    desc: 'Chess engine with a neural network evaluator: a 6-layer CNN trained on 10M Stockfish-annotated positions, blended 70/30 with material score. Search is alpha-beta minimax at depth 3. (AI slop for now)',
+    tech: ['Python', 'PyTorch', 'matplotlib'],
+    img: '/images/chess_eval.png',
+    github: 'https://github.com/monishramj/chess-engine',
+  },
+];
 
 const SKILLS = [
   {
@@ -128,6 +146,30 @@ export default function App() {
       <InterFrame left="FILM STRIP" center="02" right="MONISH RJ" />
 
       <Frame num="02">
+        <div className="eyebrow">featured projects</div>
+        <div className="proj-list">
+          {PROJECTS.map(p => <ProjectCard key={p.title} {...p} />)}
+        </div>
+      </Frame>
+
+      <InterFrame left="FILM STRIP" center="03" right="MONISH RJ" />
+
+      <Frame num="03">
+        <div className="eyebrow">Skills</div>
+        <div className="sk-grid">
+          {SKILLS.map(s => (
+            <div key={s.name} className="sk-item">
+              <span className="sk-icon">{s.icon}</span>
+              <div>
+                <div className="sk-name">{s.name}</div>
+                <div className="sk-desc">{s.desc}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </Frame>
+      <InterFrame left="FILM STRIP" center="04" right="MONISH RJ" />
+      <Frame num="04">
         <div className="eyebrow">about me</div>
         <div className="about-layout">
           <div className="about-body">
@@ -150,24 +192,6 @@ export default function App() {
           </div>
         </div>
 
-      </Frame>
-      <InterFrame left="FILM STRIP" center="03" right="MONISH RJ" />
-      <Frame num="03">
-        <div className="eyebrow">Skills</div>
-        <div className="sk-grid">
-          {SKILLS.map(s => (
-            <div key={s.name} className="sk-item">
-              <span className="sk-icon">{s.icon}</span>
-              <div>
-                <div className="sk-name">{s.name}</div>
-                <div className="sk-desc">{s.desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Frame>
-      <InterFrame left="FILM STRIP" center="04" right="MONISH RJ" />
-      <Frame num="04" scratch="65%">
       </Frame>
       <InterFrame left="FILM STRIP" center="05" right="MONISH RJ" />
       <Frame num="05" scratch="65%">
