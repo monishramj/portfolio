@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FilmStrip from './components/layout/FilmStrip';
 import Frame from './components/layout/Frame';
 import InterFrame from './components/layout/InterFrame';
 import ModelViewer from './components/ModelViewer';
 import Button, { DocIcon } from './components/Button';
 import ProjectCard from './components/ProjectCard';
+import Stack from './components/Stack';
 
 const GhIcon = ({ size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -49,32 +50,10 @@ const PROJECTS = [
   },
 ];
 
-const EXPERIENCE = [
-  {
-    role: 'Undergraduate Research Assistant',
-    org: 'Aphasia Recovery Lab — Dr. Jiyeon Lee',
-    location: 'West Lafayette, IN',
-    date: 'Jan 2026 – Present',
-    tech: ['Python', 'PyTorch', 'Scikit-learn'],
-    bullets: [
-      'working under Prof. Jiyeon Lee + Dr. Yan Cong to build ML pipelines that analyze speech patterns and support aphasia treatment',
-      'engineered automated diagnostic pipeline to distinguish aphasia from control speech — 72% accuracy via gradient boosting',
-      'extracted high-dimensional linguistic features from 1,600+ speech records using LLM surprisal analysis',
-      'optimized models with nested K-fold cross-validation and grid search across 4+ classifiers on large-scale clinical datasets',
-    ],
-  },
-  {
-    role: 'Software Team Engineer',
-    org: 'Purdue Lunabotics',
-    location: 'West Lafayette, IN',
-    date: 'Aug 2025 – Present',
-    tech: ['Python', 'Grounded SAM', 'ROS 2', 'Linux/UNIX'],
-    bullets: [
-      'Develop obstacle detection models using Grounded SAM to identify lunar hazards',
-      'Train ML vision models on UNIX-based RCAC HPC systems',
-      'Collaborate across subteams to deploy competition-ready software under strict reliability constraints',
-    ],
-  },
+const CURRENTLY = [
+  { role: 'Undergrad Research Assistant', org: 'Aphasia Recovery Lab', href: 'https://www.purdue.edu/hhs/slhs/aphasia/', date: 'Jan 2026 – Present' },
+  { role: 'Software Team Engineer', org: 'Purdue Lunabotics', date: 'Aug 2025 – Present' },
+  { role: 'Software Developer', org: 'UPlate', href: 'https://u-plate.com/', date: 'Feb 2026 – Present' },
 ];
 
 const SKILLS = [
@@ -101,12 +80,12 @@ const SKILLS = [
     name: 'Arduino',
     desc: 'embedded systems, sensors, servo control, serial comms',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <circle cx="7.5" cy="12" r="5.5"/>
-        <circle cx="16.5" cy="12" r="5.5"/>
-        <line x1="5" y1="12" x2="10" y2="12"/>
-        <line x1="7.5" y1="9.5" x2="7.5" y2="14.5"/>
-        <line x1="14" y1="12" x2="19" y2="12"/>
+      <svg viewBox="0 0 48 48" fill="currentColor" aria-hidden="true">
+        <path d="M35.7,34.7c-7.7,0-13.2-8.9-13.4-9.3l-0.6-1l0.6-1C22.5,22.9,28,14,35.7,14C41.4,14,46,18.6,46,24.3S41.4,34.7,35.7,34.7z M26.4,24.3c1.5,2,5.1,6.3,9.2,6.3c3.5,0,6.3-2.8,6.3-6.3c0-3.5-2.8-6.3-6.3-6.3C31.5,18,27.9,22.3,26.4,24.3z"/>
+        <path d="M12.3,34.7C6.6,34.7,2,30,2,24.3S6.6,14,12.3,14c7.9,0,13.2,8.9,13.4,9.3l0.6,1l-0.6,1C25.5,25.7,20,34.7,12.3,34.7z M12.3,18C8.8,18,6,20.8,6,24.3c0,3.5,2.8,6.3,6.3,6.3c4.2,0,7.8-4.3,9.3-6.3C20.2,22.3,16.6,18,12.3,18z"/>
+        <path d="M10,23h6v2h-6V23z"/>
+        <path d="M32,23h6v2h-6V23z"/>
+        <path d="M34,21h2v6h-2V21z"/>
       </svg>
     ),
   },
@@ -126,9 +105,9 @@ const SKILLS = [
     name: 'Flutter',
     desc: 'cross-platform iOS & Android (Dart)',
     icon: (
-      <svg viewBox="-1 -1 26 26" fill="currentColor" aria-hidden="true">
-        <path d="M14.314 0 2.3 12l3.7 3.7L21.686 0z" opacity=".55"/>
-        <path d="M14.314 11.368 6.179 19.5l3.791 3.791 3.886-3.886 5.831-5.831z"/>
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path fill="none" d="M0 0h24v24H0z"/>
+        <path fillRule="nonzero" d="M13.503 2.001l-10 10 3.083 3.083 13.08-13.083h-6.163zm-.006 9.198L8.122 16.62 13.494 22h6.189l-5.387-5.4 5.389-5.4h-6.188z"/>
       </svg>
     ),
   },
@@ -147,6 +126,14 @@ const SKILLS = [
 
 export default function App() {
   const [activeSkill, setActiveSkill] = useState(SKILLS[0].name);
+  const [visits, setVisits] = useState(null);
+
+  useEffect(() => {
+    fetch('https://abacus.jasoncameron.dev/hit/monishramj.dev/visits')
+      .then(r => r.json())
+      .then(d => setVisits(d.value))
+      .catch(() => {});
+  }, []);
   const selected = SKILLS.find(s => s.name === activeSkill);
 
   return (
@@ -174,8 +161,9 @@ export default function App() {
             modelYOffset={0}
             defaultRotationX={190}
             defaultRotationY={20}
-            defaultZoom={1.1}
+            defaultZoom={1.05}
             showScreenshotButton={false}
+            screenTextureSrc="/images/monish.jpeg"
             environmentPreset="dawn"
             enableManualZoom={false}
             enableMouseParallax={true}
@@ -199,8 +187,8 @@ export default function App() {
         <div className="eyebrow">about me</div>
         <div className="about-layout">
           <div className="about-body">
-            <p>currently loving it at Purdue University as a CS major and JHMC Honors student. currently, i'm in Purdue Lunabotics. beyond robotics, i've worked with VR systems and ML through mobile apps, simulation/game dev, and embedded systems programming.</p>
-            <p>i love movies, love to get creative drawing characters in my sketchbook, being with my family. i also have an origami collection of miscellaneous sorts: Star Wars, animals, random cool shapes.</p>
+            <p>CS major and JHMC Honors student at Purdue. My main interests lie in ML research + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p>
+            <p>into movies, sketching, and have an origami collection (Star Wars, animals, whatever looks cool).</p>
           </div>
           <div className="about-right">
             <div className="about-meta">
@@ -211,7 +199,6 @@ export default function App() {
               <div className="mi">
                 <div className="mi-label">Degree</div>
                 <span className="mi-val">B.S. Computer Science Honors</span>
-                <span>-</span>
                 <span className="mi-val"><b>tracks: </b>Machine Intelligence, Systems, Software</span>
               </div>
             </div>
@@ -219,29 +206,7 @@ export default function App() {
         </div>
 
         <div className="eyebrow" style={{ marginTop: '36px' }}>currently</div>
-        <div className="now-list">
-          <div className="now-row">
-            <div className="now-left">
-              <span className="now-role">Undergrad Research Assistant</span>
-              <span className="now-org">Aphasia Recovery Lab</span>
-            </div>
-            <span className="now-date">Jan 2026 – Present</span>
-          </div>
-          <div className="now-row">
-            <div className="now-left">
-              <span className="now-role">Software Team Engineer</span>
-              <span className="now-org">Purdue Lunabotics</span>
-            </div>
-            <span className="now-date">Aug 2025 – Present</span>
-          </div>
-          <div className="now-row">
-            <div className="now-left">
-              <span className="now-role">Software Developer</span>
-              <span className="now-org">UPlate</span>
-            </div>
-            <span className="now-date">Feb 2026 – Present</span>
-          </div>
-        </div>
+        <Stack items={CURRENTLY} />
 
         <div className="eyebrow" style={{ marginTop: '36px' }}>Skills</div>
         <p className="sk-blurb">i've worked with many technologies. here's some i know.</p>
@@ -265,14 +230,17 @@ export default function App() {
       <InterFrame left="FILM STRIP" center="04" right="THE END" />
       <Frame num="04">
         <div className="end-frame">
-          <div className="eyebrow">fin.</div>
+          <div className="eyebrow">fin</div>
           <p className="end-thanks">i'm always open to meeting new people and communicating. feel free to reach out!</p>
           <div className="end-links">
             <a href="https://github.com/monishramj" target="_blank" rel="noopener" className="end-link"><GhIcon size={14} /> github</a>
             <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener" className="end-link"><LiIcon size={14} /> linkedin</a>
             <a href="mailto:mrameshj@purdue.edu" className="end-link"><MailIcon size={14} /> email</a>
           </div>
-          <div className="end-sig">— monish rj, {new Date().getFullYear()}</div>
+          <div className="end-sig">
+            — monish r.j, {new Date().getFullYear()}
+            {visits !== null && <><span className="end-dot">·</span><span className="end-visits">{visits.toLocaleString()} visits</span></>}
+          </div>
         </div>
       </Frame>
     </FilmStrip>

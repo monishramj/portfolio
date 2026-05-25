@@ -3,7 +3,7 @@
   --bg: #040404;
   --strip: #0e0e0e;
   --frame: #0a0a0a;
-  --border: #2a2a2a;
+  --border: #1a1a1a;
   --text: #e8e2d6;
   --text-muted: #c3b9b0;
   --text-dim: #3e3830;
@@ -456,7 +456,7 @@ body {
   gap: 16px;
 }
 .now-row:first-child { border-top: 1px solid var(--border); }
-.now-left { display: flex; flex-direction: column; gap: 2px; }
+.now-left { display: flex; flex-direction: row; align-items: baseline; gap: 8px; }
 .now-role {
   font-family: 'Space Mono', monospace;
   font-size: 12px;
@@ -468,6 +468,11 @@ body {
   font-size: 10px;
   color: var(--accent);
   letter-spacing: 0.04em;
+}
+.now-role::after {
+  content: '·';
+  margin-left: 8px;
+  color: var(--border);
 }
 .now-date {
   font-family: 'Space Mono', monospace;
@@ -482,8 +487,8 @@ body {
 .end-frame {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  align-items: flex-start;
+  text-align: left;
   padding: 24px 0 8px;
   gap: 16px;
 }
@@ -506,7 +511,7 @@ body {
   font-family: 'Space Mono', monospace;
   font-size: 10px;
   letter-spacing: 0.1em;
-  color: var(--text-muted);
+  color: rgba(195, 185, 176, 0.45);
   text-decoration: none;
   text-transform: lowercase;
   transition: color 0.2s;
@@ -516,8 +521,17 @@ body {
   font-family: 'Space Mono', monospace;
   font-size: 9px;
   letter-spacing: 0.15em;
-  color: var(--text-dim);
+  color: var(--text-muted);
   margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.end-visits {
+  color: rgba(195, 185, 176, 0.55);
+  font-size: 9px;
+  letter-spacing: 0.1em;
 }
 
 /* ── EXPERIENCE TIMELINE ── */

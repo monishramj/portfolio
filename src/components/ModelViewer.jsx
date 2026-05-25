@@ -48,16 +48,20 @@ const DesktopControls = ({ target, min, max, zoomEnabled }) => {
 // design but without the hooks-in-useMemo React 19 violation.
 // When ModelInner suspends, the entire subtree (including groups) mounts atomically once
 // the model is ready, so refs are always fresh and there are no stale transform issues.
+const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standby', 'screennoise'];
+
 const ModelInner = ({
   url, pivot, initYaw, initPitch, defaultZoom, minZoom, maxZoom,
   enableMouseParallax, enableManualRotation, enableHoverRotation, enableManualZoom,
   autoFrame, fadeIn, autoRotate, autoRotateSpeed, onLoaded, placeholderSrc,
-  modelXOffset, modelYOffset,
+  modelXOffset, modelYOffset, screenTextureSrc,
 }) => {
   const { scene } = useGLTF(url);
   const content = useMemo(() => scene.clone(), [scene]);
 
   const root = useRef(null);
+  const screenMeshRef = useRef(null);
+  const screenAspectRef = useRef(1);
   const { camera, gl } = useThree();
 
   const vel  = useRef({ x: 0, y: 0 });
@@ -100,6 +104,41 @@ const ModelInner = ({
       if (o.isMesh) {
         o.castShadow    = true;
         o.receiveShadow = true;
+
+        if (screenTextureSrc) {
+          const n = o.name.toLowerCase();
+          if (n.includes('screenempty')) {
+            // Remap UVs from atlas space to 0-1 so the full texture covers the screen
+            const uvAttr = o.geometry.attributes.uv;
+            if (uvAttr) {
+              let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+              for (let i = 0; i < uvAttr.count; i++) {
+                minU = Math.min(minU, uvAttr.getX(i));
+                maxU = Math.max(maxU, uvAttr.getX(i));
+                minV = Math.min(minV, uvAttr.getY(i));
+                maxV = Math.max(maxV, uvAttr.getY(i));
+              }
+              const uRange = maxU - minU || 1;
+              const vRange = maxV - minV || 1;
+              for (let i = 0; i < uvAttr.count; i++) {
+                uvAttr.setXY(i,
+                  (uvAttr.getX(i) - minU) / uRange,
+                  (uvAttr.getY(i) - minV) / vRange,
+                );
+              }
+              uvAttr.needsUpdate = true;
+            }
+            const bb = new THREE.Box3().setFromObject(o);
+            const sz = new THREE.Vector3();
+            bb.getSize(sz);
+            screenAspectRef.current = sz.x / (sz.y || sz.z || 1);
+            screenMeshRef.current = o;
+            o.visible = true;
+          } else if (SCREEN_MESHES.some(s => n.includes(s))) {
+            o.visible = false;
+          }
+        }
+
         if (fadeIn) {
           const mats = Array.isArray(o.material) ? o.material : [o.material];
           mats.forEach(m => { m.transparent = true; m.opacity = 0; });
@@ -130,6 +169,40 @@ const ModelInner = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content]);
+
+  useEffect(() => {
+    if (!screenTextureSrc || !screenMeshRef.current) return;
+    const mesh = screenMeshRef.current;
+    let cancelled = false;
+    const img = new Image();
+    img.onload = () => {
+      if (cancelled) return;
+      const aspect = screenAspectRef.current || 1;
+      const W = 512;
+      const H = Math.round(W / aspect);
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      const scale = Math.max(W / img.width, H / img.height);
+      const w = img.width * scale;
+      const h = img.height * scale;
+      ctx.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.flipY = true;
+      const m = mesh.material.clone();
+      m.map = tex;
+      m.emissiveMap = tex;
+      m.emissive = new THREE.Color(0.15, 0.15, 0.15);
+      m.emissiveIntensity = 1;
+      m.needsUpdate = true;
+      mesh.material = m;
+      invalidate();
+    };
+    img.src = screenTextureSrc;
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screenTextureSrc, content]);
 
   useEffect(() => {
     if (!enableManualRotation || isTouch) return;
@@ -319,6 +392,7 @@ const ModelViewer = ({
   autoRotate = false,
   autoRotateSpeed = 0.35,
   onModelLoaded,
+  screenTextureSrc,
 }) => {
   useEffect(() => void useGLTF.preload(url), [url]);
   const pivot = useRef(new THREE.Vector3()).current;
@@ -401,6 +475,7 @@ const ModelViewer = ({
             placeholderSrc={placeholderSrc}
             modelXOffset={modelXOffset}
             modelYOffset={modelYOffset}
+            screenTextureSrc={screenTextureSrc}
           />
         </Suspense>
         {!isTouch && (
