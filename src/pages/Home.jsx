@@ -89,17 +89,6 @@ const SKILLS = [
       </svg>
     ),
   },
-  {
-    name: 'Supabase',
-    desc: 'postgres databases, auth, storage + pgvector embeddings for AI apps',
-    icon: (
-      <svg viewBox="0 0 109 113" fill="currentColor" aria-hidden="true">
-        <path d="M63.708 110.284c-2.86 3.601-8.658 1.628-8.727-2.97l-1.007-67.251h45.22c8.19 0 12.758 9.46 7.665 15.874L63.708 110.284z"/>
-        <path d="M63.708 110.284c-2.86 3.601-8.658 1.628-8.727-2.97l-1.007-67.251h45.22c8.19 0 12.758 9.46 7.665 15.874L63.708 110.284z" opacity=".2"/>
-        <path d="M45.317 2.071c2.86-3.601 8.657-1.628 8.726 2.97l.442 67.251H9.265c-8.19 0-12.758-9.46-7.664-15.875L45.317 2.071z"/>
-      </svg>
-    ),
-  },
 ];
 
 const FEATURED = PROJECTS.filter(p => p.featured);
