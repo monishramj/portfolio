@@ -110,7 +110,7 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('https://abacus.jasoncameron.dev/hit/monishramj.dev/visits')
+    fetch('https://abacus.jasoncameron.dev/hit/monishramj.dev/pageviews')
       .then(r => r.json())
       .then(d => setVisits(d.value))
       .catch(() => {});
