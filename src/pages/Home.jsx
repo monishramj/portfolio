@@ -29,9 +29,8 @@ const MailIcon = ({ size = 16 }) => (
 );
 
 const CURRENTLY = [
-  { role: 'Undergrad Research Assistant', org: 'Aphasia Recovery Lab', href: 'https://www.purdue.edu/hhs/slhs/aphasia/', date: 'Jan 2026 – Present' },
-  { role: 'Software Team Engineer', org: 'Purdue Lunabotics', date: 'Aug 2025 – Present' },
-  { role: 'Software Developer', org: 'UPlate', href: 'https://u-plate.com/', date: 'Feb 2026 – Present' },
+  { role: 'Undergrad Research Assistant', org: 'Aphasia Recovery Lab', href: 'https://www.purdue.edu/hhs/slhs/aphasia/', date: 'Jan 2026 – Present', desc: 'benchmarking LLM output on clinical speech data to model language recovery in aphasia patients.' },
+  { role: 'Software Developer', org: 'UPlate', href: 'https://u-plate.com/', date: 'Feb 2026 – Present', desc: 'developing frontend architecture and ML-assisted food logging features.' },
 ];
 
 const SKILLS = [
@@ -163,7 +162,7 @@ export default function Home() {
         <div className="about-layout">
           <div className="about-body">
             <p>CS major and JHMC Honors student at Purdue. My main interests lie in ML research + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p>
-            <p>into movies, sketching, and have an origami collection (Star Wars, animals, whatever looks cool).</p>
+            <p>into movies, sketching, and I have an origami collection.</p>
           </div>
           <div className="about-right">
             <div className="about-meta">
@@ -173,7 +172,7 @@ export default function Home() {
               </div>
               <div className="mi">
                 <div className="mi-label">Degree</div>
-                <span className="mi-val">B.S. Computer Science Honors</span>
+                <span className="mi-val">B.S. Computer Science Honors on 3+1 BS/MS track</span>
                 <span className="mi-val"><b>tracks: </b>Machine Intelligence, Systems, Software</span>
               </div>
             </div>
@@ -206,7 +205,7 @@ export default function Home() {
       <Frame num="04">
         <div className="end-frame">
           <div className="eyebrow">fin</div>
-          <p className="end-thanks">i'm always open to meeting new people and communicating. feel free to reach out!</p>
+          <p className="end-thanks">thanks for reading - always open to meeting new people. feel free to reach out!</p>
           <div className="end-links">
             <a href="https://github.com/monishramj" target="_blank" rel="noopener" className="end-link"><GhIcon size={14} /> github</a>
             <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener" className="end-link"><LiIcon size={14} /> linkedin</a>

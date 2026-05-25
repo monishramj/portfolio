@@ -34,21 +34,16 @@ export default function ProjectCard({ title, desc, tech = [], img, github, devpo
           </div>
         )}
       </div>
-      {variant === 'featured' && github && (
-        <a href={github} target="_blank" rel="noopener" className="proj-gh-btn" title="View on GitHub">
-          <GhSvg />
+      {variant === 'featured' && [
+        github  && { href: github,  icon: <GhSvg />,   title: 'View on GitHub'  },
+        devpost && { href: devpost, icon: <DpSvg />,   title: 'View on Devpost' },
+        store   && { href: store,   icon: <LinkSvg />, title: 'External link'   },
+      ].filter(Boolean).map((link, i) => (
+        <a key={i} href={link.href} target="_blank" rel="noopener"
+           className={`proj-arc-btn proj-arc-btn--${i + 1}`} title={link.title}>
+          {link.icon}
         </a>
-      )}
-      {variant === 'featured' && devpost && (
-        <a href={devpost} target="_blank" rel="noopener" className="proj-dp-btn" title="View on Devpost">
-          <DpSvg />
-        </a>
-      )}
-      {variant === 'featured' && store && (
-        <a href={store} target="_blank" rel="noopener" className="proj-store-btn" title="External link">
-          <LinkSvg />
-        </a>
-      )}
+      ))}
     </div>
   );
 

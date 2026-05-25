@@ -12,14 +12,17 @@ export default function Stack({ items }) {
       {items.map((item, i) => (
         <div className="now-row" key={i}>
           <div className="now-left">
-            <span className="now-role">{item.role}</span>
-            {item.href ? (
-              <a href={item.href} target="_blank" rel="noopener" className="now-org">
-                {item.org}<ExternalIcon />
-              </a>
-            ) : (
-              <span className="now-org">{item.org}</span>
-            )}
+            <div className="now-left-top">
+              <span className="now-role">{item.role}</span>
+              {item.href ? (
+                <a href={item.href} target="_blank" rel="noopener" className="now-org">
+                  {item.org}<ExternalIcon />
+                </a>
+              ) : (
+                <span className="now-org">{item.org}</span>
+              )}
+            </div>
+            {item.desc && <span className="now-desc">{item.desc}</span>}
           </div>
           <span className="now-date">{item.date}</span>
         </div>

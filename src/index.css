@@ -329,10 +329,8 @@ body {
 .proj-card:hover .proj-overlay {
   opacity: 1;
 }
-.proj-gh-btn {
+.proj-arc-btn {
   position: absolute;
-  top: 10px;
-  right: 10px;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -346,31 +344,14 @@ body {
   z-index: 2;
   transition: color 0.15s, border-color 0.15s;
 }
-.proj-gh-btn:hover {
+.proj-arc-btn:hover {
   color: var(--accent);
   border-color: var(--accent);
 }
-.proj-dp-btn {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  text-decoration: none;
-  z-index: 2;
-  transition: color 0.15s, border-color 0.15s;
-}
-.proj-dp-btn:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-}
+/* Right-arc positions — circle r=90, center (90,90), container 180×180 */
+/* θ=45°: */ .proj-arc-btn--1 { left: 138px; top: 10px; }
+/* θ=20°: */ .proj-arc-btn--2 { left: 159px; top: 43px; }
+/* θ=-5°: */ .proj-arc-btn--3 { left: 164px; top: 82px; }
 .proj-title-row {
   display: flex;
   align-items: center;
@@ -506,13 +487,14 @@ body {
 .now-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 12px 0;
   border-bottom: 1px solid var(--border);
   gap: 16px;
 }
 .now-row:first-child { border-top: 1px solid var(--border); }
-.now-left { display: flex; flex-direction: row; align-items: baseline; gap: 8px; }
+.now-left { display: flex; flex-direction: column; gap: 4px; }
+.now-left-top { display: flex; flex-direction: row; align-items: baseline; gap: 8px; }
 .now-role {
   font-family: 'Space Mono', monospace;
   font-size: 12px;
@@ -529,6 +511,13 @@ body {
   content: '·';
   margin-left: 8px;
   color: var(--border);
+}
+.now-desc {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: rgba(195, 185, 176, 0.55);
+  letter-spacing: 0.02em;
+  line-height: 1.5;
 }
 .now-date {
   font-family: 'Space Mono', monospace;
@@ -786,7 +775,7 @@ body {
   width: 114px;
   height: 114px;
 }
-.proj-card--row .proj-gh-btn {
+.proj-card--row .proj-arc-btn {
   width: 26px;
   height: 26px;
   top: 2px;
@@ -829,12 +818,11 @@ body {
     background: rgba(4, 4, 4, 0.6);
   }
 
-  .proj-gh-btn {
-    width: 28px;
-    height: 28px;
-    top: 6px;
-    right: 6px;
-  }
+  /* Right-arc positions — circle r=60, center (60,60), container 120×120 */
+  .proj-arc-btn { width: 28px; height: 28px; }
+  /* θ=45°: */ .proj-arc-btn--1 { left: 88px; top: 4px; }
+  /* θ=15°: */ .proj-arc-btn--2 { left: 104px; top: 30px; }
+  /* θ=-15°: */ .proj-arc-btn--3 { left: 104px; top: 62px; }
 
   /* always show desc, chips */
   .proj-desc {

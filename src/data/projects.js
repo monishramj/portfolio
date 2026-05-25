@@ -18,11 +18,12 @@ export const PROJECTS = [
     featured: true,
   },
   {
-    title: 'Drone Survey Mission',
-    desc: 'Computer vision algorithm to identify ground targets + GPS survey pipeline.',
-    tech: ['Python', 'OpenCV', 'DroneKit', 'RPi 5'],
-    img: `${base}images/drone.jpeg`,
-    github: 'https://github.com/monishramj/uas4stem-survey-mission',
+    title: 'Passenger Princess',
+    desc: 'Wearable hardware co-pilot using real-time IMU sensor fusion to coach drivers with hands-free audio feedback. Built at StarkHacks 2026.',
+    tech: ['C++', 'ESP32-S3', 'WebSockets', 'ElevenLabs'],
+    img: `${base}images/starkhacks2.jpg`,
+    github: 'https://github.com/ethannsie/Amoeba-StarkHacks',
+    devpost: 'https://devpost.com/software/passenger-princess',
     featured: true,
   },
   {
@@ -34,6 +35,13 @@ export const PROJECTS = [
     store: 'https://play.google.com/store/apps/details?id=com.mrj.diab_fit&referrer=utm_source%3Dappbrain%26utm_medium%3Dappbrain_web%26utm_campaign%3Dappbrain_web',
   },
   {
+    title: 'Drone Survey Mission',
+    desc: 'Computer vision algorithm to identify ground targets + GPS survey pipeline.',
+    tech: ['Python', 'OpenCV', 'DroneKit', 'RPi 5'],
+    img: `${base}images/drone.jpeg`,
+    github: 'https://github.com/monishramj/uas4stem-survey-mission',
+  },
+  {
     title: 'ESP32 DOOM',
     desc: 'DOOM rendered on a 128 x 64 OLED display running on an ESP32-S3 microcontroller.',
     tech: ['C', 'ESP32-S3', 'ESP-IDF'],
@@ -41,11 +49,10 @@ export const PROJECTS = [
     github: 'https://github.com/monishramj/esp32-doom',
   },
   {
-    title: 'Passenger Princess',
-    desc: 'Wearable hardware co-pilot using real-time IMU sensor fusion to coach drivers with hands-free audio feedback. Built at StarkHacks 2026.',
-    tech: ['C++', 'ESP32-S3', 'WebSockets', 'ElevenLabs'],
-    img: `${base}images/starkhacks2.jpg`,
-    github: 'https://github.com/ethannsie/Amoeba-StarkHacks',
-    devpost: 'https://devpost.com/software/passenger-princess',
+    title: 'Doffy',
+    desc: 'WIP: AI platform for user made custom coaches with unique personalities and training models with Long-term vector memory database and coach marketplace. for the 2026 RevenueCat Shipyard: Creator Contest.',
+    tech: ['React Native', 'Expo', 'Supabase', 'Gemini API', 'TypeScript'],
+    img: `${base}images/doffy_logo.png`,
+    github: 'https://github.com/monishramj/doffy',
   },
 ];
