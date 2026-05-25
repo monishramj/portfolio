@@ -350,7 +350,7 @@ const ModelViewer = ({
   };
 
   return (
-    <div style={{ width, height, touchAction: 'pan-y pinch-zoom', position: 'relative' }}>
+    <div style={{ width, height, touchAction: 'pan-y pinch-zoom', position: 'relative', cursor: 'grab' }}>
       {showScreenshotButton && (
         <button
           onClick={capture}

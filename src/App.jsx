@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import FilmStrip from './components/layout/FilmStrip';
 import Frame from './components/layout/Frame';
 import InterFrame from './components/layout/InterFrame';
@@ -27,17 +28,52 @@ const MailIcon = ({ size = 16 }) => (
 const PROJECTS = [
   {
     title: 'MedVR Haptic Glove',
-    desc: 'Wearable glove that simulates touch using Arduino + Unity + C#. Includes real-time finger tracking with ±2° accuracy via potentiometers and servo-based touch feedback, integrated with a custom Unity simulation paired with Oculus Quest VR. (AI slop for now)',
-    tech: ['Arduino', 'Unity', 'C#', 'C++'],
+    desc: 'Wearable glove that simulates touch feedback. Real-time finger tracking + custom Unity simulation with an Oculus Quest.',
+    tech: ['Arduino', 'Unity', 'C#'],
     img: '/images/vrglove.jpg',
     github: 'https://github.com/monishramj/medvr-haptic-glove',
   },
   {
-    title: 'Monkish: Chess Engine',
-    desc: 'Chess engine with a neural network evaluator: a 6-layer CNN trained on 10M Stockfish-annotated positions, blended 70/30 with material score. Search is alpha-beta minimax at depth 3. (AI slop for now)',
+    title: 'Monkish ♔',
+    desc: 'Chess engine with a neural network evaluator: 6-layer CNN trained on 10M Stockfish-eval positions.',
     tech: ['Python', 'PyTorch', 'matplotlib'],
     img: '/images/chess_eval.png',
     github: 'https://github.com/monishramj/chess-engine',
+  },
+  {
+    title: 'Drone Survey Mission',
+    desc: 'Computer vision algorithm to identify ground targets + GPS survey pipeline',
+    tech: ['Python', 'OpenCV', 'DroneKit', 'RPi 5'],
+    img: '/images/drone.jpeg',
+    github: 'https://github.com/monishramj/uas4stem-survey-mission',
+  },
+];
+
+const EXPERIENCE = [
+  {
+    role: 'Undergraduate Research Assistant',
+    org: 'Aphasia Recovery Lab — Dr. Jiyeon Lee',
+    location: 'West Lafayette, IN',
+    date: 'Jan 2026 – Present',
+    tech: ['Python', 'PyTorch', 'Scikit-learn'],
+    bullets: [
+      'working under Prof. Jiyeon Lee + Dr. Yan Cong to build ML pipelines that analyze speech patterns and support aphasia treatment',
+      'engineered automated diagnostic pipeline to distinguish aphasia from control speech — 72% accuracy via gradient boosting',
+      'extracted high-dimensional linguistic features from 1,600+ speech records using LLM surprisal analysis',
+      'optimized models with nested K-fold cross-validation and grid search across 4+ classifiers on large-scale clinical datasets',
+    ],
+  },
+  {
+    role: 'Software Team Engineer',
+    org: 'Purdue Lunabotics',
+    location: 'West Lafayette, IN',
+    date: 'Aug 2025 – Present',
+    tech: ['Python', 'Grounded SAM', 'ROS 2', 'Linux/UNIX'],
+    bullets: [
+      'Develop obstacle detection models using Grounded SAM to identify lunar hazards',
+      'Train ML vision models on UNIX-based RCAC HPC systems',
+      'Collaborate across subteams to deploy competition-ready software under strict reliability constraints',
+    ],
   },
 ];
 
@@ -54,7 +90,7 @@ const SKILLS = [
   },
   {
     name: 'C',
-    desc: 'systems (ESP32 microcontroller work)',
+    desc: 'ESP32 microcontroller work',
     icon: (
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
         <path d="M16 5.5A7 7 0 1 0 16 14.5"/>
@@ -62,18 +98,21 @@ const SKILLS = [
     ),
   },
   {
-    name: 'C++',
-    desc: 'embedded systems, VR simulations, Arduino',
+    name: 'Arduino',
+    desc: 'embedded systems, sensors, servo control, serial comms',
     icon: (
-      <svg viewBox="0 0 28 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true">
-        <path d="M15 4A8 8 0 1 0 15 16"/>
-        <path d="M19 8h4M21 6v4M24 8h4M26 6v4" strokeWidth="1.4"/>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="7.5" cy="12" r="5.5"/>
+        <circle cx="16.5" cy="12" r="5.5"/>
+        <line x1="5" y1="12" x2="10" y2="12"/>
+        <line x1="7.5" y1="9.5" x2="7.5" y2="14.5"/>
+        <line x1="14" y1="12" x2="19" y2="12"/>
       </svg>
     ),
   },
   {
     name: 'React',
-    desc: 'web apps, design prototypes',
+    desc: 'web + mobile apps (React Native)',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true">
         <circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/>
@@ -94,19 +133,22 @@ const SKILLS = [
     ),
   },
   {
-    name: 'SQL',
-    desc: 'app databases (Supabase) + vector embeddings',
+    name: 'Supabase',
+    desc: 'postgres databases, auth, storage + pgvector embeddings for AI apps',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <ellipse cx="12" cy="5" rx="8" ry="3"/>
-        <path d="M4 5v14c0 1.657 3.582 3 8 3s8-1.343 8-3V5"/>
-        <path d="M4 12c0 1.657 3.582 3 8 3s8-1.343 8-3"/>
+      <svg viewBox="0 0 109 113" fill="currentColor" aria-hidden="true">
+        <path d="M63.708 110.284c-2.86 3.601-8.658 1.628-8.727-2.97l-1.007-67.251h45.22c8.19 0 12.758 9.46 7.665 15.874L63.708 110.284z"/>
+        <path d="M63.708 110.284c-2.86 3.601-8.658 1.628-8.727-2.97l-1.007-67.251h45.22c8.19 0 12.758 9.46 7.665 15.874L63.708 110.284z" opacity=".2"/>
+        <path d="M45.317 2.071c2.86-3.601 8.657-1.628 8.726 2.97l.442 67.251H9.265c-8.19 0-12.758-9.46-7.664-15.875L45.317 2.071z"/>
       </svg>
     ),
   },
 ];
 
 export default function App() {
+  const [activeSkill, setActiveSkill] = useState(SKILLS[0].name);
+  const selected = SKILLS.find(s => s.name === activeSkill);
+
   return (
     <FilmStrip>
       <Frame num="01">
@@ -115,7 +157,7 @@ export default function App() {
             <h1>Monish Ramesh<br></br>Jayakumar</h1>
             <p>CS Honors @ Purdue</p>
             <p>ML, SWE Tracks</p>
-            <Button href="/resume.pdf" variant="outline" size="sm" icon={<DocIcon size={12} />} style={{ marginTop: '28px', marginBottom: '10px', pointerEvents: 'all' }}>
+            <Button href="/resume.pdf" variant="outline" size="sm" icon={<DocIcon size={12} />} style={{ marginTop: '20px', marginBottom: '10px', pointerEvents: 'all' }}>
               Resume
             </Button>
             <div className="hero-social">
@@ -132,7 +174,7 @@ export default function App() {
             modelYOffset={0}
             defaultRotationX={190}
             defaultRotationY={20}
-            defaultZoom={1.2}
+            defaultZoom={1.1}
             showScreenshotButton={false}
             environmentPreset="dawn"
             enableManualZoom={false}
@@ -143,7 +185,7 @@ export default function App() {
         </div>
       </Frame>
 
-      <InterFrame left="FILM STRIP" center="02" right="MONISH RJ" />
+      <InterFrame left="FILM STRIP" center="02" right="WELCOME!" />
 
       <Frame num="02">
         <div className="eyebrow">featured projects</div>
@@ -153,28 +195,12 @@ export default function App() {
       </Frame>
 
       <InterFrame left="FILM STRIP" center="03" right="MONISH RJ" />
-
       <Frame num="03">
-        <div className="eyebrow">Skills</div>
-        <div className="sk-grid">
-          {SKILLS.map(s => (
-            <div key={s.name} className="sk-item">
-              <span className="sk-icon">{s.icon}</span>
-              <div>
-                <div className="sk-name">{s.name}</div>
-                <div className="sk-desc">{s.desc}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Frame>
-      <InterFrame left="FILM STRIP" center="04" right="MONISH RJ" />
-      <Frame num="04">
         <div className="eyebrow">about me</div>
         <div className="about-layout">
           <div className="about-body">
-            <p>currently diving into ML & Systems. fullstack dev is a side passion.</p>
-            <p>i love movies, sketching characters, and being with family. currently growing an origami collection Star Wars ships, animals, whatever looks interesting.</p>
+            <p>currently loving it at Purdue University as a CS major and JHMC Honors student. currently, i'm in Purdue Lunabotics. beyond robotics, i've worked with VR systems and ML through mobile apps, simulation/game dev, and embedded systems programming.</p>
+            <p>i love movies, love to get creative drawing characters in my sketchbook, being with my family. i also have an origami collection of miscellaneous sorts: Star Wars, animals, random cool shapes.</p>
           </div>
           <div className="about-right">
             <div className="about-meta">
@@ -192,9 +218,62 @@ export default function App() {
           </div>
         </div>
 
+        <div className="eyebrow" style={{ marginTop: '36px' }}>currently</div>
+        <div className="now-list">
+          <div className="now-row">
+            <div className="now-left">
+              <span className="now-role">Undergrad Research Assistant</span>
+              <span className="now-org">Aphasia Recovery Lab</span>
+            </div>
+            <span className="now-date">Jan 2026 – Present</span>
+          </div>
+          <div className="now-row">
+            <div className="now-left">
+              <span className="now-role">Software Team Engineer</span>
+              <span className="now-org">Purdue Lunabotics</span>
+            </div>
+            <span className="now-date">Aug 2025 – Present</span>
+          </div>
+          <div className="now-row">
+            <div className="now-left">
+              <span className="now-role">Software Developer</span>
+              <span className="now-org">UPlate</span>
+            </div>
+            <span className="now-date">Feb 2026 – Present</span>
+          </div>
+        </div>
+
+        <div className="eyebrow" style={{ marginTop: '36px' }}>Skills</div>
+        <p className="sk-blurb">i've worked with many technologies. here's some i know.</p>
+        <div className="sk-display">
+          <div className="sk-display-name">{selected.name}</div>
+          <div className="sk-display-desc">{selected.desc}</div>
+        </div>
+        <div className="sk-icon-row">
+          {SKILLS.map(s => (
+            <button
+              key={s.name}
+              className={`sk-icon-btn${s.name === activeSkill ? ' active' : ''}`}
+              onClick={() => setActiveSkill(s.name)}
+              title={s.name}
+            >
+              {s.icon}
+            </button>
+          ))}
+        </div>
       </Frame>
-      <InterFrame left="FILM STRIP" center="05" right="MONISH RJ" />
-      <Frame num="05" scratch="65%">
+      <InterFrame left="FILM STRIP" center="04" right="THE END" />
+      <Frame num="04">
+        <div className="end-frame">
+          <div className="eyebrow">fin.</div>
+          <p className="end-thanks">i'm always open to meeting new people and communicating. feel free to reach out!</p>
+          <div className="end-links">
+            <a href="https://github.com/monishramj" target="_blank" rel="noopener" className="end-link"><GhIcon size={14} /> github</a>
+            <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener" className="end-link"><LiIcon size={14} /> linkedin</a>
+            <a href="mailto:mrameshj@purdue.edu" className="end-link"><MailIcon size={14} /> email</a>
+          </div>
+          <div className="end-sig">— monish rj, {new Date().getFullYear()}</div>
+        </div>
       </Frame>
     </FilmStrip>
   );
