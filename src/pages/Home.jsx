@@ -144,7 +144,7 @@ export default function Home() {
             defaultRotationY={20}
             defaultZoom={1.05}
             showScreenshotButton={false}
-            screenTextureSrc="/images/monish.jpeg"
+            screenTextureSrc={`${import.meta.env.BASE_URL}images/monish.jpeg`}
             environmentPreset="dawn"
             enableManualZoom={false}
             enableMouseParallax={true}
