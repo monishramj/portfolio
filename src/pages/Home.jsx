@@ -135,7 +135,7 @@ export default function Home() {
             </div>
           </div>
           <ModelViewer
-            url="/grandmas_tv.glb"
+            url={`${import.meta.env.BASE_URL}grandmas_tv.glb`}
             width="55%"
             height={400}
             modelXOffset={0}
