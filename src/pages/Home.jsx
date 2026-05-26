@@ -113,10 +113,10 @@ export default function Home() {
             <h1>Monish Ramesh<br></br>Jayakumar</h1>
             <p>CS Honors @ Purdue</p>
             <p>ML, SWE Tracks</p>
-            <Button href="/resume.pdf" variant="outline" size="sm" icon={<DocIcon size={12} />} style={{ marginTop: '20px', marginBottom: '10px', pointerEvents: 'all' }}>
+            {/* <Button href="/resume.pdf" variant="outline" size="sm" icon={<DocIcon size={12} />} style={{ marginTop: '20px', marginBottom: '10px', pointerEvents: 'all' }}>
               Resume
-            </Button>
-            <div className="hero-social">
+            </Button> */}
+            <div className="hero-social" style={{ marginTop: '20px' }}>
               <a href="https://github.com/monishramj" target="_blank" rel="noopener" className="hero-social-link" title="GitHub"><GhIcon size={15} /></a>
               <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener" className="hero-social-link" title="LinkedIn"><LiIcon size={15} /></a>
               <a href="mailto:mrameshj@purdue.edu" className="hero-social-link" title="Email"><MailIcon size={15} /></a>
