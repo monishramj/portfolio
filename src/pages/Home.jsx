@@ -161,7 +161,7 @@ export default function Home() {
         <div className="eyebrow">about me</div>
         <div className="about-layout">
           <div className="about-body">
-            <p>CS major and JHMC Honors student at Purdue. My main interests lie in ML research + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p>
+            <p>CS major and JMHC Honors student at Purdue. My main interests lie in ML research + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p>
             <p>into movies, sketching, and I have an origami collection.</p>
           </div>
           <div className="about-right">
