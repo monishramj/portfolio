@@ -30,7 +30,7 @@ export const PROJECTS = [
     title: 'DiabFit',
     desc: 'An insulin management app for diabetics and others, with medical insights and insulin dose calculation. available on Android.',
     tech: ['Flutter', 'Dart', 'Rest-API'],
-    img: `${base}images/diabfit.jpg`,
+    img: `${base}images/diabfit.png`,
     github: 'https://github.com/monishramj/DiabFit',
     store: 'https://play.google.com/store/apps/details?id=com.mrj.diab_fit&referrer=utm_source%3Dappbrain%26utm_medium%3Dappbrain_web%26utm_campaign%3Dappbrain_web',
   },
@@ -50,7 +50,7 @@ export const PROJECTS = [
   },
   {
     title: 'Doffy',
-    desc: 'WIP: AI platform for user made custom coaches with unique personalities and training models with Long-term vector memory database and coach marketplace. for the 2026 RevenueCat Shipyard: Creator Contest.',
+    desc: 'AI platform for user made custom coaches with unique personalities and training models with Long-term vector memory database and coach marketplace. for the 2026 RevenueCat Shipyard: Creator Contest.',
     tech: ['React Native', 'Expo', 'Supabase', 'Gemini API', 'TypeScript'],
     img: `${base}images/doffy_logo.png`,
     github: 'https://github.com/monishramj/doffy',

@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FilmStrip from '../components/layout/FilmStrip';
 import Frame from '../components/layout/Frame';
 import InterFrame from '../components/layout/InterFrame';
 import ModelViewer from '../components/ModelViewer';
-import Button, { DocIcon } from '../components/Button';
+import Button from '../components/Button';
 import ProjectCard from '../components/ProjectCard';
 import Stack from '../components/Stack';
 import { PROJECTS } from '../data/projects';
@@ -92,10 +92,14 @@ const SKILLS = [
 
 const FEATURED = PROJECTS.filter(p => p.featured);
 
+const NAV_SECTIONS = ['projects', 'about', 'currently', 'skills'];
+
 export default function Home() {
   const [activeSkill, setActiveSkill] = useState(SKILLS[0].name);
   const [visits, setVisits] = useState(null);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 900px)').matches);
   const navigate = useNavigate();
+  const splitMainRef = useRef(null);
 
   useEffect(() => {
     fetch('https://abacus.jasoncameron.dev/hit/monishramj.dev/pageviews')
@@ -103,120 +107,212 @@ export default function Home() {
       .then(d => setVisits(d.value))
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 900px)');
+    const onChange = e => setIsMobile(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
   const selected = SKILLS.find(s => s.name === activeSkill);
 
+  const scrollToSection = id => {
+    const container = splitMainRef.current;
+    const el = document.getElementById(id);
+    if (!container || !el) return;
+    const top =
+      el.getBoundingClientRect().top -
+      container.getBoundingClientRect().top +
+      container.scrollTop -
+      24;
+    container.scrollTo({ top, behavior: 'smooth' });
+  };
+
+  const socials = (
+    <div className="hero-social">
+      <a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer" className="hero-social-link" title="GitHub"><GhIcon size={17} /></a>
+      <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener noreferrer" className="hero-social-link" title="LinkedIn"><LiIcon size={17} /></a>
+      <a href="mailto:mrameshj@purdue.edu" className="hero-social-link" title="Email"><MailIcon size={17} /></a>
+    </div>
+  );
+
+  const sections = (
+    <>
+      <Frame id="projects">
+          <div className="proj-section-head">
+            <div className="eyebrow" style={{ marginBottom: 0 }}>featured</div>
+            <Button size="sm" onClick={() => navigate('/projects')}>
+              see all projects
+            </Button>
+          </div>
+          <div className="proj-list">
+            {FEATURED.map(p => <ProjectCard key={p.title} {...p} />)}
+          </div>
+        </Frame>
+
+        <InterFrame />
+        <Frame id="about">
+          <div className="eyebrow">about me</div>
+          <div className="about-layout">
+            <div className="about-body">
+              <p>CS major and JHMC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p>
+              <p>love movies, sketching, and I have an origami collection.</p>
+            </div>
+            <div className="about-right">
+              <div className="about-meta">
+                <div className="mi">
+                  <div className="mi-label">Based in</div>
+                  <span className="mi-val">IL, 🇺🇸</span>
+                </div>
+                <div className="mi">
+                  <div className="mi-label">Degree</div>
+                  <span className="mi-val">B.S. Computer Science Honors: 3+1 BS/MS Track</span>
+                  <span className="mi-val"><b>tracks: </b>Machine Intelligence, Systems</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Frame>
+
+        <InterFrame />
+        <Frame id="currently">
+          <div className="eyebrow">currently</div>
+          <Stack items={CURRENTLY} />
+        </Frame>
+
+        <InterFrame />
+        <Frame id="skills">
+          <div className="eyebrow">Skills</div>
+          <p className="sk-blurb">i've worked with various technologies. here's some i know.</p>
+          <div className="sk-display">
+            <div className="sk-display-name">{selected.name}</div>
+            <div className="sk-display-desc">{selected.desc}</div>
+          </div>
+          <div className="sk-icon-row">
+            {SKILLS.map(s => (
+              <button
+                key={s.name}
+                className={`sk-icon-btn${s.name === activeSkill ? ' active' : ''}`}
+                onClick={() => setActiveSkill(s.name)}
+                title={s.name}
+              >
+                {s.icon}
+              </button>
+            ))}
+          </div>
+        </Frame>
+
+        <InterFrame />
+        <Frame id="contact">
+          <div className="end-frame">
+            <div className="eyebrow">fin</div>
+            <p className="end-thanks">thanks for reading - always open to meeting new people. feel free to reach out!</p>
+            <div className="end-links">
+              <a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer" className="end-link"><GhIcon size={14} /> github</a>
+              <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener noreferrer" className="end-link"><LiIcon size={14} /> linkedin</a>
+              <a href="mailto:mrameshj@purdue.edu" className="end-link"><MailIcon size={14} /> email</a>
+            </div>
+            <div className="end-sig">
+              — monish r.j, {new Date().getFullYear()}
+              {visits !== null && <><span className="end-dot">·</span><span className="end-visits">{visits.toLocaleString()} visits</span></>}
+            </div>
+          </div>
+        </Frame>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <FilmStrip>
+        <Frame id="hero">
+          <div className="frame-model-wrapper">
+            <div className="frame-name-bg">
+              <h1>Monish Ramesh<br></br>Jayakumar</h1>
+              <p>CS Honors @ Purdue</p>
+              <p>ML, SWE Tracks</p>
+              {socials}
+            </div>
+            <ModelViewer
+              url={`${import.meta.env.BASE_URL}grandmas_tv.glb`}
+              width="55%"
+              height={400}
+              modelXOffset={0}
+              modelYOffset={0}
+              defaultRotationX={190}
+              defaultRotationY={20}
+              defaultZoom={1.05}
+              showScreenshotButton={false}
+              screenTextureSrc={`${import.meta.env.BASE_URL}images/monish.jpeg`}
+              environmentPreset="dawn"
+              enableManualZoom={false}
+              enableMouseParallax={true}
+              autoFrame
+              fadeIn
+            />
+          </div>
+        </Frame>
+        <InterFrame />
+        {sections}
+      </FilmStrip>
+    );
+  }
+
   return (
-    <FilmStrip>
-      <Frame num="01">
-        <div className="frame-model-wrapper">
-          <div className="frame-name-bg">
+    <div className="split">
+      <aside className="split-side">
+        <div className="split-hero">
+          <div className="split-name">
             <h1>Monish Ramesh<br></br>Jayakumar</h1>
-            <p>CS Honors @ Purdue</p>
-            <p>ML, SWE Tracks</p>
-            {/* <Button href="/resume.pdf" variant="outline" size="sm" icon={<DocIcon size={12} />} style={{ marginTop: '20px', marginBottom: '10px', pointerEvents: 'all' }}>
-              Resume
-            </Button> */}
-            <div className="hero-social" style={{ marginTop: '20px' }}>
-              <a href="https://github.com/monishramj" target="_blank" rel="noopener" className="hero-social-link" title="GitHub"><GhIcon size={15} /></a>
-              <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener" className="hero-social-link" title="LinkedIn"><LiIcon size={15} /></a>
-              <a href="mailto:mrameshj@purdue.edu" className="hero-social-link" title="Email"><MailIcon size={15} /></a>
-            </div>
+            <p className="split-tag">CS Honors @ Purdue</p>
+            <p className="split-tag">ML, SWE Tracks</p>
           </div>
-          <ModelViewer
-            url={`${import.meta.env.BASE_URL}grandmas_tv.glb`}
-            width="55%"
-            height={400}
-            modelXOffset={0}
-            modelYOffset={0}
-            defaultRotationX={190}
-            defaultRotationY={20}
-            defaultZoom={1.05}
-            showScreenshotButton={false}
-            screenTextureSrc={`${import.meta.env.BASE_URL}images/monish.jpeg`}
-            environmentPreset="dawn"
-            enableManualZoom={false}
-            enableMouseParallax={true}
-            autoFrame
-            fadeIn
-          />
-        </div>
-      </Frame>
-
-      <InterFrame left="FILM STRIP" center="02" right="WELCOME!" />
-
-      <Frame num="02">
-        <div className="proj-section-head">
-          <div className="eyebrow" style={{ marginBottom: 0 }}>featured projects</div>
-          <Button variant="outline" size="sm" onClick={() => navigate('/projects')}>
-            see all projects →
-          </Button>
-        </div>
-        <div className="proj-list">
-          {FEATURED.map(p => <ProjectCard key={p.title} {...p} />)}
-        </div>
-      </Frame>
-
-      <InterFrame left="FILM STRIP" center="03" right="MONISH RJ" />
-      <Frame num="03">
-        <div className="eyebrow">about me</div>
-        <div className="about-layout">
-          <div className="about-body">
-            <p>CS major and JHMC Honors student at Purdue. My main interests lie in ML research + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p>
-            <p>into movies, sketching, and I have an origami collection.</p>
-          </div>
-          <div className="about-right">
-            <div className="about-meta">
-              <div className="mi">
-                <div className="mi-label">Based in</div>
-                <span className="mi-val">IL, 🇺🇸</span>
-              </div>
-              <div className="mi">
-                <div className="mi-label">Degree</div>
-                <span className="mi-val">B.S. Computer Science Honors on 3+1 BS/MS track</span>
-                <span className="mi-val"><b>tracks: </b>Machine Intelligence, Systems, Software</span>
-              </div>
-            </div>
+          <div className="split-tv">
+            <ModelViewer
+              url={`${import.meta.env.BASE_URL}grandmas_tv.glb`}
+              width="100%"
+              height={600}
+              modelXOffset={0}
+              modelYOffset={0}
+              defaultRotationX={190}
+              defaultRotationY={20}
+              defaultZoom={1.5}
+              showScreenshotButton={false}
+              screenTextureSrc={`${import.meta.env.BASE_URL}images/monish.jpeg`}
+              environmentPreset="dawn"
+              enableManualZoom={false}
+              enableMouseParallax={true}
+              autoFrame
+              fadeIn
+            />
           </div>
         </div>
-
-        <div className="eyebrow" style={{ marginTop: '36px' }}>currently</div>
-        <Stack items={CURRENTLY} />
-
-        <div className="eyebrow" style={{ marginTop: '36px' }}>Skills</div>
-        <p className="sk-blurb">i've worked with various technologies. here's some i know.</p>
-        <div className="sk-display">
-          <div className="sk-display-name">{selected.name}</div>
-          <div className="sk-display-desc">{selected.desc}</div>
-        </div>
-        <div className="sk-icon-row">
-          {SKILLS.map(s => (
-            <button
-              key={s.name}
-              className={`sk-icon-btn${s.name === activeSkill ? ' active' : ''}`}
-              onClick={() => setActiveSkill(s.name)}
-              title={s.name}
+        <nav className="split-nav">
+          {NAV_SECTIONS.map(id => (
+            <a
+              key={id}
+              href={`#${id}`}
+              onClick={e => {
+                e.preventDefault();
+                if (id === 'projects') {
+                  navigate('/projects');
+                } else {
+                  scrollToSection(id);
+                }
+              }}
             >
-              {s.icon}
-            </button>
+              {id}
+            </a>
           ))}
-        </div>
-      </Frame>
-      <InterFrame left="FILM STRIP" center="04" right="THE END" />
-      <Frame num="04">
-        <div className="end-frame">
-          <div className="eyebrow">fin</div>
-          <p className="end-thanks">thanks for reading - always open to meeting new people. feel free to reach out!</p>
-          <div className="end-links">
-            <a href="https://github.com/monishramj" target="_blank" rel="noopener" className="end-link"><GhIcon size={14} /> github</a>
-            <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener" className="end-link"><LiIcon size={14} /> linkedin</a>
-            <a href="mailto:mrameshj@purdue.edu" className="end-link"><MailIcon size={14} /> email</a>
-          </div>
-          <div className="end-sig">
-            — monish r.j, {new Date().getFullYear()}
-            {visits !== null && <><span className="end-dot">·</span><span className="end-visits">{visits.toLocaleString()} visits</span></>}
-          </div>
-        </div>
-      </Frame>
-    </FilmStrip>
+        </nav>
+        {socials}
+      </aside>
+
+      <div className="split-main" ref={splitMainRef}>
+        <FilmStrip className="film-strip--split">
+          {sections}
+        </FilmStrip>
+      </div>
+    </div>
   );
 }

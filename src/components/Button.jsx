@@ -10,22 +10,28 @@ export default function Button({
   children,
   href,
   icon,
-  variant = 'outline',
+  arrow,
+  variant = 'pill-ghost',
   size = 'md',
   className = '',
   ...props
 }) {
-  const cls = `btn btn--${variant} btn--${size}${className ? ' ' + className : ''}`;
+  const isPill = variant === 'pill-ghost';
+  const arrowDir = arrow ?? (isPill && !icon ? 'right' : null);
+  const cls = `btn btn--${variant} btn--${size}${arrowDir === 'left' ? ' btn--arrow-left' : ''}${className ? ' ' + className : ''}`;
+
   const content = (
     <>
+      {arrowDir === 'left' && <span className="btn-arrow">←</span>}
       {icon && <span className="btn-icon">{icon}</span>}
       {children}
+      {arrowDir === 'right' && <span className="btn-arrow">→</span>}
     </>
   );
 
   if (href) {
     return (
-      <a href={href} className={cls} target="_blank" rel="noopener" {...props}>
+      <a href={href} className={cls} target="_blank" rel="noopener noreferrer" {...props}>
         {content}
       </a>
     );
