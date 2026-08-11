@@ -4,7 +4,8 @@ import FilmStrip from '../components/layout/FilmStrip';
 import Frame from '../components/layout/Frame';
 import InterFrame from '../components/layout/InterFrame';
 import ModelViewer from '../components/ModelViewer';
-import Button from '../components/Button';
+import Button, { DocIcon } from '../components/Button';
+import ResumeModal from '../components/ResumeModal';
 import ProjectCard from '../components/ProjectCard';
 import Stack from '../components/Stack';
 import { PROJECTS } from '../data/projects';
@@ -98,6 +99,7 @@ export default function Home() {
   const [activeSkill, setActiveSkill] = useState(SKILLS[0].name);
   const [visits, setVisits] = useState(null);
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 900px)').matches);
+  const [resumeOpen, setResumeOpen] = useState(false);
   const navigate = useNavigate();
   const splitMainRef = useRef(null);
 
@@ -134,6 +136,7 @@ export default function Home() {
       <a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer" className="hero-social-link" title="GitHub"><GhIcon size={17} /></a>
       <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener noreferrer" className="hero-social-link" title="LinkedIn"><LiIcon size={17} /></a>
       <a href="mailto:mrameshj@purdue.edu" className="hero-social-link" title="Email"><MailIcon size={17} /></a>
+      <button type="button" onClick={() => setResumeOpen(true)} className="hero-social-link" title="Resume"><DocIcon size={17} /></button>
     </div>
   );
 
@@ -224,6 +227,7 @@ export default function Home() {
 
   if (isMobile) {
     return (
+      <>
       <FilmStrip>
         <Frame id="hero">
           <div className="frame-model-wrapper">
@@ -255,10 +259,13 @@ export default function Home() {
         <InterFrame />
         {sections}
       </FilmStrip>
+      <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
+      </>
     );
   }
 
   return (
+    <>
     <div className="split">
       <aside className="split-side">
         <div className="split-hero">
@@ -314,5 +321,7 @@ export default function Home() {
         </FilmStrip>
       </div>
     </div>
+    <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
+    </>
   );
 }

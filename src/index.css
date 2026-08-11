@@ -244,6 +244,11 @@ body {
   display: flex;
   align-items: center;
   transition: color 0.2s;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
 }
 .hero-social-link:hover { color: var(--accent); }
 
@@ -1105,4 +1110,82 @@ body {
   .proj-card--row .proj-title-row    { justify-content: center; }
   .proj-card--row .proj-desc--row    { text-align: center; }
   .proj-card--row .proj-tags--row    { justify-content: center; }
+}
+
+/* ── RESUME MODAL ── */
+.resume-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 4, 4, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 32px;
+  animation: resume-fade 0.15s ease;
+}
+@keyframes resume-fade { from { opacity: 0; } to { opacity: 1; } }
+
+.resume-modal {
+  background: var(--frame);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: min(820px, 100%);
+  height: min(90vh, 1050px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.resume-modal-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.resume-modal-title {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.resume-modal-actions { display: flex; align-items: center; gap: 6px; }
+
+.resume-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+.resume-modal-btn:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-glow); }
+.resume-modal-close { padding: 6px 8px; }
+
+.resume-modal-frame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #fff;
+}
+
+@media (max-width: 600px) {
+  .resume-modal-backdrop { padding: 0; }
+  .resume-modal { width: 100%; height: 100%; border-radius: 0; }
+  .resume-modal-title { display: none; }
 }
