@@ -47,7 +47,11 @@ export default function Home() {
   const { hash } = useLocation();
 
   useEffect(() => {
-    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
+    if (hash) {
+      const target = document.getElementById(hash.slice(1));
+      target?.scrollIntoView();
+      if (target?.id === 'content') target.focus({ preventScroll: true });
+    }
     else window.scrollTo({ top: 0 });
   }, [hash]);
 
@@ -55,7 +59,7 @@ export default function Home() {
     <div className="portfolio" id="top">
       <a className="skip-link" href="#/#content">Skip to content</a>
       <header className="site-header">
-        <Link className="wordmark" to="/" aria-label="Monish RJ, home">mrj<span>✳</span></Link>
+        <Link className="wordmark" to="/#top" aria-label="Monish RJ, home">mrj<span>✳</span></Link>
         <nav aria-label="Main navigation">
           <Link to="/#projects">Work</Link>
           <Link to="/#about">About</Link>
@@ -121,7 +125,7 @@ export default function Home() {
           <div className="about-copy">
             <p className="eyebrow">02 / A little context</p>
             <h2 id="about-title">Curiosity is<br />the common thread<span>.</span></h2>
-            <p>I’m a CS major and JHMC Honors student at Purdue, on the 3+1 BS/MS track. My main interests are ML and AI, but curiosity has taken me into VR, mobile apps, simulation, and embedded systems.</p>
+            <p>I’m a CS major and JHMC Honors student at Purdue, on the 3+1 BS/MS track with a focus on Machine Intelligence and Systems. My main interests are ML and AI, but curiosity has taken me into VR, mobile apps, simulation, and embedded systems.</p>
             <p>Off screen: movies, sketching, and my origami collection.</p>
             <div className="about-note"><span>BASED IN</span> Illinois, US <span className="note-divider">/</span> Purdue University</div>
           </div>
@@ -143,7 +147,7 @@ export default function Home() {
 
         <footer className="site-footer" id="contact">
           <div className="footer-main"><div><p className="eyebrow">Keep the conversation going</p><h2>Have something in mind<span>?</span></h2></div><a className="contact-link" href="mailto:mrameshj@purdue.edu">Let’s talk <span aria-hidden="true">↗</span></a></div>
-          <div className="footer-bottom"><span>© {new Date().getFullYear()} Monish Ramesh Jayakumar</span><span className="footer-fin">Thanks for tuning in. <i>fin.</i></span><Link to="/">Back to top ↑</Link></div>
+          <div className="footer-bottom"><span>© {new Date().getFullYear()} Monish Ramesh Jayakumar</span><span className="footer-fin">Thanks for tuning in. <i>fin.</i></span><Link to="/#top">Back to top ↑</Link></div>
         </footer>
       </main>
       <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
