@@ -1,15 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
-
-import FilmStrip from '../components/layout/FilmStrip';
-import Frame from '../components/layout/Frame';
-import InterFrame from '../components/layout/InterFrame';
-import ModelViewer from '../components/ModelViewer';
-import { DocIcon } from '../components/Button';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import ResumeModal from '../components/ResumeModal';
 import ProjectCard from '../components/ProjectCard';
 import ContributionGraph from '../components/ContributionGraph';
 import Stack from '../components/Stack';
 import { PROJECTS } from '../data/projects';
+
+const ModelViewer = lazy(() => import('../components/ModelViewer'));
 
 const GhIcon = ({ size = 16 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -35,299 +32,121 @@ const CURRENTLY = [
   { role: 'Software Developer', org: 'UPlate', href: 'https://u-plate.com/', date: 'Feb 2026 – Present', desc: 'developing frontend architecture and ML-assisted food logging features.' },
 ];
 
+
+const FEATURED = PROJECTS.filter(project => project.featured);
+const MORE = PROJECTS.filter(project => !project.featured);
 const SKILLS = [
-  {
-    name: 'Python',
-    desc: 'ML (PyTorch, scikit-learn, Hugging Face)',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M11.914 0C5.82 0 6.2 2.656 6.2 2.656l.007 2.752h5.814v.826H3.9S0 5.789 0 11.969c0 6.18 3.403 5.963 3.403 5.963h2.032v-2.867s-.109-3.404 3.348-3.404h5.766s3.24.052 3.24-3.13V3.13S18.28 0 11.914 0zm-3.2 1.812a1.04 1.04 0 1 1 0 2.08 1.04 1.04 0 0 1 0-2.08z"/>
-        <path d="M12.086 24c6.094 0 5.714-2.656 5.714-2.656l-.007-2.752h-5.814v-.826h8.121S24 18.211 24 12.031c0-6.18-3.403-5.963-3.403-5.963h-2.032v2.867s.109 3.404-3.348 3.404H9.451s-3.24-.052-3.24 3.13V20.87S5.72 24 12.086 24zm3.2-1.812a1.04 1.04 0 1 1 0-2.08 1.04 1.04 0 0 1 0 2.08z"/>
-      </svg>
-    ),
-  },
-  {
-    name: 'C',
-    desc: 'ESP32 microcontroller work',
-    icon: (
-      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-        <path d="M16 5.5A7 7 0 1 0 16 14.5"/>
-      </svg>
-    ),
-  },
-  {
-    name: 'Arduino',
-    desc: 'embedded systems, sensors, servo control, serial comms',
-    icon: (
-      <svg viewBox="0 0 48 48" fill="currentColor" aria-hidden="true">
-        <path d="M35.7,34.7c-7.7,0-13.2-8.9-13.4-9.3l-0.6-1l0.6-1C22.5,22.9,28,14,35.7,14C41.4,14,46,18.6,46,24.3S41.4,34.7,35.7,34.7z M26.4,24.3c1.5,2,5.1,6.3,9.2,6.3c3.5,0,6.3-2.8,6.3-6.3c0-3.5-2.8-6.3-6.3-6.3C31.5,18,27.9,22.3,26.4,24.3z"/>
-        <path d="M12.3,34.7C6.6,34.7,2,30,2,24.3S6.6,14,12.3,14c7.9,0,13.2,8.9,13.4,9.3l0.6,1l-0.6,1C25.5,25.7,20,34.7,12.3,34.7z M12.3,18C8.8,18,6,20.8,6,24.3c0,3.5,2.8,6.3,6.3,6.3c4.2,0,7.8-4.3,9.3-6.3C20.2,22.3,16.6,18,12.3,18z"/>
-        <path d="M10,23h6v2h-6V23z"/>
-        <path d="M32,23h6v2h-6V23z"/>
-        <path d="M34,21h2v6h-2V21z"/>
-      </svg>
-    ),
-  },
-  {
-    name: 'React',
-    desc: 'web + mobile apps (React Native)',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" aria-hidden="true">
-        <circle cx="12" cy="12" r="1.8" fill="currentColor" stroke="none"/>
-        <ellipse cx="12" cy="12" rx="10" ry="3.8"/>
-        <ellipse cx="12" cy="12" rx="10" ry="3.8" transform="rotate(60 12 12)"/>
-        <ellipse cx="12" cy="12" rx="10" ry="3.8" transform="rotate(120 12 12)"/>
-      </svg>
-    ),
-  },
-  {
-    name: 'Flutter',
-    desc: 'cross-platform iOS & Android (Dart)',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path fill="none" d="M0 0h24v24H0z"/>
-        <path fillRule="nonzero" d="M13.503 2.001l-10 10 3.083 3.083 13.08-13.083h-6.163zm-.006 9.198L8.122 16.62 13.494 22h6.189l-5.387-5.4 5.389-5.4h-6.188z"/>
-      </svg>
-    ),
-  },
+  ['Python', 'PyTorch · scikit-learn · Hugging Face'],
+  ['C / Arduino', 'Embedded systems · sensors · servo control'],
+  ['React', 'Web · React Native'],
+  ['Flutter', 'Dart · iOS & Android'],
 ];
 
-const FEATURED = PROJECTS.filter(p => p.featured);
-
-const NAV_SECTIONS = ['projects', 'activity', 'about', 'currently'];
-
 export default function Home() {
-  const [activeSkill, setActiveSkill] = useState(SKILLS[0].name);
-  const [visits, setVisits] = useState(null);
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 900px)').matches);
   const [resumeOpen, setResumeOpen] = useState(false);
-  const splitMainRef = useRef(null);
+  const { hash } = useLocation();
 
   useEffect(() => {
-    fetch('https://abacus.jasoncameron.dev/hit/monishramj.dev/pageviews')
-      .then(r => r.json())
-      .then(d => setVisits(d.value))
-      .catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(max-width: 900px)');
-    const onChange = e => setIsMobile(e.matches);
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
-  }, []);
-
-  const selected = SKILLS.find(s => s.name === activeSkill);
-
-  const scrollToSection = id => {
-    const container = splitMainRef.current;
-    const el = document.getElementById(id);
-    if (!container || !el) return;
-    const top =
-      el.getBoundingClientRect().top -
-      container.getBoundingClientRect().top +
-      container.scrollTop -
-      24;
-    container.scrollTo({ top, behavior: 'smooth' });
-  };
-
-  const socials = (
-    <div className="hero-social">
-      <a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer" className="hero-social-link" title="GitHub"><GhIcon size={17} /></a>
-      <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener noreferrer" className="hero-social-link" title="LinkedIn"><LiIcon size={17} /></a>
-      <a href="mailto:mrameshj@purdue.edu" className="hero-social-link" title="Email"><MailIcon size={17} /></a>
-      <button type="button" onClick={() => setResumeOpen(true)} className="hero-social-link" title="Resume"><DocIcon size={17} /></button>
-    </div>
-  );
-
-  const sections = (
-    <>
-      <Frame id="projects">
-          <div className="proj-section-head">
-            <div className="eyebrow" style={{ marginBottom: 0 }}>featured</div>
-
-          </div>
-          <div className="proj-list">
-            {FEATURED.map(p => <ProjectCard key={p.title} {...p} />)}
-          </div>
-          <details className="more-projects">
-            <summary>More projects ({PROJECTS.length - FEATURED.length})</summary>
-            <div className="proj-grid">
-              {PROJECTS.filter(p => !p.featured).map(p => <ProjectCard key={p.title} {...p} variant="row" />)}
-            </div>
-          </details>
-        </Frame>
-
-        <InterFrame />
-        <Frame id="activity">
-          <div className="eyebrow">GitHub activity</div>
-          <ContributionGraph />
-        </Frame>
-
-        <InterFrame />
-        <Frame id="about">
-          <div className="eyebrow">about me</div>
-          <div className="about-layout">
-            <div className="about-body">
-              <p>CS major and JHMC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p>
-              <p>love movies, sketching, and I have an origami collection.</p>
-            </div>
-            <div className="about-right">
-              <div className="about-meta">
-                <div className="mi">
-                  <div className="mi-label">Based in</div>
-                  <span className="mi-val">IL, 🇺🇸</span>
-                </div>
-                <div className="mi">
-                  <div className="mi-label">Degree</div>
-                  <span className="mi-val">B.S. Computer Science Honors: 3+1 BS/MS Track</span>
-                  <span className="mi-val"><b>tracks: </b>Machine Intelligence, Systems</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </Frame>
-
-        <InterFrame />
-        <Frame id="currently">
-          <div className="eyebrow">currently</div>
-          <Stack items={CURRENTLY} />
-        </Frame>
-
-        <InterFrame />
-        <Frame id="skills">
-          <div className="eyebrow">Skills</div>
-          <p className="sk-blurb">i've worked with various technologies. here's some i know.</p>
-          <div className="sk-display">
-            <div className="sk-display-name">{selected.name}</div>
-            <div className="sk-display-desc">{selected.desc}</div>
-          </div>
-          <div className="sk-icon-row">
-            {SKILLS.map(s => (
-              <button
-                key={s.name}
-                className={`sk-icon-btn${s.name === activeSkill ? ' active' : ''}`}
-                onClick={() => setActiveSkill(s.name)}
-                title={s.name}
-              >
-                {s.icon}
-              </button>
-            ))}
-          </div>
-        </Frame>
-
-        <InterFrame />
-        <Frame id="contact">
-          <div className="end-frame">
-            <div className="eyebrow">fin</div>
-            <p className="end-thanks">thanks for reading - always open to meeting new people. feel free to reach out!</p>
-            <div className="end-links">
-              <a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer" className="end-link"><GhIcon size={14} /> github</a>
-              <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener noreferrer" className="end-link"><LiIcon size={14} /> linkedin</a>
-              <a href="mailto:mrameshj@purdue.edu" className="end-link"><MailIcon size={14} /> email</a>
-            </div>
-            <div className="end-sig">
-              — monish r.j, {new Date().getFullYear()}
-              {visits !== null && <><span className="end-dot">·</span><span className="end-visits">{visits.toLocaleString()} visits</span></>}
-            </div>
-          </div>
-        </Frame>
-    </>
-  );
-
-  if (isMobile) {
-    return (
-      <>
-      <FilmStrip>
-        <Frame id="hero">
-          <div className="frame-model-wrapper">
-            <div className="frame-name-bg">
-              <h1>Monish Ramesh<br></br>Jayakumar</h1>
-              <p>CS Honors @ Purdue</p>
-              <p>ML, SWE Tracks</p>
-              {socials}
-            </div>
-            <ModelViewer
-              url={`${import.meta.env.BASE_URL}grandmas_tv.glb`}
-              width="55%"
-              height={400}
-              modelXOffset={0}
-              modelYOffset={0}
-              defaultRotationX={190}
-              defaultRotationY={20}
-              defaultZoom={1.05}
-              showScreenshotButton={false}
-              screenTextureSrc={`${import.meta.env.BASE_URL}images/monish.jpeg`}
-              environmentPreset="dawn"
-              enableManualZoom={false}
-              enableMouseParallax={true}
-              autoFrame
-              fadeIn
-            />
-          </div>
-        </Frame>
-        <InterFrame />
-        {sections}
-      </FilmStrip>
-      <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
-      </>
-    );
-  }
+    if (hash) document.getElementById(hash.slice(1))?.scrollIntoView();
+    else window.scrollTo({ top: 0 });
+  }, [hash]);
 
   return (
-    <>
-    <div className="split">
-      <aside className="split-side">
-        <div className="split-hero">
-          <div className="split-name">
-            <h1>Monish Ramesh<br></br>Jayakumar</h1>
-            <p className="split-tag">CS Honors @ Purdue</p>
-            <p className="split-tag">ML, SWE Tracks</p>
-          </div>
-          <div className="split-tv">
-            <ModelViewer
-              url={`${import.meta.env.BASE_URL}grandmas_tv.glb`}
-              width="100%"
-              height={600}
-              modelXOffset={0}
-              modelYOffset={0}
-              defaultRotationX={190}
-              defaultRotationY={20}
-              defaultZoom={1.5}
-              showScreenshotButton={false}
-              screenTextureSrc={`${import.meta.env.BASE_URL}images/monish.jpeg`}
-              environmentPreset="dawn"
-              enableManualZoom={false}
-              enableMouseParallax={true}
-              autoFrame
-              fadeIn
-            />
-          </div>
-        </div>
-        <nav className="split-nav">
-          {NAV_SECTIONS.map(id => (
-            <a
-              key={id}
-              href={`#${id}`}
-              onClick={e => {
-                e.preventDefault();
-                scrollToSection(id);
-              }}
-            >
-              {id}
-            </a>
-          ))}
+    <div className="portfolio" id="top">
+      <a className="skip-link" href="#/#content">Skip to content</a>
+      <header className="site-header">
+        <Link className="wordmark" to="/" aria-label="Monish RJ, home">mrj<span>✳</span></Link>
+        <nav aria-label="Main navigation">
+          <Link to="/#projects">Work</Link>
+          <Link to="/#about">About</Link>
+          <Link to="/#activity">Activity</Link>
+          <a href="mailto:mrameshj@purdue.edu">Let’s talk <span aria-hidden="true">↗</span></a>
         </nav>
-        {socials}
-      </aside>
+      </header>
 
-      <div className="split-main" ref={splitMainRef}>
-        <FilmStrip className="film-strip--split">
-          {sections}
-        </FilmStrip>
-      </div>
+      <main id="content" tabIndex={-1}>
+        <section className="hero" aria-labelledby="hero-title">
+          <div className="hero-copy">
+            <p className="eyebrow"><span className="status-dot" /> CS Honors @ Purdue</p>
+            <h1 id="hero-title">monish<br />ramesh<br /><span>jayakumar.</span></h1>
+            <p className="hero-intro">Exploring machine intelligence.<br />Building things you can interact with.</p>
+            <div className="hero-actions">
+              <Link className="primary-link" to="/#projects">Explore my work <span aria-hidden="true">↘</span></Link>
+              <button className="text-link" onClick={() => setResumeOpen(true)}>Résumé <span aria-hidden="true">↗</span></button>
+            </div>
+            <div className="hero-social" aria-label="Social links">
+              <a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><GhIcon size={18} /></a>
+              <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><LiIcon size={18} /></a>
+              <a href="mailto:mrameshj@purdue.edu" aria-label="Email"><MailIcon size={18} /></a>
+              <span>ML, software & a little hardware.</span>
+            </div>
+          </div>
+          <figure className="hero-tv">
+            <div className="tv-label"><span>CHANNEL 01</span><span>PERSONAL BROADCAST</span></div>
+            <div className="tv-stage" role="img" aria-label="Interactive vintage television displaying a portrait of Monish">
+              <Suspense fallback={<img className="tv-placeholder" src={`${import.meta.env.BASE_URL}images/monish.jpeg`} alt="" />}>
+                <ModelViewer
+                  url={`${import.meta.env.BASE_URL}grandmas_tv.glb`}
+                  width="100%" height="100%"
+                  defaultRotationX={190} defaultRotationY={20} defaultZoom={1.05}
+                  showScreenshotButton={false}
+                  screenTextureSrc={`${import.meta.env.BASE_URL}images/monish.jpeg`}
+                  environmentPreset="none" ambientIntensity={1.6} keyLightIntensity={3}
+                  enableManualZoom={false} enableMouseParallax={false} enableHoverRotation={false}
+                  autoFrame fadeIn
+                />
+              </Suspense>
+            </div>
+            <figcaption><span className="status-dot" /> A familiar face. A different frequency.<span className="drag-hint">drag to rotate ↔</span></figcaption>
+          </figure>
+        </section>
+
+        <section className="section" id="projects" aria-labelledby="projects-title">
+          <div className="section-heading">
+            <div><p className="eyebrow">01 / Selected work</p><h2 id="projects-title">A few things I’ve built<span>.</span></h2></div>
+            <p>From neural networks<br />to things with wires.</p>
+          </div>
+          <div className="project-grid">
+            {FEATURED.map((project, index) => <ProjectCard key={project.title} {...project} index={index + 1} />)}
+          </div>
+          <details className="more-projects">
+            <summary><span className="more-label">More projects <span className="count">{MORE.length.toString().padStart(2, '0')}</span></span><span className="expand-icon" aria-hidden="true">+</span></summary>
+            <div className="project-grid project-grid--archive">
+              {MORE.map((project, index) => <ProjectCard key={project.title} {...project} index={FEATURED.length + index + 1} />)}
+            </div>
+          </details>
+        </section>
+
+        <section className="section about-section" id="about" aria-labelledby="about-title">
+          <div className="about-copy">
+            <p className="eyebrow">02 / A little context</p>
+            <h2 id="about-title">Curiosity is<br />the common thread<span>.</span></h2>
+            <p>I’m a CS major and JHMC Honors student at Purdue, on the 3+1 BS/MS track. My main interests are ML and AI, but curiosity has taken me into VR, mobile apps, simulation, and embedded systems.</p>
+            <p>Off screen: movies, sketching, and my origami collection.</p>
+            <div className="about-note"><span>BASED IN</span> Illinois, US <span className="note-divider">/</span> Purdue University</div>
+          </div>
+          <div className="about-details">
+            <h3 className="eyebrow">Currently</h3>
+            <Stack items={CURRENTLY} />
+            <h3 className="eyebrow toolkit-heading">My toolkit</h3>
+            <dl className="toolkit">{SKILLS.map(([name, description]) => <div key={name}><dt>{name}</dt><dd>{description}</dd></div>)}</dl>
+          </div>
+        </section>
+
+        <section className="section" id="activity" aria-labelledby="activity-title">
+          <div className="section-heading">
+            <div><p className="eyebrow">03 / In the works</p><h2 id="activity-title">One commit at a time<span>.</span></h2></div>
+            <a className="text-link" href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer"><GhIcon /> @monishramj <span aria-hidden="true">↗</span></a>
+          </div>
+          <ContributionGraph />
+        </section>
+
+        <footer className="site-footer" id="contact">
+          <div className="footer-main"><div><p className="eyebrow">Keep the conversation going</p><h2>Have something in mind<span>?</span></h2></div><a className="contact-link" href="mailto:mrameshj@purdue.edu">Let’s talk <span aria-hidden="true">↗</span></a></div>
+          <div className="footer-bottom"><span>© {new Date().getFullYear()} Monish Ramesh Jayakumar</span><span className="footer-fin">Thanks for tuning in. <i>fin.</i></span><Link to="/">Back to top ↑</Link></div>
+        </footer>
+      </main>
+      <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
     </div>
-    <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
-    </>
   );
 }

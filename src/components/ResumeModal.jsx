@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 const DownloadIcon = ({ size = 13 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -26,24 +26,18 @@ const CloseIcon = ({ size = 15 }) => (
 export default function ResumeModal({ open, onClose }) {
   const resumeUrl = `${import.meta.env.BASE_URL}resume.pdf`;
 
+  const dialogRef = useRef(null);
   useEffect(() => {
-    if (!open) return;
-    const onKey = e => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
+    const dialog = dialogRef.current;
+    if (!open) { dialog.close(); return; }
+    const previousOverflow = document.body.style.overflow;
+    dialog.showModal();
     document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
-  }, [open, onClose]);
-
-  if (!open) return null;
+    return () => { dialog.close(); document.body.style.overflow = previousOverflow; };
+  }, [open]);
 
   return (
-    <div className="resume-modal-backdrop" onClick={onClose}>
-      <div className="resume-modal" onClick={e => e.stopPropagation()}>
+    <dialog ref={dialogRef} className="resume-modal" aria-label="Résumé" onCancel={onClose} onClick={event => { if (event.target === event.currentTarget) onClose(); }}>
         <div className="resume-modal-bar">
           <span className="resume-modal-title">resume</span>
           <div className="resume-modal-actions">
@@ -64,8 +58,7 @@ export default function ResumeModal({ open, onClose }) {
             </button>
           </div>
         </div>
-        <iframe src={resumeUrl} title="Resume" className="resume-modal-frame" />
-      </div>
-    </div>
+        {open && <iframe src={resumeUrl} title="Resume" className="resume-modal-frame" />}
+    </dialog>
   );
 }

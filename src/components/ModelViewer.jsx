@@ -1,5 +1,5 @@
-/* eslint-disable react/no-unknown-property */
-import { Suspense, useRef, useLayoutEffect, useEffect, useCallback, useMemo } from 'react';
+/* eslint-disable react-hooks/immutability -- Three.js owns mutable camera and scene objects. */
+import { Suspense, useRef, useLayoutEffect, useEffect, useMemo } from 'react';
 import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
 import { OrbitControls, useGLTF, useProgress, Html, Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
@@ -53,7 +53,7 @@ const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standb
 const ModelInner = ({
   url, pivot, initYaw, initPitch, defaultZoom, minZoom, maxZoom,
   enableMouseParallax, enableManualRotation, enableHoverRotation, enableManualZoom,
-  autoFrame, fadeIn, autoRotate, autoRotateSpeed, onLoaded, placeholderSrc,
+  autoFrame, fadeIn, autoRotate, autoRotateSpeed, onLoaded,
   modelXOffset, modelYOffset, screenTextureSrc,
 }) => {
   const { scene } = useGLTF(url);
@@ -201,7 +201,6 @@ const ModelInner = ({
     };
     img.src = screenTextureSrc;
     return () => { cancelled = true; };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [screenTextureSrc, content]);
 
   useEffect(() => {
@@ -395,7 +394,7 @@ const ModelViewer = ({
   screenTextureSrc,
 }) => {
   useEffect(() => void useGLTF.preload(url), [url]);
-  const pivot = useRef(new THREE.Vector3()).current;
+  const pivot = useMemo(() => new THREE.Vector3(), []);
   const contactRef  = useRef(null);
   const rendererRef = useRef(null);
   const sceneRef    = useRef(null);
