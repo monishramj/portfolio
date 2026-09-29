@@ -22,7 +22,7 @@ class Television extends Component {
       width="100%" height="100%" defaultRotationX={180} defaultRotationY={0} defaultZoom={1.5}
       screenTextureSrc={channel.img} screenTextureFit={channel.id === 'about' ? 'cover' : 'contain'}
       environmentPreset="dawn"
-      enableManualZoom={false} enableManualRotation={false} enableMouseParallax={false} enableHoverRotation={false}
+      enableManualZoom={false} enableManualRotation={false} enableMouseParallax enableHoverRotation
       showScreenshotButton={false} focusScreen autoFrame
     /></Suspense>;
   }
