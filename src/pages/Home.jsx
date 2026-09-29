@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router-dom';
 import ResumeModal from '../components/ResumeModal';
 import ProjectCard from '../components/ProjectCard';
 import ContributionGraph from '../components/ContributionGraph';
-import Stack from '../components/Stack';
 import { PROJECTS } from '../data/projects';
 
 const ModelViewer = lazy(() => import('../components/ModelViewer'));
@@ -36,14 +35,22 @@ const CURRENTLY = [
 const FEATURED = PROJECTS.filter(project => project.featured);
 const MORE = PROJECTS.filter(project => !project.featured);
 const SKILLS = [
-  ['Python', 'PyTorch · scikit-learn · Hugging Face'],
-  ['C / Arduino', 'Embedded systems · sensors · servo control'],
-  ['React', 'Web · React Native'],
-  ['Flutter', 'Dart · iOS & Android'],
+  { name: 'Python', symbol: 'Py', desc: 'PyTorch · scikit-learn · Hugging Face', project: PROJECTS[1] },
+  { name: 'Embedded', symbol: '⌁', desc: 'C · Arduino · ESP32', project: PROJECTS[0] },
+  { name: 'React', symbol: '⚛', desc: 'Web · React Native', project: PROJECTS[6] },
+  { name: 'Flutter', symbol: '↗', desc: 'Dart · iOS & Android', project: PROJECTS[3] },
+];
+const CHANNELS = [
+  { name: 'Me', image: `${import.meta.env.BASE_URL}images/monish.jpeg` },
+  { name: 'Hardware', image: PROJECTS[0].img },
+  { name: 'DOOM', image: PROJECTS[5].img },
 ];
 
 export default function Home() {
   const [resumeOpen, setResumeOpen] = useState(false);
+  const [channel, setChannel] = useState(0);
+  const [skill, setSkill] = useState(0);
+  const [portraitFlipped, setPortraitFlipped] = useState(false);
   const { hash } = useLocation();
 
   useEffect(() => {
@@ -73,7 +80,7 @@ export default function Home() {
           <div className="hero-copy">
             <p className="eyebrow"><span className="status-dot" /> CS Honors @ Purdue</p>
             <h1 id="hero-title">monish<br />ramesh<br /><span>jayakumar.</span></h1>
-            <p className="hero-intro">Exploring machine intelligence.<br />Building things you can interact with.</p>
+            <p className="hero-intro">ML. Software. A little hardware.</p>
             <div className="hero-actions">
               <Link className="primary-link" to="/#projects">Explore my work <span aria-hidden="true">↘</span></Link>
               <button className="text-link" onClick={() => setResumeOpen(true)}>Résumé <span aria-hidden="true">↗</span></button>
@@ -82,33 +89,31 @@ export default function Home() {
               <a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><GhIcon size={18} /></a>
               <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><LiIcon size={18} /></a>
               <a href="mailto:mrameshj@purdue.edu" aria-label="Email"><MailIcon size={18} /></a>
-              <span>ML, software & a little hardware.</span>
             </div>
           </div>
           <figure className="hero-tv">
-            <div className="tv-label"><span>CHANNEL 01</span><span>PERSONAL BROADCAST</span></div>
-            <div className="tv-stage" role="img" aria-label="Interactive vintage television displaying a portrait of Monish">
+            <div className="tv-label"><span>CH. 0{channel + 1}</span><span>{CHANNELS[channel].name}</span></div>
+            <div className="tv-stage" role="img" aria-label={`Interactive vintage television: ${CHANNELS[channel].name}`}>
               <Suspense fallback={<img className="tv-placeholder" src={`${import.meta.env.BASE_URL}images/monish.jpeg`} alt="" />}>
                 <ModelViewer
                   url={`${import.meta.env.BASE_URL}grandmas_tv.glb`}
                   width="100%" height="100%"
                   defaultRotationX={190} defaultRotationY={20} defaultZoom={1.05}
                   showScreenshotButton={false}
-                  screenTextureSrc={`${import.meta.env.BASE_URL}images/monish.jpeg`}
+                  screenTextureSrc={CHANNELS[channel].image}
                   environmentPreset="none" ambientIntensity={1.6} keyLightIntensity={3}
                   enableManualZoom={false} enableMouseParallax={false} enableHoverRotation={false}
                   autoFrame fadeIn
                 />
               </Suspense>
             </div>
-            <figcaption><span className="status-dot" /> A familiar face. A different frequency.<span className="drag-hint">drag to rotate ↔</span></figcaption>
+            <figcaption><div className="channel-controls" role="group" aria-label="TV channel">{CHANNELS.map((item, index) => <button key={item.name} aria-label={`TV channel: ${item.name}`} aria-pressed={channel === index} onClick={() => setChannel(index)}>0{index + 1}</button>)}</div><span className="drag-hint">Switch channels · drag to rotate</span></figcaption>
           </figure>
         </section>
 
         <section className="section" id="projects" aria-labelledby="projects-title">
           <div className="section-heading">
-            <div><p className="eyebrow">01 / Selected work</p><h2 id="projects-title">A few things I’ve built<span>.</span></h2></div>
-            <p>From neural networks<br />to things with wires.</p>
+            <div><p className="eyebrow">01 / Work</p><h2 id="projects-title">Selected experiments<span>.</span></h2></div><span className="gallery-hint">Pick one to explore ↗</span>
           </div>
           <div className="project-grid">
             {FEATURED.map((project, index) => <ProjectCard key={project.title} {...project} index={index + 1} />)}
@@ -122,32 +127,41 @@ export default function Home() {
         </section>
 
         <section className="section about-section" id="about" aria-labelledby="about-title">
-          <div className="about-copy">
-            <p className="eyebrow">02 / A little context</p>
-            <h2 id="about-title">Curiosity is<br />the common thread<span>.</span></h2>
-            <p>I’m a CS major and JHMC Honors student at Purdue, on the 3+1 BS/MS track with a focus on Machine Intelligence and Systems. My main interests are ML and AI, but curiosity has taken me into VR, mobile apps, simulation, and embedded systems.</p>
-            <p>Off screen: movies, sketching, and my origami collection.</p>
-            <div className="about-note"><span>BASED IN</span> Illinois, US <span className="note-divider">/</span> Purdue University</div>
+          <div className="about-visual">
+            <p className="eyebrow">02 / Behind the screen</p>
+            <button className={`portrait-card${portraitFlipped ? ' is-flipped' : ''}`} onClick={() => setPortraitFlipped(!portraitFlipped)} aria-pressed={portraitFlipped} aria-label="Flip portrait to see interests">
+              <span className="portrait-front"><img src={`${import.meta.env.BASE_URL}images/monish.jpeg`} alt="Monish" loading="lazy" /><span>monish, off screen. <span aria-hidden="true">↻</span></span></span>
+              <span className="portrait-back" aria-hidden={!portraitFlipped}>
+                <svg viewBox="0 0 200 160" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M20 95 84 70 113 18 123 83 183 45 146 101 100 124 20 95 105 91 113 18M84 70 105 91 100 124M105 91 146 101 183 45M100 124 64 145 77 116" /></svg>
+                <span>Movies. Sketches.<br />An origami collection.</span><span className="portrait-flip-hint">↻ back to me</span>
+              </span>
+            </button>
           </div>
           <div className="about-details">
-            <h3 className="eyebrow">Currently</h3>
-            <Stack items={CURRENTLY} />
-            <h3 className="eyebrow toolkit-heading">My toolkit</h3>
-            <dl className="toolkit">{SKILLS.map(([name, description]) => <div key={name}><dt>{name}</dt><dd>{description}</dd></div>)}</dl>
+            <h2 id="about-title">Hi, I’m Monish<span>.</span></h2>
+            <p className="about-short">CS Honors @ Purdue.<br />Machine Intelligence + Systems.</p>
+            <div className="about-badges"><span>3+1 BS/MS</span><span>Illinois, US</span></div>
+            <div className="role-cards">
+              {CURRENTLY.map(item => <details className="role-card" key={item.org}><summary><span className="status-dot" /><span><strong>{item.org}</strong><small>{item.role}</small></span><span className="expand-icon" aria-hidden="true">+</span></summary><p>{item.desc}</p><a href={item.href} target="_blank" rel="noopener noreferrer">{item.date} ↗</a></details>)}
+            </div>
+          </div>
+          <div className="toolkit-board">
+            <div className="toolkit-controls"><h3 className="eyebrow">The toolkit</h3><div className="skill-switcher" role="group" aria-label="Explore skills">{SKILLS.map((item, index) => <button key={item.name} onClick={() => setSkill(index)} aria-pressed={skill === index}><span className="skill-symbol" aria-hidden="true">{item.symbol}</span>{item.name}</button>)}</div><p className="skill-description" aria-live="polite">{SKILLS[skill].desc}</p></div>
+            <a className="toolkit-preview" href={SKILLS[skill].project.github} target="_blank" rel="noopener noreferrer" aria-label={`View ${SKILLS[skill].project.title} on GitHub`}><img src={SKILLS[skill].project.img} alt={SKILLS[skill].project.title} loading="lazy" /><span>{SKILLS[skill].project.title} <span aria-hidden="true">↗</span></span></a>
           </div>
         </section>
 
         <section className="section" id="activity" aria-labelledby="activity-title">
           <div className="section-heading">
-            <div><p className="eyebrow">03 / In the works</p><h2 id="activity-title">One commit at a time<span>.</span></h2></div>
+            <div><p className="eyebrow">03 / GitHub</p><h2 id="activity-title">On the record<span>.</span></h2></div>
             <a className="text-link" href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer"><GhIcon /> @monishramj <span aria-hidden="true">↗</span></a>
           </div>
           <ContributionGraph />
         </section>
 
         <footer className="site-footer" id="contact">
-          <div className="footer-main"><div><p className="eyebrow">Keep the conversation going</p><h2>Have something in mind<span>?</span></h2></div><a className="contact-link" href="mailto:mrameshj@purdue.edu">Let’s talk <span aria-hidden="true">↗</span></a></div>
-          <div className="footer-bottom"><span>© {new Date().getFullYear()} Monish Ramesh Jayakumar</span><span className="footer-fin">Thanks for tuning in. <i>fin.</i></span><Link to="/#top">Back to top ↑</Link></div>
+          <div className="footer-main"><div><p className="eyebrow">Have an idea?</p><h2>Say hello<span>↘</span></h2></div><a className="contact-link" href="mailto:mrameshj@purdue.edu">Let’s talk <span aria-hidden="true">↗</span></a></div>
+          <div className="footer-bottom"><span>© {new Date().getFullYear()} Monish Ramesh Jayakumar</span><span className="footer-fin"><i>fin.</i></span><Link to="/#top">Back to top ↑</Link></div>
         </footer>
       </main>
       <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
