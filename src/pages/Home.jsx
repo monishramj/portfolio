@@ -1,170 +1,69 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { Component, lazy, Suspense, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import ResumeModal from '../components/ResumeModal';
-import ProjectCard from '../components/ProjectCard';
 import ContributionGraph from '../components/ContributionGraph';
 import { PROJECTS } from '../data/projects';
 
 const ModelViewer = lazy(() => import('../components/ModelViewer'));
-
-const GhIcon = ({ size = 16 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
-  </svg>
-);
-
-const LiIcon = ({ size = 16 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-  </svg>
-);
-
-const MailIcon = ({ size = 16 }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-    <rect x="2" y="4" width="20" height="16" rx="2"/>
-    <path d="M2 7l10 7 10-7"/>
-  </svg>
-);
-
-const CURRENTLY = [
-  { role: 'Undergrad Research Assistant', org: 'Aphasia Recovery Lab', href: 'https://www.purdue.edu/hhs/slhs/aphasia/', date: 'Jan 2026 – Present', desc: 'benchmarking LLM output on clinical speech data to model language recovery in aphasia patients.' },
-  { role: 'Software Developer', org: 'UPlate', href: 'https://u-plate.com/', date: 'Feb 2026 – Present', desc: 'developing frontend architecture and ML-assisted food logging features.' },
-];
-
-
-const FEATURED = PROJECTS.filter(project => project.featured);
-const MORE = PROJECTS.filter(project => !project.featured);
-const SKILLS = [
-  { name: 'Python', symbol: 'Py', desc: 'PyTorch · scikit-learn · Hugging Face', project: PROJECTS[1] },
-  { name: 'Embedded', symbol: '⌁', desc: 'C · Arduino · ESP32', project: PROJECTS[0] },
-  { name: 'React', symbol: '⚛', desc: 'Web · React Native', project: PROJECTS[6] },
-  { name: 'Flutter', symbol: '↗', desc: 'Dart · iOS & Android', project: PROJECTS[3] },
-];
 const CHANNELS = [
-  { name: 'Me', image: `${import.meta.env.BASE_URL}images/monish.jpeg` },
-  { name: 'Hardware', image: PROJECTS[0].img },
-  { name: 'DOOM', image: PROJECTS[5].img },
+  { id: 'about', title: 'About me', img: `${import.meta.env.BASE_URL}images/monish.jpeg` },
+  ...PROJECTS.map(project => ({ ...project, id: project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') })),
 ];
+const channelUrl = channel => channel.id === 'about' ? '/' : `/?channel=${channel.id}`;
+
+class Television extends Component {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() {
+    const { channel } = this.props;
+    const image = <img className="screen-fallback" src={channel.img} alt={channel.title} />;
+    if (this.state.failed) return image;
+    return <Suspense fallback={image}><ModelViewer
+      url={`${import.meta.env.BASE_URL}grandmas_tv.glb`}
+      width="100%" height="100%" defaultRotationX={180} defaultRotationY={0} defaultZoom={1.5}
+      screenTextureSrc={channel.img} screenTextureFit={channel.id === 'about' ? 'cover' : 'contain'}
+      environmentPreset="dawn"
+      enableManualZoom={false} enableManualRotation={false} enableMouseParallax={false} enableHoverRotation={false}
+      showScreenshotButton={false} focusScreen autoFrame
+    /></Suspense>;
+  }
+}
 
 export default function Home() {
-  const [resumeOpen, setResumeOpen] = useState(false);
-  const [channel, setChannel] = useState(0);
-  const [skill, setSkill] = useState(0);
-  const [portraitFlipped, setPortraitFlipped] = useState(false);
-  const { hash } = useLocation();
-
-  useEffect(() => {
-    if (hash) {
-      const target = document.getElementById(hash.slice(1));
-      target?.scrollIntoView();
-      if (target?.id === 'content') target.focus({ preventScroll: true });
-    }
-    else window.scrollTo({ top: 0 });
-  }, [hash]);
+  const { search } = useLocation();
+  const params = new URLSearchParams(search);
+  const index = Math.max(0, CHANNELS.findIndex(item => item.id === params.get('channel')));
+  const channel = CHANNELS[index];
+  const view = ['activity', 'contact'].includes(params.get('view')) ? params.get('view') : index ? 'projects' : 'about';
+  const preview = useRef(null);
 
   return (
-    <div className="portfolio" id="top">
-      <a className="skip-link" href="#/#content">Skip to content</a>
-      <header className="site-header">
-        <Link className="wordmark" to="/#top" aria-label="Monish RJ, home">mrj<span>✳</span></Link>
-        <nav aria-label="Main navigation">
-          <Link to="/#projects">Work</Link>
-          <Link to="/#about">About</Link>
-          <Link to="/#activity">Activity</Link>
-          <a href="mailto:mrameshj@purdue.edu">Let’s talk <span aria-hidden="true">↗</span></a>
-        </nav>
-      </header>
+    <main className="portfolio">
+      <a className="skip-link" href="#screen-content" onClick={event => { event.preventDefault(); document.getElementById('screen-content').focus(); }}>Skip to content</a>
+      <aside className="identity">
+        <div><h1>monish<br />ramesh<br /><span>jayakumar.</span></h1><p className="identity-note">CS Honors @ Purdue</p></div>
+        <div className="identity-bottom">
+          <nav aria-label="Main navigation">
+            <Link to="/" aria-current={view === 'about' ? 'page' : undefined}>about me</Link>
+            <Link to={channelUrl(CHANNELS[1])} aria-current={view === 'projects' ? 'page' : undefined}>projects</Link>
+            <Link to="/?view=activity" aria-current={view === 'activity' ? 'page' : undefined}>github activity</Link>
+            <Link to="/?view=contact" aria-current={view === 'contact' ? 'page' : undefined}>contact</Link>
+          </nav>
+          <div className="small-links"><a href={`${import.meta.env.BASE_URL}resume.pdf`} target="_blank" rel="noopener noreferrer">résumé ↗</a><a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer">github ↗</a></div>
+        </div>
+      </aside>
 
-      <main id="content" tabIndex={-1}>
-        <section className="hero" aria-labelledby="hero-title">
-          <div className="hero-copy">
-            <p className="eyebrow"><span className="status-dot" /> CS Honors @ Purdue</p>
-            <h1 id="hero-title">monish<br />ramesh<br /><span>jayakumar.</span></h1>
-            <p className="hero-intro">ML. Software. A little hardware.</p>
-            <div className="hero-actions">
-              <Link className="primary-link" to="/#projects">Explore my work <span aria-hidden="true">↘</span></Link>
-              <button className="text-link" onClick={() => setResumeOpen(true)}>Résumé <span aria-hidden="true">↗</span></button>
+      <section className="screen-panel" id="screen-content" tabIndex={-1} aria-label="Portfolio content">
+        {view === 'activity' ? <div className="activity-panel"><p className="eyebrow">github / monishramj</p><h2>Little by little.</h2><ContributionGraph /><a className="inline-link" href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer">View on GitHub ↗</a></div> : <>
+          <div className="screen-stage" role="img" aria-label={`TV showing ${view === 'contact' ? 'About me' : channel.title}`}><Television channel={view === 'contact' ? CHANNELS[0] : channel} /></div>
+          {view === 'contact' ? <div className="screen-caption contact-panel"><h2>Say hello.</h2><a href="mailto:mrameshj@purdue.edu">mrameshj@purdue.edu ↗</a><a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></div> : <>
+            <div className="channel-controls" aria-label="Channel controls"><Link to={channelUrl(CHANNELS[(index + CHANNELS.length - 1) % CHANNELS.length])} aria-label="Previous channel">←</Link><span aria-live="polite" aria-atomic="true">{String(index + 1).padStart(2, '0')} / {String(CHANNELS.length).padStart(2, '0')} <span className="channel-label">{channel.title}</span></span><Link to={channelUrl(CHANNELS[(index + 1) % CHANNELS.length])} aria-label="Next channel">→</Link></div>
+            <div className="screen-caption">
+              {index === 0 ? <><p>CS major and JHMC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p><p>love movies, sketching, and I have an origami collection.</p></> : <><h2>{channel.title}</h2><p>{channel.desc}</p><div className="project-meta"><span>{channel.tech.join(' · ')}</span><div><a href={channel.github} target="_blank" rel="noopener noreferrer">Source ↗</a>{channel.devpost && <a href={channel.devpost} target="_blank" rel="noopener noreferrer">Devpost ↗</a>}{channel.store && <a href={channel.store} target="_blank" rel="noopener noreferrer">App ↗</a>}<button onClick={() => preview.current.showModal()}>Enlarge ↗</button></div></div></>}
             </div>
-            <div className="hero-social" aria-label="Social links">
-              <a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><GhIcon size={18} /></a>
-              <a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><LiIcon size={18} /></a>
-              <a href="mailto:mrameshj@purdue.edu" aria-label="Email"><MailIcon size={18} /></a>
-            </div>
-          </div>
-          <figure className="hero-tv">
-            <div className="tv-label"><span>CH. 0{channel + 1}</span><span>{CHANNELS[channel].name}</span></div>
-            <div className="tv-stage" role="img" aria-label={`Interactive vintage television: ${CHANNELS[channel].name}`}>
-              <Suspense fallback={<img className="tv-placeholder" src={`${import.meta.env.BASE_URL}images/monish.jpeg`} alt="" />}>
-                <ModelViewer
-                  url={`${import.meta.env.BASE_URL}grandmas_tv.glb`}
-                  width="100%" height="100%"
-                  defaultRotationX={190} defaultRotationY={20} defaultZoom={1.05}
-                  showScreenshotButton={false}
-                  screenTextureSrc={CHANNELS[channel].image}
-                  environmentPreset="none" ambientIntensity={1.6} keyLightIntensity={3}
-                  enableManualZoom={false} enableMouseParallax={false} enableHoverRotation={false}
-                  autoFrame fadeIn
-                />
-              </Suspense>
-            </div>
-            <figcaption><div className="channel-controls" role="group" aria-label="TV channel">{CHANNELS.map((item, index) => <button key={item.name} aria-label={`TV channel: ${item.name}`} aria-pressed={channel === index} onClick={() => setChannel(index)}>0{index + 1}</button>)}</div><span className="drag-hint">Switch channels · drag to rotate</span></figcaption>
-          </figure>
-        </section>
-
-        <section className="section" id="projects" aria-labelledby="projects-title">
-          <div className="section-heading">
-            <div><p className="eyebrow">01 / Work</p><h2 id="projects-title">Selected experiments<span>.</span></h2></div><span className="gallery-hint">Pick one to explore ↗</span>
-          </div>
-          <div className="project-grid">
-            {FEATURED.map((project, index) => <ProjectCard key={project.title} {...project} index={index + 1} />)}
-          </div>
-          <details className="more-projects">
-            <summary><span className="more-label">More projects <span className="count">{MORE.length.toString().padStart(2, '0')}</span></span><span className="expand-icon" aria-hidden="true">+</span></summary>
-            <div className="project-grid project-grid--archive">
-              {MORE.map((project, index) => <ProjectCard key={project.title} {...project} index={FEATURED.length + index + 1} />)}
-            </div>
-          </details>
-        </section>
-
-        <section className="section about-section" id="about" aria-labelledby="about-title">
-          <div className="about-visual">
-            <p className="eyebrow">02 / Behind the screen</p>
-            <button className={`portrait-card${portraitFlipped ? ' is-flipped' : ''}`} onClick={() => setPortraitFlipped(!portraitFlipped)} aria-pressed={portraitFlipped} aria-label="Flip portrait to see interests">
-              <span className="portrait-front"><img src={`${import.meta.env.BASE_URL}images/monish.jpeg`} alt="Monish" loading="lazy" /><span>monish, off screen. <span aria-hidden="true">↻</span></span></span>
-              <span className="portrait-back" aria-hidden={!portraitFlipped}>
-                <svg viewBox="0 0 200 160" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="M20 95 84 70 113 18 123 83 183 45 146 101 100 124 20 95 105 91 113 18M84 70 105 91 100 124M105 91 146 101 183 45M100 124 64 145 77 116" /></svg>
-                <span>Movies. Sketches.<br />An origami collection.</span><span className="portrait-flip-hint">↻ back to me</span>
-              </span>
-            </button>
-          </div>
-          <div className="about-details">
-            <h2 id="about-title">Hi, I’m Monish<span>.</span></h2>
-            <p className="about-short">CS Honors @ Purdue.<br />Machine Intelligence + Systems.</p>
-            <div className="about-badges"><span>3+1 BS/MS</span><span>Illinois, US</span></div>
-            <div className="role-cards">
-              {CURRENTLY.map(item => <details className="role-card" key={item.org}><summary><span className="status-dot" /><span><strong>{item.org}</strong><small>{item.role}</small></span><span className="expand-icon" aria-hidden="true">+</span></summary><p>{item.desc}</p><a href={item.href} target="_blank" rel="noopener noreferrer">{item.date} ↗</a></details>)}
-            </div>
-          </div>
-          <div className="toolkit-board">
-            <div className="toolkit-controls"><h3 className="eyebrow">The toolkit</h3><div className="skill-switcher" role="group" aria-label="Explore skills">{SKILLS.map((item, index) => <button key={item.name} onClick={() => setSkill(index)} aria-pressed={skill === index}><span className="skill-symbol" aria-hidden="true">{item.symbol}</span>{item.name}</button>)}</div><p className="skill-description" aria-live="polite">{SKILLS[skill].desc}</p></div>
-            <a className="toolkit-preview" href={SKILLS[skill].project.github} target="_blank" rel="noopener noreferrer" aria-label={`View ${SKILLS[skill].project.title} on GitHub`}><img src={SKILLS[skill].project.img} alt={SKILLS[skill].project.title} loading="lazy" /><span>{SKILLS[skill].project.title} <span aria-hidden="true">↗</span></span></a>
-          </div>
-        </section>
-
-        <section className="section" id="activity" aria-labelledby="activity-title">
-          <div className="section-heading">
-            <div><p className="eyebrow">03 / GitHub</p><h2 id="activity-title">On the record<span>.</span></h2></div>
-            <a className="text-link" href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer"><GhIcon /> @monishramj <span aria-hidden="true">↗</span></a>
-          </div>
-          <ContributionGraph />
-        </section>
-
-        <footer className="site-footer" id="contact">
-          <div className="footer-main"><div><p className="eyebrow">Have an idea?</p><h2>Say hello<span>↘</span></h2></div><a className="contact-link" href="mailto:mrameshj@purdue.edu">Let’s talk <span aria-hidden="true">↗</span></a></div>
-          <div className="footer-bottom"><span>© {new Date().getFullYear()} Monish Ramesh Jayakumar</span><span className="footer-fin"><i>fin.</i></span><Link to="/#top">Back to top ↑</Link></div>
-        </footer>
-      </main>
-      <ResumeModal open={resumeOpen} onClose={() => setResumeOpen(false)} />
-    </div>
+          </>}
+        </>}
+      </section>
+      <dialog ref={preview} className="image-preview" aria-label={`${channel.title} image preview`} onClick={event => { if (event.target === event.currentTarget) preview.current.close(); }}><div className="preview-bar"><span>{channel.title}</span><button onClick={() => preview.current.close()} aria-label="Close image preview">×</button></div><img src={channel.img} alt={channel.title} /></dialog>
+    </main>
   );
 }

@@ -53,8 +53,8 @@ const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standb
 const ModelInner = ({
   url, pivot, initYaw, initPitch, defaultZoom, minZoom, maxZoom,
   enableMouseParallax, enableManualRotation, enableHoverRotation, enableManualZoom,
-  autoFrame, fadeIn, autoRotate, autoRotateSpeed, onLoaded,
-  modelXOffset, modelYOffset, screenTextureSrc,
+  autoFrame, focusScreen, fadeIn, autoRotate, autoRotateSpeed, onLoaded,
+  modelXOffset, modelYOffset, screenTextureSrc, screenTextureFit,
 }) => {
   const { scene } = useGLTF(url);
   const content = useMemo(() => scene.clone(), [scene]);
@@ -62,7 +62,7 @@ const ModelInner = ({
   const root = useRef(null);
   const screenMeshRef = useRef(null);
   const screenAspectRef = useRef(1);
-  const { camera, gl } = useThree();
+  const { camera, gl, size: viewport } = useThree();
 
   const vel  = useRef({ x: 0, y: 0 });
   const tPar = useRef({ x: 0, y: 0 });
@@ -170,6 +170,21 @@ const ModelInner = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content]);
 
+  useLayoutEffect(() => {
+    if (!focusScreen || !screenMeshRef.current) return;
+    root.current.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(screenMeshRef.current);
+    const size = box.getSize(new THREE.Vector3());
+    box.getCenter(pivot);
+    const distance = Math.max(size.y, size.x / camera.aspect) * defaultZoom / (2 * Math.tan(deg2rad(camera.fov / 2)));
+    camera.position.copy(pivot).add(new THREE.Vector3(0, 0, distance));
+    camera.lookAt(pivot);
+    camera.near = distance / 100;
+    camera.far = distance * 100;
+    camera.updateProjectionMatrix();
+    invalidate();
+  }, [camera, content, defaultZoom, focusScreen, pivot, viewport.width, viewport.height]);
+
   useEffect(() => {
     if (!screenTextureSrc || !screenMeshRef.current) return;
     const mesh = screenMeshRef.current;
@@ -185,19 +200,19 @@ const ModelInner = ({
       const canvas = document.createElement('canvas');
       canvas.width = W; canvas.height = H;
       const ctx = canvas.getContext('2d');
-      const scale = Math.max(W / img.width, H / img.height);
+      ctx.fillStyle = '#080808';
+      ctx.fillRect(0, 0, W, H);
+      const scale = (screenTextureFit === 'contain' ? Math.min : Math.max)(W / img.width, H / img.height);
       const w = img.width * scale;
       const h = img.height * scale;
       ctx.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
       const tex = texture = new THREE.CanvasTexture(canvas);
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.flipY = true;
-      const m = material = originalMaterial.clone();
-      m.map = tex;
-      m.emissiveMap = tex;
-      m.emissive = new THREE.Color(0.15, 0.15, 0.15);
-      m.emissiveIntensity = 1;
-      m.needsUpdate = true;
+      const m = material = new THREE.MeshBasicMaterial({
+        map: tex, toneMapped: false, side: originalMaterial.side,
+        transparent: originalMaterial.transparent, opacity: originalMaterial.opacity,
+      });
       mesh.material = m;
       invalidate();
     };
@@ -211,7 +226,7 @@ const ModelInner = ({
         texture.dispose();
       }
     };
-  }, [screenTextureSrc, content]);
+  }, [screenTextureSrc, screenTextureFit, content]);
 
   useEffect(() => {
     if (!enableManualRotation || isTouch) return;
@@ -395,6 +410,7 @@ const ModelViewer = ({
   rimLightIntensity = 0.8,
   environmentPreset = 'forest',
   autoFrame = false,
+  focusScreen = false,
   placeholderSrc,
   showScreenshotButton = true,
   fadeIn = false,
@@ -402,6 +418,7 @@ const ModelViewer = ({
   autoRotateSpeed = 0.35,
   onModelLoaded,
   screenTextureSrc,
+  screenTextureFit = 'cover',
 }) => {
   useEffect(() => void useGLTF.preload(url), [url]);
   const pivot = useMemo(() => new THREE.Vector3(), []);
@@ -433,7 +450,7 @@ const ModelViewer = ({
   };
 
   return (
-    <div style={{ width, height, touchAction: 'pan-y pinch-zoom', position: 'relative', cursor: 'grab' }}>
+    <div style={{ width, height, touchAction: 'pan-y pinch-zoom', position: 'relative', cursor: enableManualRotation ? 'grab' : 'default' }}>
       {showScreenshotButton && (
         <button
           onClick={capture}
@@ -477,6 +494,7 @@ const ModelViewer = ({
             enableHoverRotation={enableHoverRotation}
             enableManualZoom={enableManualZoom}
             autoFrame={autoFrame}
+            focusScreen={focusScreen}
             fadeIn={fadeIn}
             autoRotate={autoRotate}
             autoRotateSpeed={autoRotateSpeed}
@@ -485,6 +503,7 @@ const ModelViewer = ({
             modelXOffset={modelXOffset}
             modelYOffset={modelYOffset}
             screenTextureSrc={screenTextureSrc}
+            screenTextureFit={screenTextureFit}
           />
         </Suspense>
         {!isTouch && (

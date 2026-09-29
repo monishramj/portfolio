@@ -1,31 +1,8 @@
-# TV portfolio
+# Two-panel portfolio
 
-## Structure
+Left: name, bottom navigation, résumé and GitHub links.
+Right: the original 3D TV, framed around its screen with the original dawn environment.
 
-Header → centered TV → named channel selector → selected channel details → GitHub activity → contact.
+About me is the first channel: portrait on screen, original bio beneath it. Previous/next arrows switch through all seven project images, with descriptions and source/demo links below. Projects opens the first project channel. GitHub activity and contact replace the right panel's content. No gallery, thumbnails, stacked homepage sections, or autoplay.
 
-The TV is the single browsing surface. Remove the separate featured gallery, portrait flip, and toolkit preview. Keep the existing colors, model, résumé, and project data.
-
-## Browsing
-
-- Start on About me: portrait on the TV and the original biography underneath.
-- Show About me plus three featured project thumbnails, each with a readable title.
-- More projects reveals the remaining four channel buttons in the same selector.
-- Previous / next browse every channel; reveal the extra channels automatically when one is selected.
-- Mark the selected thumbnail with a border, an On air label, and `aria-pressed`.
-- Keep the TV and controls in fixed positions when content changes. Never autoplay.
-- Keep channel selection in the URL so reload, direct links, and browser Back work.
-
-## Content
-
-A project channel shows its image on the TV, followed by its title, description, technologies, and source / demo links. About me shows the original bio, degree, and expandable current roles.
-
-Fit project images inside the screen without cropping charts or screenshots. Enlarge image opens the original image in a native dialog with Escape, focus trapping, and focus return. Text stays outside the small TV screen for legibility.
-
-## Accessibility and mobile
-
-Use ordinary labeled buttons, visible focus, at least 44px targets, and a polite channel announcement. Two thumbnail columns on mobile; no hidden swipe-only navigation. Keep the TV facing forward so its screen remains legible. A portrait/project image fallback preserves browsing if WebGL cannot load.
-
-## Validation
-
-Check all eight channels, next/previous wraparound, expanded archive selection, original biography, matching images and links, URL reload/Back, image dialog keyboard behavior, mobile overflow, and contribution loading failures.
+Channel and panel selection live in the URL for reload and browser Back. Project images fit the screen without cropping and can be enlarged. On phones, the left panel stacks above the TV. All controls have text labels, keyboard access, and visible focus. A plain image remains available if the model fails to load.
