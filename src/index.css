@@ -65,9 +65,10 @@ h2 span { color: var(--accent); }
 .gallery-hint { color: var(--text-muted); font-size: 11px; }
 .project-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; }
 .project-card { min-width: 0; position: relative; }
+.project-grid:not(.project-grid--archive) { grid-template-rows: repeat(2, 240px); }
 .project-grid:not(.project-grid--archive) > .project-card:first-child { grid-row: span 2; }
 .project-image { position: relative; display: block; width: 100%; height: 240px; padding: 0; text-align: left; overflow: hidden; border: 1px solid #ffffff14; border-radius: 9px; background: #18171b; color: var(--text); }
-.project-grid:not(.project-grid--archive) > .project-card:first-child .project-image { height: 100%; min-height: 498px; }
+.project-grid:not(.project-grid--archive) > .project-card:first-child .project-image { height: 100%; min-height: 0; }
 .project-image::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, #00000010 35%, #000000dd); pointer-events: none; }
 .project-image img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .45s, filter .45s; }
 .project-image:hover img, .project-image:focus-visible img { transform: scale(1.05); filter: saturate(1.15); }
@@ -153,7 +154,7 @@ html:has(dialog[open]) { overflow: hidden; }
 @media (max-width: 720px) {
   html { scroll-padding-top: 28px; }.portfolio { padding: 0 24px; }.site-header { min-height: 78px; }.site-header nav { gap: 18px; font-size: 12px; }.site-header nav a:last-child { display: none; }
   .hero { grid-template-columns: 1fr; padding: 48px 0; gap: 36px; }h1 { font-size: clamp(64px, 13vw, 96px); }.hero-intro { font-size: 16px; }.hero-social > span { display: inline; }.hero-tv { max-width: 480px; width: 100%; margin: auto; }.tv-stage { height: 320px; }.drag-hint { display: inline; }
-  .section { padding: 42px 0; }.section-heading { align-items: flex-start; gap: 12px; }.section-heading > p { display: none; }.section-heading h2 { font-size: 30px; }.project-grid { grid-template-columns: 1fr; gap: 16px; }.project-image, .project-grid--archive .project-image { height: 260px; }.project-grid:not(.project-grid--archive) > .project-card:first-child { grid-row: auto; }.project-grid:not(.project-grid--archive) > .project-card:first-child .project-image { height: 350px; min-height: 0; }.gallery-hint { display: none; }.project-info h3 { font-size: 23px; }.project-info > p { font-size: 14px; }.project-tags li { font-size: 10px; }.project-links { font-size: 12px; }
+  .section { padding: 42px 0; }.section-heading { align-items: flex-start; gap: 12px; }.section-heading > p { display: none; }.section-heading h2 { font-size: 30px; }.project-grid { grid-template-columns: 1fr; gap: 16px; }.project-image, .project-grid--archive .project-image { height: 260px; }.project-grid:not(.project-grid--archive) { grid-template-rows: none; }.project-grid:not(.project-grid--archive) > .project-card:first-child { grid-row: auto; }.project-grid:not(.project-grid--archive) > .project-card:first-child .project-image { height: 350px; min-height: 0; }.gallery-hint { display: none; }.project-info h3 { font-size: 23px; }.project-info > p { font-size: 14px; }.project-tags li { font-size: 10px; }.project-links { font-size: 12px; }
   .about-section { grid-template-columns: 1fr; gap: 36px; }.toolkit-board { grid-template-columns: 1fr; }.toolkit-preview { min-height: 210px; }.toolkit-controls { padding: 22px; }.skill-switcher { gap: 8px; }.about-copy h2 br { display: none; }.about-copy h2 { max-width: 400px; }.about-note { line-height: 2; }
   #activity .section-heading { flex-direction: column; }.contrib-section { padding: 18px; }.contrib-header { align-items: flex-start; flex-direction: column; gap: 4px; }.contrib-footer { align-items: flex-start; }.contrib-legend { flex-shrink: 0; }.contrib-footer > span { max-width: 140px; }
   .footer-main { align-items: flex-start; flex-direction: column; }.footer-bottom { flex-wrap: wrap; margin-top: 40px; }.footer-fin { display: none; }.site-footer { padding-top: 40px; }.resume-modal-title { display: none; }

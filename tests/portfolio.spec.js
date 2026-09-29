@@ -32,10 +32,23 @@ test('one-page browsing, responsive layout, resume and calendar fallback', async
   await expect(page.locator('.project-card:visible')).toHaveCount(3);
   await page.getByRole('link', { name: 'Work', exact: true }).click();
   await expect(page).toHaveURL(/#\/#projects$/);
-  await page.locator('summary').click();
+  await page.locator('.more-projects > summary').click();
   await expect(page.locator('.project-card:visible')).toHaveCount(7);
-  await page.locator('summary').click();
+  await page.locator('.more-projects > summary').click();
   await expect(page.locator('.project-card:visible')).toHaveCount(3);
+  await page.getByRole('button', { name: 'Explore MedVR Haptic Glove' }).click();
+  await expect(page.getByRole('dialog', { name: 'MedVR Haptic Glove' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'MedVR Haptic Glove source on GitHub' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', { name: 'Explore MedVR Haptic Glove' })).toBeFocused();
+  await page.getByRole('button', { name: 'TV channel: DOOM' }).click();
+  await expect(page.getByRole('button', { name: 'TV channel: DOOM' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Flip portrait to see interests' }).click();
+  await expect(page.getByRole('button', { name: 'Flip portrait to see interests' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'Flutter', exact: true }).click();
+  await expect(page.getByRole('link', { name: 'View DiabFit on GitHub' })).toBeVisible();
+  await page.locator('.role-card').first().locator('summary').click();
+  await expect(page.getByText('benchmarking LLM output', { exact: false })).toBeVisible();
   await page.getByRole('button', { name: 'Résumé' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.keyboard.press('Escape');
@@ -44,13 +57,13 @@ test('one-page browsing, responsive layout, resume and calendar fallback', async
   for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    await page.locator('summary').click();
+    await page.locator('.more-projects > summary').click();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-    await page.locator('summary').click();
+    await page.locator('.more-projects > summary').click();
   }
   await page.goto('http://127.0.0.1:5173/portfolio/#/projects');
   await expect(page).toHaveURL(/#\/#projects$/);
-  await expect(page.getByRole('heading', { name: 'A few things I’ve built.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Selected experiments.' })).toBeVisible();
   await page.route('**/github-contributions-api.jogruber.de/**', route => route.fulfill({ status: 503, body: 'Unavailable' }));
   await page.reload();
   await expect(page.getByRole('link', { name: 'View activity on GitHub' })).toBeVisible();

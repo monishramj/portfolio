@@ -173,6 +173,8 @@ const ModelInner = ({
   useEffect(() => {
     if (!screenTextureSrc || !screenMeshRef.current) return;
     const mesh = screenMeshRef.current;
+    const originalMaterial = mesh.material;
+    let texture, material;
     let cancelled = false;
     const img = new Image();
     img.onload = () => {
@@ -187,10 +189,10 @@ const ModelInner = ({
       const w = img.width * scale;
       const h = img.height * scale;
       ctx.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
-      const tex = new THREE.CanvasTexture(canvas);
+      const tex = texture = new THREE.CanvasTexture(canvas);
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.flipY = true;
-      const m = mesh.material.clone();
+      const m = material = originalMaterial.clone();
       m.map = tex;
       m.emissiveMap = tex;
       m.emissive = new THREE.Color(0.15, 0.15, 0.15);
@@ -200,7 +202,15 @@ const ModelInner = ({
       invalidate();
     };
     img.src = screenTextureSrc;
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+      if (material) {
+        originalMaterial.opacity = material.opacity;
+        mesh.material = originalMaterial;
+        material.dispose();
+        texture.dispose();
+      }
+    };
   }, [screenTextureSrc, content]);
 
   useEffect(() => {
