@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 import FilmStrip from '../components/layout/FilmStrip';
 import Frame from '../components/layout/Frame';
 import InterFrame from '../components/layout/InterFrame';
 import ModelViewer from '../components/ModelViewer';
-import Button, { DocIcon } from '../components/Button';
+import { DocIcon } from '../components/Button';
 import ResumeModal from '../components/ResumeModal';
 import ProjectCard from '../components/ProjectCard';
+import ContributionGraph from '../components/ContributionGraph';
 import Stack from '../components/Stack';
 import { PROJECTS } from '../data/projects';
 
@@ -93,14 +94,13 @@ const SKILLS = [
 
 const FEATURED = PROJECTS.filter(p => p.featured);
 
-const NAV_SECTIONS = ['projects', 'about', 'currently', 'skills'];
+const NAV_SECTIONS = ['projects', 'activity', 'about', 'currently'];
 
 export default function Home() {
   const [activeSkill, setActiveSkill] = useState(SKILLS[0].name);
   const [visits, setVisits] = useState(null);
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 900px)').matches);
   const [resumeOpen, setResumeOpen] = useState(false);
-  const navigate = useNavigate();
   const splitMainRef = useRef(null);
 
   useEffect(() => {
@@ -145,13 +145,23 @@ export default function Home() {
       <Frame id="projects">
           <div className="proj-section-head">
             <div className="eyebrow" style={{ marginBottom: 0 }}>featured</div>
-            <Button size="sm" onClick={() => navigate('/projects')}>
-              see all projects
-            </Button>
+
           </div>
           <div className="proj-list">
             {FEATURED.map(p => <ProjectCard key={p.title} {...p} />)}
           </div>
+          <details className="more-projects">
+            <summary>More projects ({PROJECTS.length - FEATURED.length})</summary>
+            <div className="proj-grid">
+              {PROJECTS.filter(p => !p.featured).map(p => <ProjectCard key={p.title} {...p} variant="row" />)}
+            </div>
+          </details>
+        </Frame>
+
+        <InterFrame />
+        <Frame id="activity">
+          <div className="eyebrow">GitHub activity</div>
+          <ContributionGraph />
         </Frame>
 
         <InterFrame />
@@ -301,11 +311,7 @@ export default function Home() {
               href={`#${id}`}
               onClick={e => {
                 e.preventDefault();
-                if (id === 'projects') {
-                  navigate('/projects');
-                } else {
-                  scrollToSection(id);
-                }
+                scrollToSection(id);
               }}
             >
               {id}

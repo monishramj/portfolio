@@ -1189,3 +1189,7 @@ body {
   .resume-modal { width: 100%; height: 100%; border-radius: 0; }
   .resume-modal-title { display: none; }
 }
+
+.more-projects { margin-top: 32px; }
+.more-projects summary { cursor: pointer; color: var(--accent); padding: 12px 0; }
+.more-projects .proj-grid { margin-top: 16px; }
