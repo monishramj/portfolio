@@ -276,7 +276,7 @@ const ModelInner = ({
   // a new image starts the dim straight away, without waiting for it to load
   useEffect(() => {
     const m = screenMat.current;
-    if (screenDip && m?.map) dip.current = { phase: 'out', t: 0, start: m.color.r, pending: null };
+    if (screenDip && m?.map) { dip.current = { phase: 'out', t: 0, start: m.color.r, pending: null }; invalidate(); }
   }, [screenTextureSrc, screenDip]);
 
   useEffect(() => {
@@ -528,6 +528,15 @@ const ModelInner = ({
     root.current.rotation.x += vel.current.y;
     vel.current.x *= INERTIA;
     vel.current.y *= INERTIA;
+
+    // frameloop="demand": keep drawing only while something is still easing, then go idle
+    const near = (a, b) => Math.abs(a - b) < 3e-4; // well under a pixel at this scene's scale
+    const settling = d || dip.current || autoRotate
+      || Math.abs(vel.current.x) > 1e-5 || Math.abs(vel.current.y) > 1e-5
+      || !near(tPar.current.x, cPar.current.x) || !near(tPar.current.y, cPar.current.y)
+      || !near(tHov.current.x, cHov.current.x) || !near(tHov.current.y, cHov.current.y)
+      || (ft && fc && (pivot.distanceToSquared(ft.center) > 1e-6 || !near(fc.dist, ft.dist) || !near(fc.lift, ft.lift)));
+    if (settling) invalidate();
   });
 
   return (
@@ -640,7 +649,7 @@ const ModelViewer = ({
       )}
       <Canvas
         shadows
-        frameloop="always"
+        frameloop="demand"
         gl={{ preserveDrawingBuffer: true }}
         onCreated={({ gl, scene, camera }) => {
           rendererRef.current = gl;
