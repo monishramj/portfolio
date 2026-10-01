@@ -51,6 +51,7 @@ const DesktopControls = ({ target, min, max, zoomEnabled }) => {
 const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standby', 'screennoise'];
 // channel change: the picture dims, swaps while dark, then comes back up
 const DIP_OUT = 0.12, DIP_IN = 0.2, DIP_LOW = 0.08;
+const DOILY_SCALE = 1.22; // the white pixel-art doily draped over the TV's front-top, scaled up about its own centre
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
 const ModelInner = ({
@@ -85,6 +86,23 @@ const ModelInner = ({
 
   useLayoutEffect(() => {
     if (!root.current || !content) return;
+
+    // Enlarge the doily. Its vertices are the ones that map to its patch of the texture atlas
+    // (u > .40, v > .85) and sit on the front of the TV; the geometry is shared, so only do it once.
+    const tvGeo = content.getObjectByName('TV_Tv_0')?.geometry;
+    if (tvGeo && !tvGeo.userData.doilyScaled) {
+      tvGeo.userData.doilyScaled = true;
+      const pos = tvGeo.attributes.position, uv = tvGeo.attributes.uv, ids = [];
+      for (let i = 0; i < pos.count; i++) if (uv.getX(i) > 0.4 && uv.getY(i) > 0.85 && pos.getZ(i) > 3.8) ids.push(i);
+      if (ids.length) {
+        const c = new THREE.Vector3();
+        ids.forEach(i => c.add(new THREE.Vector3().fromBufferAttribute(pos, i)));
+        c.divideScalar(ids.length);
+        ids.forEach(i => pos.setXYZ(i, c.x + (pos.getX(i) - c.x) * DOILY_SCALE, c.y + (pos.getY(i) - c.y) * DOILY_SCALE, pos.getZ(i)));
+        pos.needsUpdate = true;
+        tvGeo.computeBoundingBox(); tvGeo.computeBoundingSphere();
+      }
+    }
 
     const box = new THREE.Box3().setFromObject(content);
     if (box.isEmpty()) return;
