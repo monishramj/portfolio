@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-import { COUNT, layout } from './shelfLayout';
+import { layout } from './shelfLayout';
 
 // Palette sampled from the model's own texture atlas (grey plastic, cream labels).
 const PLASTIC = ['#1a1a1c', '#232122', '#2c2829', '#373031'];
@@ -65,9 +65,21 @@ function pixelTexture(canvas) {
   return tex;
 }
 
+// Boxes for the shelf use the model's own wood region of its texture atlas (u .44-.66, v .04-.42).
+function woodGeometry(w, h, d, grainAlongX) {
+  const g = new THREE.BoxGeometry(w, h, d);
+  const uv = g.attributes.uv;
+  for (let i = 0; i < uv.count; i++) {
+    const [u, v] = [uv.getX(i), uv.getY(i)];
+    uv.setXY(i, 0.44 + (grainAlongX ? v : u) * 0.22, 0.04 + (grainAlongX ? u : v) * 0.38);
+  }
+  return g;
+}
+
 function Tape({ skill, index, selected, active, onSelect, l, plastic }) {
   const group = useRef(null);
   const hover = useRef(false);
+  const slot = l.slots[index];
   const spine = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = SPINE_W; canvas.height = SPINE_H;
@@ -86,13 +98,12 @@ function Tape({ skill, index, selected, active, onSelect, l, plastic }) {
     return () => { live = false; spine.dispose(); };
   }, [spine, skill]);
 
-  const baseX = l.cx + (index - (COUNT - 1) / 2) * l.pitch;
   useFrame((_, dt) => {
     const g = group.current;
     if (!g) return;
     const pull = selected ? l.tapeD * 0.42 : active && hover.current ? l.tapeD * 0.2 : 0;
     const k = 1 - Math.exp(-dt * 10);
-    g.position.z += (pull - g.position.z) * k;
+    g.position.z += (slot.z + pull - g.position.z) * k;
   });
 
   const handlers = active ? {
@@ -101,14 +112,38 @@ function Tape({ skill, index, selected, active, onSelect, l, plastic }) {
     onClick: e => { e.stopPropagation(); onSelect(index); },
   } : {};
 
+  // leaning tapes pivot on their bottom-left corner, upright ones on their bottom centre
   return (
-    <group ref={group} position={[baseX, l.floorTop + l.tapeH / 2, l.cz]} {...handlers}>
-      <mesh castShadow>
+    <group ref={group} position={[slot.x, l.floorTop, slot.z]} rotation={[0, 0, slot.tilt]} {...handlers}>
+      <mesh castShadow position={[slot.lean ? l.tapeW / 2 : 0, l.tapeH / 2, 0]}>
         <boxGeometry args={[l.tapeW, l.tapeH, l.tapeD]} />
         {[plastic, plastic, plastic, plastic].map((m, i) => <primitive key={i} object={m} attach={`material-${i}`} />)}
         <meshStandardMaterial attach="material-4" map={spine} roughness={0.8} envMapIntensity={0.5} />
         <primitive object={plastic} attach="material-5" />
       </mesh>
+    </group>
+  );
+}
+
+function Cubby({ l, material }) {
+  const floor = useMemo(() => woodGeometry(l.innerW, l.board, l.depth, true), [l]);
+  const back = useMemo(() => woodGeometry(l.innerW, l.ceiling - l.floorTop + l.board, 0.012, true), [l]);
+  const side = useMemo(() => woodGeometry(0.014, l.ceiling - l.floorTop + l.board, l.depth, false), [l]);
+  // own copy of the model's atlas material, so matte lighting here doesn't change the TV
+  const mat = useMemo(() => {
+    if (!material) return null;
+    const m = material.clone();
+    m.roughness = 1; m.metalness = 0; m.envMapIntensity = 0.45;
+    return m;
+  }, [material]);
+  const wood = mat ? <primitive object={mat} attach="material" /> : <meshStandardMaterial color="#3a2f2c" roughness={0.9} />;
+  const midY = (l.ceiling + l.floorTop - l.board) / 2;
+  return (
+    <group>
+      <mesh geometry={floor} position={[l.cx, l.floorTop - l.board / 2, l.cz]} receiveShadow>{wood}</mesh>
+      <mesh geometry={back} position={[l.cx, midY, l.cz - l.depth / 2 + 0.006]}>{wood}</mesh>
+      <mesh geometry={side} position={[l.cx - l.innerW / 2 + 0.007, midY, l.cz]}>{wood}</mesh>
+      <mesh geometry={side} position={[l.cx + l.innerW / 2 - 0.007, midY, l.cz]}>{wood}</mesh>
     </group>
   );
 }
@@ -124,6 +159,7 @@ export default function VhsShelf({ bounds, skills, selected, active, onSelect })
   }, []);
   return (
     <group>
+      <Cubby l={l} material={bounds.tableMaterial} />
       {skills.map((skill, i) => (
         <Tape key={skill.name} skill={skill} index={i} selected={selected === i} active={active} onSelect={onSelect} l={l} plastic={plastic} />
       ))}

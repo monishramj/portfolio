@@ -104,7 +104,9 @@ const ModelInner = ({
       content.traverse(o => { if (o.isMesh && o.name.toLowerCase().includes(match)) b.expandByObject(o); });
       return b.isEmpty() ? null : { min: b.min.toArray(), max: b.max.toArray() };
     };
-    const parts = { table: part('table'), vhs: part('vhs_reader_tv'), vhs2: part('vhs_reader.001') };
+    let tableMaterial = null;
+    content.traverse(o => { if (o.isMesh && o.name.toLowerCase().includes('table')) tableMaterial = o.material; });
+    const parts = { table: part('table'), tableMaterial };
     boundsRef.current = { width: size.x * s, height: size.y * s, depth: size.z * s, bottomY: -size.y * s / 2, ...parts };
     setBounds(boundsRef.current);
 
@@ -190,11 +192,12 @@ const ModelInner = ({
   useLayoutEffect(() => {
     if (!focusScreen || !screenMeshRef.current || !boundsRef.current) return;
     const tanHalf = Math.tan(deg2rad(camera.fov / 2));
-    let center, dist;
+    let center, dist, lift = 0;
     if (typeof focus === 'function') {
       // shelf framing: { top, bottom, width } in the same normalised units as bounds
       const f = focus(boundsRef.current);
       center = new THREE.Vector3(0, (f.top + f.bottom) / 2, 0);
+      lift = f.lift || 0;
       dist = Math.max(f.top - f.bottom, f.width / camera.aspect) * 1.4 / (2 * tanHalf);
     } else {
       tv.current.updateMatrixWorld(true);
@@ -203,14 +206,14 @@ const ModelInner = ({
       center = box.getCenter(new THREE.Vector3());
       dist = Math.max(size.y, size.x / camera.aspect) * defaultZoom / (2 * tanHalf);
     }
-    focusTarget.current = { center, dist };
+    focusTarget.current = { center, dist, lift };
     camera.near = dist / 100;
     camera.far = dist * 100;
     camera.updateProjectionMatrix();
     if (!focusCur.current || instantFocus) {
-      focusCur.current = { dist };
+      focusCur.current = { dist, lift };
       pivot.copy(center);
-      camera.position.set(center.x, center.y, center.z + dist);
+      camera.position.set(center.x, center.y + dist * lift, center.z + dist);
       camera.lookAt(pivot);
     }
     invalidate();
@@ -393,7 +396,8 @@ const ModelInner = ({
       const k = 1 - Math.exp(-dt * 4.5);
       pivot.lerp(ft.center, k);
       fc.dist += (ft.dist - fc.dist) * k;
-      camera.position.set(pivot.x, pivot.y, pivot.z + fc.dist);
+      fc.lift += (ft.lift - fc.lift) * k;
+      camera.position.set(pivot.x, pivot.y + fc.dist * fc.lift, pivot.z + fc.dist);
       camera.lookAt(pivot);
     }
 
