@@ -44,6 +44,9 @@ h1 em { color: var(--accent); }
 .screen-panel:focus { outline: none; }
 .screen-panel:focus-visible { outline: 2px solid var(--accent); }
 .screen-stage { position: relative; flex: 1 1 0; min-height: 0; width: 100%; isolation: isolate; }
+/* nothing shows until the TV, its lighting and the first picture are all ready, then it fades in */
+.screen-stage > :first-child { transition: opacity .7s ease; }
+.screen-stage.booting > :first-child { opacity: 0; }
 .screen-stage.clickable, .screen-stage.clickable * { cursor: pointer !important; } /* the 3D canvas sets its own cursor inline */
 .screen-fallback { position: absolute; inset: 10%; width: 80%; height: 80%; object-fit: contain; border-radius: 24px; }
 

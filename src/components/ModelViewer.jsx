@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/immutability -- Three.js owns mutable camera and scene objects. */
-import { Suspense, useRef, useState, useLayoutEffect, useEffect, useMemo } from 'react';
+import { Suspense, useCallback, useRef, useState, useLayoutEffect, useEffect, useMemo } from 'react';
 import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
 import { OrbitControls, useGLTF, useProgress, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
@@ -62,7 +62,7 @@ const ModelInner = ({
   enableMouseParallax, enableManualRotation, enableHoverRotation, enableManualZoom,
   autoFrame, focusScreen, fadeIn, autoRotate, autoRotateSpeed, onLoaded,
   modelXOffset, modelYOffset, screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip,
-  focus, instantFocus, children,
+  focus, instantFocus, children, onBoot,
 }) => {
   const { scene } = useGLTF(url);
   const content = useMemo(() => scene.clone(), [scene]);
@@ -202,6 +202,7 @@ const ModelInner = ({
     }
 
     ready.current = true;
+    onBoot?.('model');
     invalidate();
 
     if (fadeIn) {
@@ -292,11 +293,13 @@ const ModelInner = ({
     const show = tex => {
       const m = screenMat.current;
       if (!m || m.map === tex) return;
+      const first = !m.map;
       apply = () => { m.map = tex; m.needsUpdate = true; };
       if (!screenDip) { apply(); m.color.setScalar(1); }
       else if (!m.map) { apply(); dip.current = { phase: 'in', t: 0, start: 0 }; }
       else if (dip.current) dip.current.pending = apply;
       else dip.current = { phase: 'out', t: 0, start: 1, pending: apply };
+      if (first) onBoot?.('picture');
       invalidate();
     };
     const cached = texCache.current.get(key);
@@ -387,7 +390,7 @@ const ModelInner = ({
       cancelled = true;
       if (dip.current?.pending === apply) dip.current.pending = null;
     };
-  }, [screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip, content]);
+  }, [screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip, content, onBoot]);
 
   useEffect(() => {
     if (!enableManualRotation || isTouch) return;
@@ -564,6 +567,18 @@ const ModelInner = ({
   );
 };
 
+// Fires once every asset (model, sky lighting, textures) has finished loading and stayed finished briefly,
+// since assets can be discovered one after another and the loader goes idle between them.
+const AssetsSignal = ({ onDone }) => {
+  const { active, progress } = useProgress();
+  useEffect(() => {
+    if (active || progress < 100) return;
+    const t = setTimeout(onDone, 250);
+    return () => clearTimeout(t);
+  }, [active, progress, onDone]);
+  return null;
+};
+
 const NullBackground = () => {
   const { scene } = useThree();
   useLayoutEffect(() => {
@@ -621,6 +636,7 @@ const ModelViewer = ({
   screenDip = false,
   focus,
   instantFocus = false,
+  onReady,
   children,
 }) => {
   useEffect(() => void useGLTF.preload(url), [url]);
@@ -628,6 +644,16 @@ const ModelViewer = ({
   const rendererRef = useRef(null);
   const sceneRef    = useRef(null);
   const cameraRef   = useRef(null);
+
+  // tell the page once the model, its lighting/assets and the first picture are all in, so it can fade the stage in
+  const boot = useRef({ model: false, assets: false, picture: !screenTextureSrc, done: false });
+  const onReadyRef = useRef(onReady);
+  useEffect(() => { onReadyRef.current = onReady; });
+  const markBoot = useCallback(key => {
+    const b = boot.current;
+    b[key] = true;
+    if (!b.done && b.model && b.assets && b.picture) { b.done = true; onReadyRef.current?.(); }
+  }, []);
 
   const initYaw   = deg2rad(defaultRotationX);
   const initPitch = deg2rad(defaultRotationY);
@@ -674,6 +700,7 @@ const ModelViewer = ({
         camera={{ fov: 50, position: [0, 0, camZ], near: 0.01, far: 100 }}
         style={{ touchAction: 'pan-y pinch-zoom' }}
       >
+        <AssetsSignal onDone={() => markBoot('assets')} />
         <NullBackground />
         {environmentPreset !== 'none' && <Environment preset={environmentPreset} background={false} resolution={LOW_END ? 64 : 128} />}
         <ambientLight intensity={ambientIntensity} />
@@ -706,6 +733,7 @@ const ModelViewer = ({
             screenTextureFit={screenTextureFit}
             screenTextureFocus={screenTextureFocus}
             screenDip={screenDip}
+            onBoot={markBoot}
             focus={focus}
             instantFocus={instantFocus}
           >

@@ -127,3 +127,17 @@ test.describe('automatic carousel', () => {
     await expect(page.getByRole('heading', { name: 'Passenger Princess', exact: true })).toBeVisible({ timeout: 5000 });
   });
 });
+
+test('the stage stays hidden until the TV is ready, with no placeholder photo flashing first', async ({ page }) => {
+  test.setTimeout(40000);
+  await page.route('**/abacus.jasoncameron.dev/**', route => route.fulfill({ json: { value: 1 } }));
+  await page.addInitScript(() => {
+    window.__sawPlaceholder = false;
+    new MutationObserver(() => { if (document.querySelector('.screen-fallback')) window.__sawPlaceholder = true; }).observe(document, { childList: true, subtree: true });
+  });
+  await page.goto('http://127.0.0.1:5173/portfolio/');
+  await expect(page.locator('.screen-stage')).toHaveClass(/booting/); // hidden while loading
+  await expect(page.locator('.screen-stage:not(.booting)')).toBeVisible({ timeout: 30000 }); // revealed once ready
+  await expect(page.locator('canvas')).toBeVisible();
+  expect(await page.evaluate(() => window.__sawPlaceholder)).toBe(false);
+});
