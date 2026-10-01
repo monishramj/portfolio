@@ -75,6 +75,7 @@ const ModelInner = ({
   const screenMeshRef = useRef(null);
   const screenMat = useRef(null); // one material for the screen; only its map changes between channels
   const dip = useRef(null);
+  const texCache = useRef(new Map()); // finished screen pictures by image+fit+focus, so each is drawn only once
   const screenAspectRef = useRef(1);
   const { camera, gl, size: viewport } = useThree();
 
@@ -259,6 +260,7 @@ const ModelInner = ({
     const mesh = screenMeshRef.current;
     if (!hasScreen || !mesh) return;
     const original = mesh.material;
+    const cache = texCache.current;
     const m = new THREE.MeshBasicMaterial({
       color: 0x000000, toneMapped: false, side: original.side,
       transparent: original.transparent, opacity: original.opacity,
@@ -268,8 +270,9 @@ const ModelInner = ({
     return () => {
       screenMat.current = null; dip.current = null;
       mesh.material = original;
-      m.map?.dispose();
       m.dispose();
+      cache.forEach(t => t.dispose());
+      cache.clear();
     };
   }, [content, hasScreen]);
 
@@ -281,8 +284,22 @@ const ModelInner = ({
 
   useEffect(() => {
     if (!screenTextureSrc || !screenMeshRef.current) return;
-    let tex, apply;
+    const key = `${screenTextureSrc}|${screenTextureFit}|${screenTextureFocus ?? ''}`;
+    let apply;
     let cancelled = false;
+    // hand a finished texture to the screen: first picture fades up, later ones dim, swap, brighten
+    const show = tex => {
+      const m = screenMat.current;
+      if (!m || m.map === tex) return;
+      apply = () => { m.map = tex; m.needsUpdate = true; };
+      if (!screenDip) { apply(); m.color.setScalar(1); }
+      else if (!m.map) { apply(); dip.current = { phase: 'in', t: 0, start: 0 }; }
+      else if (dip.current) dip.current.pending = apply;
+      else dip.current = { phase: 'out', t: 0, start: 1, pending: apply };
+      invalidate();
+    };
+    const cached = texCache.current.get(key);
+    if (cached) { show(cached); return () => { if (dip.current?.pending === apply) dip.current.pending = null; }; }
     const img = new Image();
     img.onload = () => {
       if (cancelled) return;
@@ -353,24 +370,17 @@ const ModelInner = ({
       glare.addColorStop(0.45, 'rgba(255,255,255,0)');
       ctx.fillStyle = glare;
       ctx.fillRect(0, 0, W, H);
-      tex = new THREE.CanvasTexture(canvas);
+      const tex = new THREE.CanvasTexture(canvas);
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = 4;
       tex.flipY = true;
-      const m = screenMat.current;
-      if (!m) return;
-      apply = () => { const old = m.map; m.map = tex; m.needsUpdate = true; old?.dispose(); tex = null; }; // the material owns it now
-      if (!screenDip) { apply(); m.color.setScalar(1); }
-      else if (!m.map) { apply(); dip.current = { phase: 'in', t: 0, start: 0 }; } // first picture fades up from black
-      else if (dip.current) dip.current.pending = apply;
-      else dip.current = { phase: 'out', t: 0, start: 1, pending: apply };
-      invalidate();
+      texCache.current.set(key, tex);
+      show(tex);
     };
     img.src = screenTextureSrc;
     return () => {
       cancelled = true;
       if (dip.current?.pending === apply) dip.current.pending = null;
-      tex?.dispose();
     };
   }, [screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip, content]);
 
