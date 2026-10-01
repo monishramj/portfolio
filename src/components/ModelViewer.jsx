@@ -58,7 +58,8 @@ const FRAME_DROP = 0.06; // frames a little above the subject, which sits the TV
 // Sky lighting hosted with the site (CC0, Poly Haven via pmndrs/drei-assets) instead of fetched from a third-party mirror on every load.
 const LOCAL_HDRI = { dawn: 'hdri/kiara_1_dawn_512.hdr' };
 // first power-on: after the TV has been visible for a beat, a thin bright line opens up into the picture
-const POWER_ON_S = 0.55, POWER_BEAT_MS = 700;
+const POWER_ON_S = 0.45, POWER_BEAT_MS = 450;
+const MAX_STEP = 1 / 30; // the longest slice of time one frame may advance an animation by
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
 const ModelInner = ({
@@ -546,8 +547,11 @@ const ModelInner = ({
     return () => window.removeEventListener('pointermove', mm);
   }, [enableMouseParallax, enableHoverRotation]);
 
-  useFrame((_, dt) => {
+  useFrame((_, rawDt) => {
     if (!ready.current || !root.current) return;
+    // A hitch frame (a texture upload, a shader compile) or the first frame after the scene sat idle reports a huge
+    // time step. Cap it, or animations jump to their end in a single frame instead of playing.
+    const dt = Math.min(rawDt, MAX_STEP);
 
     const d = dip.current, sm = screenMat.current;
     if (d && sm) {
@@ -635,7 +639,7 @@ const AssetsSignal = ({ onDone }) => {
   const { active, progress } = useProgress();
   useEffect(() => {
     if (active || progress < 100) return;
-    const t = setTimeout(onDone, 250);
+    const t = setTimeout(onDone, 120);
     return () => clearTimeout(t);
   }, [active, progress, onDone]);
   return null;
@@ -715,14 +719,23 @@ const ModelViewer = ({
   const onReadyRef = useRef(onReady);
   useEffect(() => { onReadyRef.current = onReady; });
   useEffect(() => () => clearTimeout(powerTimer.current), []);
-  const markBoot = useCallback(key => {
+  const finishBoot = useCallback(() => {
     const b = boot.current;
-    b[key] = true;
-    if (b.done || !b.model || !b.assets) return;
+    if (b.done) return;
     b.done = true;
     onReadyRef.current?.();
     powerTimer.current = setTimeout(() => setPowered(true), POWER_BEAT_MS);
   }, []);
+  const markBoot = useCallback(key => {
+    const b = boot.current;
+    b[key] = true;
+    if (b.model && b.assets) finishBoot();
+  }, [finishBoot]);
+  // never leave the TV switched off because one asset was slow or failed: go ahead after a while regardless
+  useEffect(() => {
+    const t = setTimeout(finishBoot, 7000);
+    return () => clearTimeout(t);
+  }, [finishBoot]);
 
   const initYaw   = deg2rad(defaultRotationX);
   const initPitch = deg2rad(defaultRotationY);
