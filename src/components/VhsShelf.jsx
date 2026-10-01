@@ -76,7 +76,7 @@ function woodGeometry(w, h, d, grainAlongX) {
   return g;
 }
 
-function Tape({ skill, index, selected, active, onSelect, l, plastic }) {
+function Tape({ skill, index, selected, active, onSelect, l, plastic, gloss }) {
   const group = useRef(null);
   const hover = useRef(false);
   const slot = l.slots[index];
@@ -115,10 +115,10 @@ function Tape({ skill, index, selected, active, onSelect, l, plastic }) {
   // leaning tapes pivot on their bottom-left corner, upright ones on their bottom centre
   return (
     <group ref={group} position={[slot.x, l.floorTop, slot.z]} rotation={[0, 0, slot.tilt]} {...handlers}>
-      <mesh castShadow position={[slot.lean ? l.tapeW / 2 : 0, l.tapeH / 2, 0]}>
+      <mesh castShadow receiveShadow position={[slot.lean ? l.tapeW / 2 : 0, l.tapeH / 2, 0]}>
         <boxGeometry args={[l.tapeW, l.tapeH, l.tapeD]} />
         {[plastic, plastic, plastic, plastic].map((m, i) => <primitive key={i} object={m} attach={`material-${i}`} />)}
-        <meshStandardMaterial attach="material-4" map={spine} roughness={0.8} envMapIntensity={0.5} />
+        <meshStandardMaterial attach="material-4" map={spine} {...gloss} />
         <primitive object={plastic} attach="material-5" />
       </mesh>
     </group>
@@ -129,39 +129,36 @@ function Cubby({ l, material }) {
   const floor = useMemo(() => woodGeometry(l.innerW, l.board, l.depth, true), [l]);
   const back = useMemo(() => woodGeometry(l.innerW, l.ceiling - l.floorTop + l.board, 0.012, true), [l]);
   const side = useMemo(() => woodGeometry(0.014, l.ceiling - l.floorTop + l.board, l.depth, false), [l]);
-  // own copy of the model's atlas material, so matte lighting here doesn't change the TV
-  const mat = useMemo(() => {
-    if (!material) return null;
-    const m = material.clone();
-    m.roughness = 1; m.metalness = 0; m.envMapIntensity = 0.45;
-    return m;
-  }, [material]);
-  const wood = mat ? <primitive object={mat} attach="material" /> : <meshStandardMaterial color="#3a2f2c" roughness={0.9} />;
+  // the model's own atlas material, so the shelf is lit exactly like the table around it
+  const wood = material ? <primitive object={material} attach="material" /> : <meshStandardMaterial color="#3a2f2c" roughness={0.9} />;
   const midY = (l.ceiling + l.floorTop - l.board) / 2;
   return (
     <group>
-      <mesh geometry={floor} position={[l.cx, l.floorTop - l.board / 2, l.cz]} receiveShadow>{wood}</mesh>
-      <mesh geometry={back} position={[l.cx, midY, l.cz - l.depth / 2 + 0.006]}>{wood}</mesh>
-      <mesh geometry={side} position={[l.cx - l.innerW / 2 + 0.007, midY, l.cz]}>{wood}</mesh>
-      <mesh geometry={side} position={[l.cx + l.innerW / 2 - 0.007, midY, l.cz]}>{wood}</mesh>
+      <mesh geometry={floor} position={[l.cx, l.floorTop - l.board / 2, l.cz]} castShadow receiveShadow>{wood}</mesh>
+      <mesh geometry={back} position={[l.cx, midY, l.cz - l.depth / 2 + 0.006]} receiveShadow>{wood}</mesh>
+      <mesh geometry={side} position={[l.cx - l.innerW / 2 + 0.007, midY, l.cz]} receiveShadow>{wood}</mesh>
+      <mesh geometry={side} position={[l.cx + l.innerW / 2 - 0.007, midY, l.cz]} receiveShadow>{wood}</mesh>
     </group>
   );
 }
 
 export default function VhsShelf({ bounds, skills, selected, active, onSelect }) {
   const l = layout(bounds);
+  // same surface response as the model's own material (it is glossy, not matte), so the tapes are lit like the table
+  const m = bounds.tableMaterial;
+  const gloss = useMemo(() => ({ roughness: m?.roughness ?? 0, metalness: m?.metalness ?? 0, envMapIntensity: m?.envMapIntensity ?? 1 }), [m]);
   const plastic = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 16;
     const g = canvas.getContext('2d');
     for (let y = 0; y < 16; y++) for (let x = 0; x < 16; x++) { g.fillStyle = PLASTIC[(x * 5 + y * 11 + x * y) % 7 === 0 ? 3 : (x + y * 3) % 4 === 0 ? 2 : (x * y) % 3 === 0 ? 1 : 0]; g.fillRect(x, y, 1, 1); }
-    return new THREE.MeshStandardMaterial({ map: pixelTexture(canvas), roughness: 0.85 });
-  }, []);
+    return new THREE.MeshStandardMaterial({ map: pixelTexture(canvas), ...gloss });
+  }, [gloss]);
   return (
     <group>
-      <Cubby l={l} material={bounds.tableMaterial} />
+      <Cubby l={l} material={m} />
       {skills.map((skill, i) => (
-        <Tape key={skill.name} skill={skill} index={i} selected={selected === i} active={active} onSelect={onSelect} l={l} plastic={plastic} />
+        <Tape key={skill.name} skill={skill} index={i} selected={selected === i} active={active} onSelect={onSelect} l={l} plastic={plastic} gloss={gloss} />
       ))}
     </group>
   );

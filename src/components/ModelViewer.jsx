@@ -548,7 +548,7 @@ const ModelViewer = ({
         <NullBackground />
         {environmentPreset !== 'none' && <Environment preset={environmentPreset} background={false} />}
         <ambientLight intensity={ambientIntensity} />
-        <directionalLight position={[5, 5, 5]}  intensity={keyLightIntensity} castShadow />
+        <directionalLight position={[5, 5, 5]}  intensity={keyLightIntensity} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-left={-1} shadow-camera-right={1} shadow-camera-top={1} shadow-camera-bottom={-1} shadow-camera-near={0.5} shadow-camera-far={15} shadow-bias={-0.0005} />
         <directionalLight position={[-5, 2, 5]} intensity={fillLightIntensity} />
         <directionalLight position={[0, 4, -5]} intensity={rimLightIntensity} />
         <ContactShadows ref={contactRef} position={[0, -0.5, 0]} opacity={0.35} scale={10} blur={2} />
