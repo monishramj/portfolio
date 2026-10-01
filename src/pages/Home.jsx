@@ -92,6 +92,12 @@ export default function Home() {
         {view === 'projects' && <div className="channels"><Link to={previous} aria-label="previous project">‹</Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick" />)}<Link to={next} aria-label="next project">›</Link></div>}
       </div>
     </section>
-    <dialog ref={preview} className="image-preview" aria-label={`${channel.title} image preview`} onClick={event => { if (event.target === event.currentTarget) preview.current.close(); }}><div className="preview-bar"><span>{channel.title}</span><button onClick={() => preview.current.close()} aria-label="close image preview">×</button></div><img src={channel.img} alt={channel.title} /></dialog>
+    <dialog ref={preview} className="image-preview" aria-label={`${channel.title} image preview`} onClick={event => { if (event.target === event.currentTarget) preview.current.close(); }}>
+      <div className="preview-body">
+        <img src={channel.img} alt={channel.title} />
+        <div className="preview-caption"><span>{channel.title}</span>{channel.tech && <span>{channel.tech.join(' · ')}</span>}</div>
+        <button className="preview-close" onClick={() => preview.current.close()} aria-label="close image preview"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true"><path d="M1.5 1.5l9 9M10.5 1.5l-9 9" /></svg></button>
+      </div>
+    </dialog>
   </main>;
 }
