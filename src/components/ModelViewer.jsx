@@ -53,6 +53,7 @@ const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standb
 const DIP_OUT = 0.06, DIP_IN = 0.11, DIP_LOW = 0.12;
 const DOILY_SCALE = 1.22; // the white pixel-art doily draped over the TV's front-top, scaled up about its own centre
 const PIXEL = 3; // screen images are drawn at 1/PIXEL of the texture's resolution, so they look slightly pixelated
+const FRAME_DROP = 0.06; // frames a little above the subject, which sits the TV lower in its stage (share of the visible height)
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
 const ModelInner = ({
@@ -239,6 +240,7 @@ const ModelInner = ({
       center = box.getCenter(new THREE.Vector3());
       dist = Math.max(size.y, size.x / camera.aspect) * defaultZoom / (2 * tanHalf);
     }
+    center.y += 2 * dist * tanHalf * FRAME_DROP;
     focusTarget.current = { center, dist, lift };
     camera.near = dist / 100;
     camera.far = dist * 100;
