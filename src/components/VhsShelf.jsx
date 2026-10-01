@@ -114,7 +114,7 @@ function Tape({ skill, index, selected, active, onSelect, l, plastic, gloss }) {
 
   // leaning tapes pivot on their bottom-left corner, upright ones on their bottom centre
   return (
-    <group ref={group} position={[slot.x, l.floorTop, slot.z]} rotation={[0, 0, slot.tilt]} {...handlers}>
+    <group ref={group} position={[slot.x, l.floorTop, slot.z]} rotation={[slot.pitch, slot.yaw, slot.tilt]} {...handlers}>
       <mesh castShadow receiveShadow position={[slot.lean ? l.tapeW / 2 : 0, l.tapeH / 2, 0]}>
         <boxGeometry args={[l.tapeW, l.tapeH, l.tapeD]} />
         {[plastic, plastic, plastic, plastic].map((m, i) => <primitive key={i} object={m} attach={`material-${i}`} />)}

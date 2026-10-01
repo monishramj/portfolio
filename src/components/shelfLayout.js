@@ -5,7 +5,10 @@ const SLAB = 0.068; // bottom slab's share of the table height (measured from th
 const BOARD = 0.022;
 const UPRIGHT = 6; // the rest lean left against the last upright one, resting on each other
 const LEAN = 10 * Math.PI / 180;
-const WOBBLE = [0.006, -0.008, 0.004, 0.009, -0.005, 0.007]; // tiny tilts so the upright ones aren't ruler-straight
+const WOBBLE = [0.011, -0.013, 0.006, 0.014, -0.009, 0.012]; // side-to-side roll of the upright ones, in radians (about 0.3-0.8 deg)
+// small noise in which way each tape faces, so none stands perfectly square to the front
+const YAW = [0.03, -0.035, 0.02, -0.028, 0.034, -0.022, 0.012, -0.015, 0.018, -0.01];
+const PITCH = [0.012, -0.018, 0.008, 0.02, -0.01, 0.016, -0.014, 0.01, -0.008, 0.015];
 const ZJITTER = [0.004, -0.003, 0.005, -0.004, 0.002, -0.005, 0.003, -0.002, 0.004, -0.003];
 
 export function layout(b) {
@@ -18,15 +21,15 @@ export function layout(b) {
   const innerW = (x1 - x0) * 0.86; // between the table legs
   const tapeH = (ceiling - floorTop) * 0.95;
   // width chosen so the 6 upright + 4 leaning tapes fit across the shelf
-  const tapeW = Math.min(tapeH / 6.2, innerW * 0.94 / 11.9);
-  const gap = tapeW * 0.14;
+  const tapeW = Math.min(tapeH / 6.2, innerW * 0.94 / 12.4);
+  const gap = tapeW * 0.24;
   const tapeD = Math.min(tapeW * 4, (z1 - z0) * 0.7);
 
   const slots = [];
   let x = 0;
-  for (let i = 0; i < UPRIGHT; i++) { slots.push({ x: x + tapeW / 2, tilt: WOBBLE[i] }); x += tapeW + gap; }
+  for (let i = 0; i < UPRIGHT; i++) { slots.push({ x: x + tapeW / 2, tilt: WOBBLE[i], yaw: YAW[i], pitch: PITCH[i] }); x += tapeW + gap; }
   let xl = x - gap + tapeH * Math.sin(LEAN) + 0.002; // bottom-left corner: top-left corner touches the last upright tape
-  for (let i = UPRIGHT; i < COUNT; i++) { slots.push({ x: xl, tilt: LEAN, lean: true }); xl += tapeW / Math.cos(LEAN) + 0.0015; }
+  for (let i = UPRIGHT; i < COUNT; i++) { slots.push({ x: xl, tilt: LEAN, lean: true, yaw: YAW[i] * 0.4, pitch: PITCH[i] }); xl += tapeW / Math.cos(LEAN) + 0.0015; }
   const right = Math.max(...slots.map(s => s.x + (s.lean ? tapeW * Math.cos(LEAN) : tapeW / 2)));
   const shift = cx - right / 2; // slots start at x=0 on the left edge, so centre the span on the table
   slots.forEach((s, i) => { s.x += shift; s.z = cz + ZJITTER[i]; });
