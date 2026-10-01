@@ -24,8 +24,7 @@ a:hover, button:hover { color: var(--accent); }
 h1 { font: 400 clamp(48px, min(5vw, 9vh), 82px)/.95 var(--title-font); letter-spacing: -.01em; }
 h1 em { color: var(--accent); }
 .identity-note { font-size: 12px; margin-top: 22px; color: var(--text-muted); letter-spacing: .04em; }
-.experience { display: grid; gap: 14px; } /* the middle child of .identity, so space-between centres it between the name and the nav */
-.experience h2 { font: 400 11px/1 var(--body-font); color: var(--text-muted); }
+.experience { display: grid; } /* the middle child of .identity, so space-between centres it between the name and the nav */
 .experience ul { list-style: none; padding: 0; display: grid; gap: 18px; text-transform: lowercase; }
 .experience li { display: grid; gap: 2px; }
 .experience li span:first-child { font-size: 14px; color: var(--text); }
