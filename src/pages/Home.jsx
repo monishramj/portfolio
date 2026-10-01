@@ -95,6 +95,14 @@ export default function Home() {
   const previous = projectUrl((index + CHANNELS.length - 1) % CHANNELS.length);
   const next = projectUrl((index + 1) % CHANNELS.length);
 
+  // once the TV is up, quietly fetch every project photo so the carousel never waits on the network
+  useEffect(() => {
+    if (!tvReady) return;
+    const idle = window.requestIdleCallback || (fn => setTimeout(fn, 200));
+    const handle = idle(() => CHANNELS.forEach(item => { new Image().src = item.img; }));
+    return () => (window.cancelIdleCallback || clearTimeout)(handle);
+  }, [tvReady]);
+
   // the stage stays hidden until the TV is fully ready (see ModelViewer's onReady); never wait forever, though
   useEffect(() => {
     const t = setTimeout(markTvReady, 10000);
