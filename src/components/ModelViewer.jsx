@@ -53,7 +53,7 @@ const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standb
 // channel change: the picture dims, swaps while dark, then comes back up
 const DIP_OUT = 0.06, DIP_IN = 0.11, DIP_LOW = 0.12;
 const DOILY_SCALE = 1.22; // the white pixel-art doily draped over the TV's front-top, scaled up about its own centre
-const PIXEL = 3; // screen images are drawn at 1/PIXEL of the texture's resolution, so they look slightly pixelated
+const PIXELS_ACROSS = 341; // screen images are redrawn this many pixels wide, so they look slightly pixelated at any texture size
 const FRAME_DROP = 0.06; // frames a little above the subject, which sits the TV lower in its stage (share of the visible height)
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
@@ -305,7 +305,7 @@ const ModelInner = ({
     img.onload = () => {
       if (cancelled) return;
       const aspect = screenAspectRef.current || 1;
-      const W = 1024;
+      const W = LOW_END ? 640 : 1024;
       const H = Math.round(W / aspect);
       const canvas = document.createElement('canvas');
       canvas.width = W; canvas.height = H;
@@ -323,41 +323,45 @@ const ModelInner = ({
       if (screenTextureFit === 'contain') draw('cover', 'blur(28px) brightness(.45)');
       draw(screenTextureFit === 'contain' ? 'contain' : 'cover', 'contrast(1.12) saturate(.84) brightness(.97)');
       ctx.filter = 'none';
-      // slight pixelation: redraw at 1/PIXEL resolution, then scale back up without smoothing
+      // slight pixelation: redraw at PIXELS_ACROSS wide, then scale back up without smoothing
       const small = document.createElement('canvas');
-      small.width = Math.round(W / PIXEL); small.height = Math.round(H / PIXEL);
+      small.width = PIXELS_ACROSS; small.height = Math.round(H * PIXELS_ACROSS / W);
       small.getContext('2d').drawImage(canvas, 0, 0, small.width, small.height);
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(small, 0, 0, W, H);
       ctx.imageSmoothingEnabled = true;
       // CRT look, applied in the order light would pass through a tube:
       // colour fringing, bloom, lifted blacks, phosphor tint, grain, scanlines, vignette, glare
-      const frame = ctx.getImageData(0, 0, W, H), px = frame.data, src = new Uint8ClampedArray(px), fringe = 2;
-      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-        const i = (y * W + x) * 4;
-        px[i] = src[(y * W + Math.min(W - 1, x + fringe)) * 4];
-        px[i + 2] = src[(y * W + Math.max(0, x - fringe)) * 4 + 2];
+      if (!LOW_END) { // the per-pixel steps are skipped on weak devices
+        const frame = ctx.getImageData(0, 0, W, H), px = frame.data, src = new Uint8ClampedArray(px), fringe = 2;
+        for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+          const i = (y * W + x) * 4;
+          px[i] = src[(y * W + Math.min(W - 1, x + fringe)) * 4];
+          px[i + 2] = src[(y * W + Math.max(0, x - fringe)) * 4 + 2];
+        }
+        ctx.putImageData(frame, 0, 0);
+        const glow = document.createElement('canvas');
+        glow.width = W >> 2; glow.height = H >> 2;
+        glow.getContext('2d').drawImage(canvas, 0, 0, glow.width, glow.height);
+        ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.3;
+        ctx.drawImage(glow, 0, 0, W, H);
       }
-      ctx.putImageData(frame, 0, 0);
-      const glow = document.createElement('canvas');
-      glow.width = W >> 2; glow.height = H >> 2;
-      glow.getContext('2d').drawImage(canvas, 0, 0, glow.width, glow.height);
-      ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.3;
-      ctx.drawImage(glow, 0, 0, W, H);
       ctx.globalCompositeOperation = 'lighten'; ctx.globalAlpha = 1;
       ctx.fillStyle = '#17141f';
       ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = 0.16;
       ctx.fillStyle = '#d6c8ec';
       ctx.fillRect(0, 0, W, H);
-      const grain = document.createElement('canvas');
-      grain.width = grain.height = 128;
-      const gg = grain.getContext('2d'), gd = gg.createImageData(128, 128);
-      for (let i = 0; i < gd.data.length; i += 4) { gd.data[i] = gd.data[i + 1] = gd.data[i + 2] = Math.random() * 255; gd.data[i + 3] = 255; }
-      gg.putImageData(gd, 0, 0);
-      ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.09;
-      ctx.fillStyle = ctx.createPattern(grain, 'repeat');
-      ctx.fillRect(0, 0, W, H);
+      if (!LOW_END) {
+        const grain = document.createElement('canvas');
+        grain.width = grain.height = 128;
+        const gg = grain.getContext('2d'), gd = gg.createImageData(128, 128);
+        for (let i = 0; i < gd.data.length; i += 4) { gd.data[i] = gd.data[i + 1] = gd.data[i + 2] = Math.random() * 255; gd.data[i + 3] = 255; }
+        gg.putImageData(gd, 0, 0);
+        ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.09;
+        ctx.fillStyle = ctx.createPattern(grain, 'repeat');
+        ctx.fillRect(0, 0, W, H);
+      }
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
       ctx.fillStyle = 'rgba(0,0,0,.26)';
       for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
