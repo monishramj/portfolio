@@ -1,12 +1,14 @@
 import { Component, lazy, Suspense, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ContributionGraph from '../components/ContributionGraph';
+import VhsShelf from '../components/VhsShelf';
+import { shelfFrame } from '../components/shelfLayout';
 import { PROJECTS } from '../data/projects';
 import { SKILLS } from '../data/skills';
 
 const ModelViewer = lazy(() => import('../components/ModelViewer'));
-const SECTIONS = ['about', 'projects', 'skills', 'activity', 'contact'];
-const LABELS = ['about me', 'projects', 'skills', 'github activity', 'contact'];
+const SECTIONS = ['about', 'projects', 'skills'];
+const LABELS = ['about me', 'projects', 'skills'];
 const base = import.meta.env.BASE_URL;
 const ABOUT = { id: 'about', title: 'About me', img: `${base}images/monish.jpeg` };
 const CHANNELS = PROJECTS.map(project => ({ ...project, id: project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') }));
@@ -19,24 +21,25 @@ function Icon({ name }) {
     mail: <><rect x="2" y="4" width="20" height="16" rx="3" /><path d="m3 6 9 7 9-7" /></>,
     resume: <><path d="M14 2H5v20h14V7zM14 2v5h5M8 12h8M8 16h6" /></>,
   };
-  return <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 
 class Television extends Component {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
   render() {
-    const { channel, reducedMotion } = this.props;
+    const { channel, reducedMotion, view, selectedSkill, onSelectSkill } = this.props;
     const fallback = <img className="screen-fallback" src={channel.img} alt={channel.title} />;
     if (this.state.failed) return fallback;
     return <Suspense fallback={fallback}><ModelViewer
       url={`${base}grandmas_tv.glb`} width="100%" height="100%"
-      defaultRotationX={180} defaultRotationY={0} defaultZoom={1.45}
-      screenTextureSrc={channel.img} screenTextureFit={channel.id === 'about' ? 'cover' : 'contain'}
+      defaultRotationX={180} defaultRotationY={0} defaultZoom={1.9}
+      screenTextureSrc={channel.img} screenTextureFit={channel.fit} screenTextureFocus={channel.focus}
       environmentPreset="dawn" enableManualZoom={false} enableManualRotation={false}
       enableMouseParallax={!reducedMotion} enableHoverRotation={!reducedMotion}
       showScreenshotButton={false} focusScreen autoFrame
-    /></Suspense>;
+      focus={view === 'skills' ? shelfFrame : 'screen'} instantFocus={reducedMotion}
+    >{bounds => <VhsShelf bounds={bounds} skills={SKILLS} selected={selectedSkill} active={view === 'skills'} onSelect={onSelectSkill} />}</ModelViewer></Suspense>;
   }
 }
 
@@ -55,38 +58,39 @@ export default function Home() {
   const next = projectUrl((index + 1) % CHANNELS.length);
 
   return <main className="portfolio">
-    <a className="skip-link" href="#screen-content" onClick={event => { event.preventDefault(); document.getElementById('screen-content').focus(); }}>Skip to content</a>
+    <a className="skip-link" href="#screen-content" onClick={event => { event.preventDefault(); document.getElementById('screen-content').focus(); }}>skip to content</a>
     <aside className="identity">
-      <div><h1>monish<br />ramesh<br /><span>jayakumar.</span></h1><p className="identity-note">CS Honors @ Purdue</p></div>
-      <div className="identity-bottom"><nav aria-label="Main navigation">{SECTIONS.map((id, i) => <Link key={id} to={id === 'about' ? '/' : `/?view=${id}`} aria-current={view === id ? 'page' : undefined}><span className="nav-number" aria-hidden="true">0{i + 1}</span>{LABELS[i]}</Link>)}</nav>
-        <div className="social-links" aria-label="Social links">
+      <div><h1>monish<br /><em>ramesh <br />jayakumar</em></h1><p className="identity-note">cs honors @ purdue</p></div>
+      <div className="identity-bottom"><nav aria-label="Main navigation">{SECTIONS.map((id, i) => <Link key={id} to={id === 'about' ? '/' : `/?view=${id}`} aria-current={view === id ? 'page' : undefined}>{LABELS[i]}</Link>)}</nav>
+        <div className="social-links" aria-label="social links">
           {[
-            ['github', 'GitHub', 'https://github.com/monishramj'], ['linkedin', 'LinkedIn', 'https://www.linkedin.com/in/monish-rj'],
-            ['mail', 'Email', 'mailto:mrameshj@purdue.edu'], ['resume', 'Résumé', `${base}resume.pdf`],
-          ].map(([icon, label, href]) => <a key={icon} href={href} aria-label={label} title={label} target={icon === 'mail' ? undefined : '_blank'} rel="noopener noreferrer"><Icon name={icon} /><span className="social-tooltip">{label}</span></a>)}
+            ['github', 'github', 'https://github.com/monishramj'], ['linkedin', 'linkedin', 'https://www.linkedin.com/in/monish-rj'],
+            ['mail', 'email', 'mailto:mrameshj@purdue.edu'], ['resume', 'résumé', `${base}resume.pdf`],
+          ].map(([icon, label, href]) => <a key={icon} href={href} aria-label={label} title={label} target={icon === 'mail' ? undefined : '_blank'} rel="noopener noreferrer"><Icon name={icon} /></a>)}
         </div>
       </div>
     </aside>
-    <section className={`screen-panel ${view === 'skills' ? 'show-shelf' : ''}`} id="screen-content" tabIndex={-1} aria-label="Portfolio content">
-      {view === 'activity' ? <div className="activity-panel"><h2>GitHub activity</h2><ContributionGraph /><a className="inline-link" href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer">View on GitHub ↗</a></div> : <>
-        <div className="scene-window"><div className="scene-rig">
-          <div className="screen-stage" role="img" aria-label={`TV showing ${channel.title}`}><Television channel={channel} reducedMotion={reducedMotion} /><div className="tuning-flash" key={channel.id} aria-hidden="true" /><div className="frosted-edge" aria-hidden="true" /></div>
-          <section className="skill-library" aria-label="VHS skills library" inert={view !== 'skills'} aria-hidden={view !== 'skills'}>
-            <div className="vhs-shelf">{SKILLS.map((item, i) => <button className="vhs-tape" key={item.name} style={{ '--tape-color': item.color }} aria-pressed={selectedSkill === i} aria-label={item.name} onClick={() => setSelectedSkill(i)}><span className="tape-number">{String(i + 1).padStart(2, '0')}</span><span className="tape-name">{item.name}</span><span className="tape-format">VHS</span></button>)}</div>
-            <div className="skill-detail" aria-live="polite" aria-atomic="true"><div><span className="skill-category">{skill.category}</span><h2>{skill.name}</h2></div><p>{skill.detail}</p></div>
-          </section>
-        </div></div>
-        {view === 'projects' && <div className="channel-console"><div className="channel-readout" aria-live="polite" aria-atomic="true"><span>{String(index + 1).padStart(2, '0')} <span>/ {String(CHANNELS.length).padStart(2, '0')}</span></span></div>
-          <div className="tuner"><Link to={previous} aria-label="Previous project" className="tuner-step">−</Link><Link to={next} className="channel-dial" aria-label="Turn dial to next project"><span style={{ transform: `rotate(${index * 45 - 135}deg)` }} /><span className="dial-label">CH</span></Link><Link to={next} aria-label="Next project" className="tuner-step">+</Link></div>
-          <button className="enlarge-button" onClick={() => preview.current.showModal()}>Enlarge ↗</button>
+    <section className="screen-panel" id="screen-content" tabIndex={-1} aria-label="portfolio content">
+      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''}`} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => preview.current.showModal() : undefined}>
+        <Television channel={channel} reducedMotion={reducedMotion} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
+        <div className="tuning-flash" key={channel.id} aria-hidden="true" />
+        <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div>
+      </div>
+      {view === 'skills' && <div className="sr-only-group" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} className="sr-only" aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}>{item.name}</button>)}</div>}
+      {view === 'projects' && <button className="sr-only" onClick={() => preview.current.showModal()}>enlarge image</button>}
+      <div className="screen-caption">
+        {view === 'about' && <><p>CS major and JMHC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p><p>love movies, sketching, and I have an origami collection.</p></>}
+        {view === 'projects' && <>
+          <h2>{channel.title}</h2><p>{channel.desc}</p>
+          <div className="project-meta"><span>{channel.tech.join(' · ')}</span><div><a href={channel.github} target="_blank" rel="noopener noreferrer">source ↗</a>{channel.devpost && <a href={channel.devpost} target="_blank" rel="noopener noreferrer">devpost ↗</a>}{channel.store && <a href={channel.store} target="_blank" rel="noopener noreferrer">app ↗</a>}</div></div>
+          <div className="channels"><Link to={previous} aria-label="previous project">‹</Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick" />)}<Link to={next} aria-label="next project">›</Link></div>
+        </>}
+        {view === 'skills' && <div className="skill-detail" aria-live="polite" aria-atomic="true">
+          <span className="skill-category">{skill.category}</span><h2>{skill.name}</h2><p>{skill.detail}</p>
+          <ContributionGraph />
         </div>}
-        <div className="screen-caption">
-          {view === 'about' && <><p>CS major and JMHC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p><p>love movies, sketching, and I have an origami collection.</p></>}
-          {view === 'projects' && <><h2>{channel.title}</h2><p>{channel.desc}</p><div className="project-meta"><span>{channel.tech.join(' · ')}</span><div><a href={channel.github} target="_blank" rel="noopener noreferrer">Source ↗</a>{channel.devpost && <a href={channel.devpost} target="_blank" rel="noopener noreferrer">Devpost ↗</a>}{channel.store && <a href={channel.store} target="_blank" rel="noopener noreferrer">App ↗</a>}</div></div></>}
-          {view === 'contact' && <div className="contact-panel"><a href="mailto:mrameshj@purdue.edu">mrameshj@purdue.edu ↗</a><a href="https://www.linkedin.com/in/monish-rj" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a></div>}
-        </div>
-      </>}
+      </div>
     </section>
-    <dialog ref={preview} className="image-preview" aria-label={`${channel.title} image preview`} onClick={event => { if (event.target === event.currentTarget) preview.current.close(); }}><div className="preview-bar"><span>{channel.title}</span><button onClick={() => preview.current.close()} aria-label="Close image preview">×</button></div><img src={channel.img} alt={channel.title} /></dialog>
+    <dialog ref={preview} className="image-preview" aria-label={`${channel.title} image preview`} onClick={event => { if (event.target === event.currentTarget) preview.current.close(); }}><div className="preview-bar"><span>{channel.title}</span><button onClick={() => preview.current.close()} aria-label="close image preview">×</button></div><img src={channel.img} alt={channel.title} /></dialog>
   </main>;
 }

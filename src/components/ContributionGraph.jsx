@@ -27,15 +27,15 @@ export default function ContributionGraph() {
 
   return (
     <div className="contrib-section" aria-busy={!calendar && !failed}>
-      {!calendar ? <p className="contrib-message" role="status">{failed ? <>The calendar couldn’t load. <a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer">View activity on GitHub ↗</a></> : 'Tuning in to GitHub…'}</p> : <>
+      {!calendar ? <p className="contrib-message" role="status">{failed ? <>the calendar couldn’t load. <a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer">View activity on GitHub ↗</a></> : 'tuning in to github…'}</p> : <>
         <div className="contrib-header"><span><strong>{calendar.total.toLocaleString()} contributions</strong> in the last year</span></div>
         <div className="contrib-graph" ref={scrollRef} tabIndex={0} role="region" aria-label="GitHub contribution calendar. Scroll horizontally to explore the last year.">
           <div className="contrib-scroll-inner">
-            <div className="contrib-months" aria-hidden="true">{calendar.months.map(({ week, label }) => <span key={week} className="contrib-month-label" style={{ left: week * 17 }}>{label}</span>)}</div>
+            <div className="contrib-months" aria-hidden="true">{calendar.months.map(({ week, label }) => <span key={week} className="contrib-month-label" style={{ left: `calc(${week} * (var(--cell) + var(--gap)))` }}>{label}</span>)}</div>
             <div className="contrib-grid">{calendar.cells.map((day, index) => day ? <div key={day.date} className="contrib-cell" data-level={day.level} role="img" aria-label={`${day.count} contributions on ${day.date}`} title={`${day.count} contributions on ${day.date}`} /> : <div key={`empty-${index}`} className="contrib-cell contrib-cell--empty" />)}</div>
           </div>
         </div>
-        <div className="contrib-footer"><span>Public activity</span><div className="contrib-legend" aria-label="Contribution intensity from less to more"><span>Less</span>{[0, 1, 2, 3, 4].map(level => <span key={level} className="contrib-cell" data-level={level} aria-hidden="true" />)}<span>More</span></div></div>
+        <a className="contrib-link" href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer">github ↗</a>
       </>}
     </div>
   );

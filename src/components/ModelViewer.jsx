@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/immutability -- Three.js owns mutable camera and scene objects. */
-import { Suspense, useRef, useLayoutEffect, useEffect, useMemo } from 'react';
+import { Suspense, useRef, useState, useLayoutEffect, useEffect, useMemo } from 'react';
 import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
 import { OrbitControls, useGLTF, useProgress, Html, Environment, ContactShadows } from '@react-three/drei';
 import * as THREE from 'three';
@@ -54,12 +54,18 @@ const ModelInner = ({
   url, pivot, initYaw, initPitch, defaultZoom, minZoom, maxZoom,
   enableMouseParallax, enableManualRotation, enableHoverRotation, enableManualZoom,
   autoFrame, focusScreen, fadeIn, autoRotate, autoRotateSpeed, onLoaded,
-  modelXOffset, modelYOffset, screenTextureSrc, screenTextureFit,
+  modelXOffset, modelYOffset, screenTextureSrc, screenTextureFit, screenTextureFocus,
+  focus, instantFocus, children,
 }) => {
   const { scene } = useGLTF(url);
   const content = useMemo(() => scene.clone(), [scene]);
 
   const root = useRef(null);
+  const tv = useRef(null);
+  const [bounds, setBounds] = useState(null);
+  const boundsRef = useRef(null);
+  const focusTarget = useRef(null);
+  const focusCur = useRef(null);
   const screenMeshRef = useRef(null);
   const screenAspectRef = useRef(1);
   const { camera, gl, size: viewport } = useThree();
@@ -87,9 +93,12 @@ const ModelInner = ({
 
     const s = 1 / maxDim;
     content.position.sub(center);
-    root.current.scale.setScalar(s);
-    root.current.rotation.set(initPitch, initYaw, 0);
+    tv.current.scale.setScalar(s);
+    tv.current.rotation.set(initPitch, initYaw, 0);
     pivot.set(0, 0, 0);
+    // TV extents in normalised world units, so children (e.g. the shelf) can sit flush under it
+    boundsRef.current = { width: size.x * s, height: size.y * s, depth: size.z * s, bottomY: -size.y * s / 2 };
+    setBounds(boundsRef.current);
 
     if (autoFrame && camera.isPerspectiveCamera) {
       // defaultZoom scales the fit distance: 1.5 (default) = comfortable padding, 1 = tight fit
@@ -171,19 +180,33 @@ const ModelInner = ({
   }, [content]);
 
   useLayoutEffect(() => {
-    if (!focusScreen || !screenMeshRef.current) return;
-    root.current.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(screenMeshRef.current);
-    const size = box.getSize(new THREE.Vector3());
-    box.getCenter(pivot);
-    const distance = Math.max(size.y, size.x / camera.aspect) * defaultZoom / (2 * Math.tan(deg2rad(camera.fov / 2)));
-    camera.position.copy(pivot).add(new THREE.Vector3(0, 0, distance));
-    camera.lookAt(pivot);
-    camera.near = distance / 100;
-    camera.far = distance * 100;
+    if (!focusScreen || !screenMeshRef.current || !boundsRef.current) return;
+    const tanHalf = Math.tan(deg2rad(camera.fov / 2));
+    let center, dist;
+    if (typeof focus === 'function') {
+      // shelf framing: { top, bottom, width } in the same normalised units as bounds
+      const f = focus(boundsRef.current);
+      center = new THREE.Vector3(0, (f.top + f.bottom) / 2, 0);
+      dist = Math.max(f.top - f.bottom, f.width / camera.aspect) * 1.4 / (2 * tanHalf);
+    } else {
+      tv.current.updateMatrixWorld(true);
+      const box = new THREE.Box3().setFromObject(screenMeshRef.current);
+      const size = box.getSize(new THREE.Vector3());
+      center = box.getCenter(new THREE.Vector3());
+      dist = Math.max(size.y, size.x / camera.aspect) * defaultZoom / (2 * tanHalf);
+    }
+    focusTarget.current = { center, dist };
+    camera.near = dist / 100;
+    camera.far = dist * 100;
     camera.updateProjectionMatrix();
+    if (!focusCur.current || instantFocus) {
+      focusCur.current = { dist };
+      pivot.copy(center);
+      camera.position.set(center.x, center.y, center.z + dist);
+      camera.lookAt(pivot);
+    }
     invalidate();
-  }, [camera, content, defaultZoom, focusScreen, pivot, viewport.width, viewport.height]);
+  }, [camera, content, bounds, defaultZoom, focus, focusScreen, instantFocus, pivot, viewport.width, viewport.height]);
 
   useEffect(() => {
     if (!screenTextureSrc || !screenMeshRef.current) return;
@@ -195,19 +218,40 @@ const ModelInner = ({
     img.onload = () => {
       if (cancelled) return;
       const aspect = screenAspectRef.current || 1;
-      const W = 512;
+      const W = 1024;
       const H = Math.round(W / aspect);
       const canvas = document.createElement('canvas');
       canvas.width = W; canvas.height = H;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#080808';
+      const [fx, fy] = screenTextureFocus || [0.5, 0.5];
+      const draw = (fit, filter) => {
+        const scale = (fit === 'contain' ? Math.min : Math.max)(W / img.width, H / img.height);
+        const w = img.width * scale, h = img.height * scale;
+        ctx.filter = filter;
+        ctx.drawImage(img, (W - w) * (fit === 'contain' ? 0.5 : fx), (H - h) * (fit === 'contain' ? 0.5 : fy), w, h);
+      };
+      ctx.fillStyle = '#050505';
       ctx.fillRect(0, 0, W, H);
-      const scale = (screenTextureFit === 'contain' ? Math.min : Math.max)(W / img.width, H / img.height);
-      const w = img.width * scale;
-      const h = img.height * scale;
-      ctx.drawImage(img, (W - w) / 2, (H - h) / 2, w, h);
+      // contain: sit the whole image over a blurred, dimmed copy of itself instead of black bars
+      if (screenTextureFit === 'contain') draw('cover', 'blur(28px) brightness(.45)');
+      draw(screenTextureFit === 'contain' ? 'contain' : 'cover', 'contrast(1.08) saturate(.92)');
+      ctx.filter = 'none';
+      // CRT: scanlines, vignette, glare
+      ctx.fillStyle = 'rgba(0,0,0,.16)';
+      for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
+      const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, Math.hypot(W, H) / 2);
+      vig.addColorStop(0, 'rgba(0,0,0,0)');
+      vig.addColorStop(1, 'rgba(0,0,0,.6)');
+      ctx.fillStyle = vig;
+      ctx.fillRect(0, 0, W, H);
+      const glare = ctx.createLinearGradient(0, 0, W * 0.6, H * 0.6);
+      glare.addColorStop(0, 'rgba(255,255,255,.07)');
+      glare.addColorStop(0.45, 'rgba(255,255,255,0)');
+      ctx.fillStyle = glare;
+      ctx.fillRect(0, 0, W, H);
       const tex = texture = new THREE.CanvasTexture(canvas);
       tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = 4;
       tex.flipY = true;
       const m = material = new THREE.MeshBasicMaterial({
         map: tex, toneMapped: false, side: originalMaterial.side,
@@ -226,7 +270,7 @@ const ModelInner = ({
         texture.dispose();
       }
     };
-  }, [screenTextureSrc, screenTextureFit, content]);
+  }, [screenTextureSrc, screenTextureFit, screenTextureFocus, content]);
 
   useEffect(() => {
     if (!enableManualRotation || isTouch) return;
@@ -336,6 +380,15 @@ const ModelInner = ({
   useFrame((_, dt) => {
     if (!ready.current || !root.current) return;
 
+    const ft = focusTarget.current, fc = focusCur.current;
+    if (ft && fc) {
+      const k = 1 - Math.exp(-dt * 4.5);
+      pivot.lerp(ft.center, k);
+      fc.dist += (ft.dist - fc.dist) * k;
+      camera.position.set(pivot.x, pivot.y, pivot.z + fc.dist);
+      camera.lookAt(pivot);
+    }
+
     cPar.current.x += (tPar.current.x - cPar.current.x) * PARALLAX_EASE;
     cPar.current.y += (tPar.current.y - cPar.current.y) * PARALLAX_EASE;
     const phx = cHov.current.x, phy = cHov.current.y;
@@ -361,7 +414,10 @@ const ModelInner = ({
 
   return (
     <group ref={root}>
-      <primitive object={content} />
+      <group ref={tv}>
+        <primitive object={content} />
+      </group>
+      {bounds && children?.(bounds)}
     </group>
   );
 };
@@ -419,6 +475,10 @@ const ModelViewer = ({
   onModelLoaded,
   screenTextureSrc,
   screenTextureFit = 'cover',
+  screenTextureFocus,
+  focus,
+  instantFocus = false,
+  children,
 }) => {
   useEffect(() => void useGLTF.preload(url), [url]);
   const pivot = useMemo(() => new THREE.Vector3(), []);
@@ -504,7 +564,12 @@ const ModelViewer = ({
             modelYOffset={modelYOffset}
             screenTextureSrc={screenTextureSrc}
             screenTextureFit={screenTextureFit}
-          />
+            screenTextureFocus={screenTextureFocus}
+            focus={focus}
+            instantFocus={instantFocus}
+          >
+            {children}
+          </ModelInner>
         </Suspense>
         {!isTouch && (
           <DesktopControls target={pivot} min={minZoomDistance} max={maxZoomDistance} zoomEnabled={enableManualZoom} />
