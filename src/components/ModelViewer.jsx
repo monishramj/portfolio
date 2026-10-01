@@ -52,6 +52,7 @@ const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standb
 // channel change: the picture dims, swaps while dark, then comes back up
 const DIP_OUT = 0.06, DIP_IN = 0.11, DIP_LOW = 0.12;
 const DOILY_SCALE = 1.22; // the white pixel-art doily draped over the TV's front-top, scaled up about its own centre
+const PIXEL = 3; // screen images are drawn at 1/PIXEL of the texture's resolution, so they look slightly pixelated
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
 const ModelInner = ({
@@ -302,6 +303,13 @@ const ModelInner = ({
       if (screenTextureFit === 'contain') draw('cover', 'blur(28px) brightness(.45)');
       draw(screenTextureFit === 'contain' ? 'contain' : 'cover', 'contrast(1.12) saturate(.84) brightness(.97)');
       ctx.filter = 'none';
+      // slight pixelation: redraw at 1/PIXEL resolution, then scale back up without smoothing
+      const small = document.createElement('canvas');
+      small.width = Math.round(W / PIXEL); small.height = Math.round(H / PIXEL);
+      small.getContext('2d').drawImage(canvas, 0, 0, small.width, small.height);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(small, 0, 0, W, H);
+      ctx.imageSmoothingEnabled = true;
       // CRT look, applied in the order light would pass through a tube:
       // colour fringing, bloom, lifted blacks, phosphor tint, grain, scanlines, vignette, glare
       const frame = ctx.getImageData(0, 0, W, H), px = frame.data, src = new Uint8ClampedArray(px), fringe = 2;
