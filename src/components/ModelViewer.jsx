@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/immutability -- Three.js owns mutable camera and scene objects. */
 import { Suspense, useRef, useState, useLayoutEffect, useEffect, useMemo } from 'react';
 import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
-import { OrbitControls, useGLTF, useProgress, Html, Environment, ContactShadows } from '@react-three/drei';
+import { OrbitControls, useGLTF, useProgress, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 
 const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
@@ -620,7 +620,6 @@ const ModelViewer = ({
 }) => {
   useEffect(() => void useGLTF.preload(url), [url]);
   const pivot = useMemo(() => new THREE.Vector3(), []);
-  const contactRef  = useRef(null);
   const rendererRef = useRef(null);
   const sceneRef    = useRef(null);
   const cameraRef   = useRef(null);
@@ -637,13 +636,11 @@ const ModelViewer = ({
     s.traverse(o => {
       if (o.isLight && 'castShadow' in o) { tmp.push({ l: o, cast: o.castShadow }); o.castShadow = false; }
     });
-    if (contactRef.current) contactRef.current.visible = false;
     g.render(s, c);
     const png = g.domElement.toDataURL('image/png');
     Object.assign(document.createElement('a'), { download: 'model.png', href: png }).click();
     g.shadowMap.enabled = true;
     tmp.forEach(({ l, cast }) => (l.castShadow = cast));
-    if (contactRef.current) contactRef.current.visible = true;
     invalidate();
   };
 
@@ -677,7 +674,6 @@ const ModelViewer = ({
         <directionalLight position={[5, 5, 5]}  intensity={keyLightIntensity} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-left={-1} shadow-camera-right={1} shadow-camera-top={1} shadow-camera-bottom={-1} shadow-camera-near={0.5} shadow-camera-far={15} shadow-bias={-0.0005} />
         <directionalLight position={[-5, 2, 5]} intensity={fillLightIntensity} />
         <directionalLight position={[0, 4, -5]} intensity={rimLightIntensity} />
-        <ContactShadows ref={contactRef} position={[0, -0.5, 0]} opacity={0.35} scale={10} blur={2} />
         <Suspense fallback={<Loader placeholderSrc={placeholderSrc} />}>
           <ModelInner
             url={url}
