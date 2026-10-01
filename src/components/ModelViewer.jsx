@@ -55,6 +55,8 @@ const DIP_OUT = 0.06, DIP_IN = 0.11, DIP_LOW = 0.12;
 const DOILY_SCALE = 1.22; // the white pixel-art doily draped over the TV's front-top, scaled up about its own centre
 const PIXELS_ACROSS = 341; // screen images are redrawn this many pixels wide, so they look slightly pixelated at any texture size
 const FRAME_DROP = 0.06; // frames a little above the subject, which sits the TV lower in its stage (share of the visible height)
+// Sky lighting hosted with the site (CC0, Poly Haven via pmndrs/drei-assets) instead of fetched from a third-party mirror on every load.
+const LOCAL_HDRI = { dawn: 'hdri/kiara_1_dawn_1k.hdr' };
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
 const ModelInner = ({
@@ -702,7 +704,9 @@ const ModelViewer = ({
       >
         <AssetsSignal onDone={() => markBoot('assets')} />
         <NullBackground />
-        {environmentPreset !== 'none' && <Environment preset={environmentPreset} background={false} resolution={LOW_END ? 64 : 128} />}
+        {environmentPreset !== 'none' && (LOCAL_HDRI[environmentPreset]
+          ? <Environment files={`${import.meta.env.BASE_URL}${LOCAL_HDRI[environmentPreset]}`} background={false} resolution={LOW_END ? 64 : 128} />
+          : <Environment preset={environmentPreset} background={false} resolution={LOW_END ? 64 : 128} />)}
         <ambientLight intensity={ambientIntensity} />
         <directionalLight position={[5, 5, 5]}  intensity={keyLightIntensity} castShadow={!LOW_END} shadow-mapSize={[1024, 1024]} shadow-camera-left={-1} shadow-camera-right={1} shadow-camera-top={1} shadow-camera-bottom={-1} shadow-camera-near={0.5} shadow-camera-far={15} shadow-bias={-0.0005} />
         <directionalLight position={[-5, 2, 5]} intensity={fillLightIntensity} />
