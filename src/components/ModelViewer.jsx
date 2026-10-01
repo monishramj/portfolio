@@ -57,6 +57,8 @@ const PIXELS_ACROSS = 341; // screen images are redrawn this many pixels wide, s
 const FRAME_DROP = 0.06; // frames a little above the subject, which sits the TV lower in its stage (share of the visible height)
 // Sky lighting hosted with the site (CC0, Poly Haven via pmndrs/drei-assets) instead of fetched from a third-party mirror on every load.
 const LOCAL_HDRI = { dawn: 'hdri/kiara_1_dawn_1k.hdr' };
+// first power-on: after the TV has been visible for a beat, a thin bright line opens up into the picture
+const POWER_ON_S = 0.55, POWER_BEAT_MS = 700;
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
 const ModelInner = ({
@@ -64,7 +66,7 @@ const ModelInner = ({
   enableMouseParallax, enableManualRotation, enableHoverRotation, enableManualZoom,
   autoFrame, focusScreen, fadeIn, autoRotate, autoRotateSpeed, onLoaded,
   modelXOffset, modelYOffset, screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip,
-  focus, instantFocus, children, onBoot,
+  focus, instantFocus, children, onBoot, powered,
 }) => {
   const { scene } = useGLTF(url);
   const content = useMemo(() => scene.clone(), [scene]);
@@ -78,6 +80,31 @@ const ModelInner = ({
   const screenMeshRef = useRef(null);
   const screenMat = useRef(null); // one material for the screen; only its map changes between channels
   const dip = useRef(null);
+  const screenBoxRef = useRef(null); // the screen's box at load, so framing doesn't depend on its current (animated) scale
+  const screenRig = useRef(null);
+  const screenOff = useRef(false); // true while the first picture is loaded but the TV hasn't powered on yet
+  const poweredRef = useRef(!!powered);
+  // scales the screen mesh vertically about its own centre (the axis that points up on screen is found once)
+  const setScreenScale = useCallback(sc => {
+    const mesh = screenMeshRef.current;
+    if (!mesh) return;
+    if (!screenRig.current) {
+      mesh.updateWorldMatrix(true, false);
+      const e = mesh.matrixWorld.elements;
+      let ax = 0, best = 0;
+      for (let i = 0; i < 3; i++) if (Math.abs(e[i * 4 + 1]) > best) { best = Math.abs(e[i * 4 + 1]); ax = i; }
+      mesh.geometry.computeBoundingBox();
+      screenRig.current = { ax, c: mesh.geometry.boundingBox.getCenter(new THREE.Vector3()), p0: mesh.position.clone(), s0: mesh.scale.clone() };
+    }
+    const r = screenRig.current, s0 = r.s0.getComponent(r.ax);
+    mesh.scale.copy(r.s0).setComponent(r.ax, s0 * sc);
+    mesh.position.copy(r.p0).setComponent(r.ax, r.p0.getComponent(r.ax) + s0 * r.c.getComponent(r.ax) * (1 - sc));
+  }, []);
+  const startPower = useCallback(() => {
+    screenOff.current = false;
+    dip.current = { phase: 'power', t: 0 };
+    invalidate();
+  }, []);
   const texCache = useRef(new Map()); // finished screen pictures by image+fit+focus, so each is drawn only once
   const screenAspectRef = useRef(1);
   const { camera, gl, size: viewport } = useThree();
@@ -201,7 +228,18 @@ const ModelInner = ({
       screenNode.userData.z0 ??= screenNode.position.z; // original depth, so a repeated effect run doesn't shift twice
       const delta = (glass.position.z - screenNode.userData.z0) * SCREEN_FORWARD - (screenNode.position.z - screenNode.userData.z0);
       screenNode.position.z += delta;
+      // A dark "screen off" plane stays at the screen's original depth, so while the picture is collapsed (before
+      // power-on) the TV reads as a switched-off CRT instead of showing its hollow interior.
+      if (!screenNode.userData.offPlane) {
+        const off = screenNode.clone(true);
+        off.position.z = screenNode.userData.z0;
+        const dark = new THREE.MeshBasicMaterial({ color: 0x060608, toneMapped: false });
+        off.traverse(o => { if (o.isMesh) { o.material = dark; o.castShadow = false; o.receiveShadow = false; } });
+        screenNode.parent.add(off);
+        screenNode.userData.offPlane = off;
+      }
     }
+    if (screenMeshRef.current) { root.current.updateMatrixWorld(true); screenBoxRef.current = new THREE.Box3().setFromObject(screenMeshRef.current); }
 
     ready.current = true;
     onBoot?.('model');
@@ -239,8 +277,7 @@ const ModelInner = ({
       lift = f.lift || 0;
       dist = Math.max(f.top - f.bottom, f.width / camera.aspect) * 1.4 / (2 * tanHalf);
     } else {
-      tv.current.updateMatrixWorld(true);
-      const box = new THREE.Box3().setFromObject(screenMeshRef.current);
+      const box = screenBoxRef.current ?? new THREE.Box3().setFromObject(screenMeshRef.current);
       const size = box.getSize(new THREE.Vector3());
       center = box.getCenter(new THREE.Vector3());
       dist = Math.max(size.y, size.x / camera.aspect) * defaultZoom / (2 * tanHalf);
@@ -283,8 +320,17 @@ const ModelInner = ({
   // a new image starts the dim straight away, without waiting for it to load
   useEffect(() => {
     const m = screenMat.current;
-    if (screenDip && m?.map) { dip.current = { phase: 'out', t: 0, start: m.color.r, pending: null }; invalidate(); }
-  }, [screenTextureSrc, screenDip]);
+    if (screenDip && m?.map) {
+      if (dip.current?.phase === 'power' || screenOff.current) { setScreenScale(1); screenOff.current = false; m.color.setScalar(1); }
+      dip.current = { phase: 'out', t: 0, start: m.color.r, pending: null }; invalidate();
+    }
+  }, [screenTextureSrc, screenDip, setScreenScale]);
+
+  // the page says when the TV has been visible for a beat; if the first picture is already waiting, power on now
+  useEffect(() => {
+    poweredRef.current = !!powered;
+    if (powered && screenOff.current) startPower();
+  }, [powered, startPower]);
 
   useEffect(() => {
     if (!screenTextureSrc || !screenMeshRef.current) return;
@@ -295,13 +341,14 @@ const ModelInner = ({
     const show = tex => {
       const m = screenMat.current;
       if (!m || m.map === tex) return;
-      const first = !m.map;
       apply = () => { m.map = tex; m.needsUpdate = true; };
       if (!screenDip) { apply(); m.color.setScalar(1); }
-      else if (!m.map) { apply(); dip.current = { phase: 'in', t: 0, start: 0 }; }
+      else if (!m.map) { // first picture: the screen stays dark and collapsed until the TV powers on
+        apply(); setScreenScale(0.001); screenOff.current = true;
+        if (poweredRef.current) startPower();
+      }
       else if (dip.current) dip.current.pending = apply;
       else dip.current = { phase: 'out', t: 0, start: 1, pending: apply };
-      if (first) onBoot?.('picture');
       invalidate();
     };
     const cached = texCache.current.get(key);
@@ -392,7 +439,7 @@ const ModelInner = ({
       cancelled = true;
       if (dip.current?.pending === apply) dip.current.pending = null;
     };
-  }, [screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip, content, onBoot]);
+  }, [screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip, content, setScreenScale, startPower]);
 
   useEffect(() => {
     if (!enableManualRotation || isTouch) return;
@@ -506,7 +553,20 @@ const ModelInner = ({
     if (d && sm) {
       d.t += dt;
       const ease = k => k * k * (3 - 2 * k);
-      if (d.phase === 'out') {
+      if (d.phase === 'power') {
+        const k = Math.min(1, d.t / POWER_ON_S);
+        let scale, bright;
+        if (k < 0.25) { // a thin line flares up, white-hot
+          const u = k / 0.25;
+          scale = 0.012 + 0.012 * u; bright = 2.4 * (0.4 + 0.6 * u);
+        } else { // then opens vertically into the picture as the glow settles
+          const u = (k - 0.25) / 0.75, e = 1 - (1 - u) ** 3;
+          scale = 0.024 + 0.976 * e; bright = 1 + 1.4 * (1 - u) ** 2;
+        }
+        setScreenScale(scale);
+        sm.color.setScalar(bright);
+        if (k >= 1) { setScreenScale(1); sm.color.setScalar(1); dip.current = null; }
+      } else if (d.phase === 'out') {
         const k = Math.min(1, d.t / DIP_OUT);
         sm.color.setScalar(d.start + (DIP_LOW - d.start) * ease(k));
         if (k >= 1 && d.pending) { d.pending(); dip.current = { phase: 'in', t: 0, start: DIP_LOW }; }
@@ -647,14 +707,21 @@ const ModelViewer = ({
   const sceneRef    = useRef(null);
   const cameraRef   = useRef(null);
 
-  // tell the page once the model, its lighting/assets and the first picture are all in, so it can fade the stage in
-  const boot = useRef({ model: false, assets: false, picture: !screenTextureSrc, done: false });
+  // Tell the page once the model and its lighting are in, so it can fade the stage in on a dark TV. After a beat
+  // the TV "powers on" (ModelInner opens the first picture); with reduced motion there is no beat, it is just on.
+  const boot = useRef({ model: false, assets: false, done: false });
+  const [powered, setPowered] = useState(!screenDip);
+  const powerTimer = useRef(0);
   const onReadyRef = useRef(onReady);
   useEffect(() => { onReadyRef.current = onReady; });
+  useEffect(() => () => clearTimeout(powerTimer.current), []);
   const markBoot = useCallback(key => {
     const b = boot.current;
     b[key] = true;
-    if (!b.done && b.model && b.assets && b.picture) { b.done = true; onReadyRef.current?.(); }
+    if (b.done || !b.model || !b.assets) return;
+    b.done = true;
+    onReadyRef.current?.();
+    powerTimer.current = setTimeout(() => setPowered(true), POWER_BEAT_MS);
   }, []);
 
   const initYaw   = deg2rad(defaultRotationX);
@@ -738,6 +805,7 @@ const ModelViewer = ({
             screenTextureFocus={screenTextureFocus}
             screenDip={screenDip}
             onBoot={markBoot}
+            powered={powered}
             focus={focus}
             instantFocus={instantFocus}
           >
