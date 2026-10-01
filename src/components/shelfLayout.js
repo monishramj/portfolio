@@ -4,10 +4,10 @@ export const COUNT = 10;
 const SLAB = 0.085; // bottom slab's share of the table height (measured from the GLB)
 const MID = 0.36; // underside of the mid shelf (holds the VCR), as a share of the table height from the top
 const BOARD = 0.022;
-const UPRIGHT = COUNT;
+const UPRIGHT = 6; // the rest lean left against the last upright one, resting on each other
 const LEAN = 10 * Math.PI / 180;
-const WOBBLE = Array(COUNT).fill(0);
-const ZJITTER = Array(COUNT).fill(0);
+const WOBBLE = [0.006, -0.008, 0.004, 0.009, -0.005, 0.007]; // tiny tilts so the upright ones aren't ruler-straight
+const ZJITTER = [0.004, -0.003, 0.005, -0.004, 0.002, -0.005, 0.003, -0.002, 0.004, -0.003];
 
 export function layout(b) {
   const [x0, y0, z0] = b.table.min;
@@ -18,6 +18,7 @@ export function layout(b) {
   const floorTop = y0 + SLAB * tableH + BOARD;
   const innerW = (x1 - x0) * 0.86; // between the table legs
   const tapeH = (ceiling - floorTop) * 0.95;
+  // width chosen so the 6 upright + 4 leaning tapes fit across the shelf
   const tapeW = Math.min(tapeH / 6.2, innerW * 0.94 / 11.9);
   const gap = tapeW * 0.14;
   const tapeD = Math.min(tapeW * 4, (z1 - z0) * 0.7);
