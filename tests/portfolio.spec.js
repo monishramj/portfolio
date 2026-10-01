@@ -125,6 +125,8 @@ test.describe('automatic carousel', () => {
     await expect(page.getByRole('heading', { name: 'Monkish', exact: true })).toBeVisible();
     await page.mouse.move(5, 5); // pointer leaves: it carries on
     await expect(page.getByRole('heading', { name: 'Passenger Princess', exact: true })).toBeVisible({ timeout: 5000 });
+    await page.mouse.move(900, 740); // over the caption below the TV: only the TV stage pauses it
+    await expect(page.getByRole('heading', { name: 'DiabFit', exact: true })).toBeVisible({ timeout: 5000 });
   });
 });
 

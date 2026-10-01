@@ -116,7 +116,7 @@ export default function Home() {
   }, []);
 
   // Automatic carousel: after AUTOPLAY_MS on a project, move to the next. Any pause condition (pointer over the
-  // stage/caption, keyboard focus inside it, popup open, hidden tab, reduced motion) stops it, and changing
+  // TV stage (not the caption below it), keyboard focus inside it, popup open, hidden tab, reduced motion) stops it, and changing
   // project by hand resets the clock because `index` is a dependency. Auto steps replace history entries.
   const autoplay = view === 'projects' && !reducedMotion && tabVisible && !hovered && !focused && !previewOpen;
   useEffect(() => {
@@ -142,9 +142,8 @@ export default function Home() {
       </div>
     </aside>
     <section className="screen-panel" id="screen-content" tabIndex={-1} aria-label="portfolio content"
-      onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
-      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''} ${tvReady ? '' : 'booting'}`} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
+      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''} ${tvReady ? '' : 'booting'}`} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
         <Television channel={channel} reducedMotion={reducedMotion} onReady={markTvReady} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
         <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div>
       </div>
