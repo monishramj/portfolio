@@ -3,6 +3,7 @@ import { Suspense, useRef, useState, useLayoutEffect, useEffect, useMemo } from 
 import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
 import { OrbitControls, useGLTF, useProgress, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
+import { LOW_END } from '../perf';
 
 const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 const deg2rad = d => (d * Math.PI) / 180;
@@ -655,10 +656,10 @@ const ModelViewer = ({
         </button>
       )}
       <Canvas
-        shadows
-        dpr={[1, 1.5]} // retina would otherwise render at 2x, which is ~78% more pixels than 1.5x for no visible gain here
+        shadows={!LOW_END}
+        dpr={LOW_END ? 1 : [1, 1.5]} // retina would otherwise render at 2x, which is ~78% more pixels than 1.5x for no visible gain here
         frameloop="demand"
-        gl={{ preserveDrawingBuffer: showScreenshotButton }} // only the screenshot button needs the buffer kept
+        gl={{ antialias: !LOW_END, preserveDrawingBuffer: showScreenshotButton }} // only the screenshot button needs the buffer kept
         onCreated={({ gl, scene, camera }) => {
           rendererRef.current = gl;
           sceneRef.current    = scene;
@@ -670,9 +671,9 @@ const ModelViewer = ({
         style={{ touchAction: 'pan-y pinch-zoom' }}
       >
         <NullBackground />
-        {environmentPreset !== 'none' && <Environment preset={environmentPreset} background={false} resolution={128} />}
+        {environmentPreset !== 'none' && <Environment preset={environmentPreset} background={false} resolution={LOW_END ? 64 : 128} />}
         <ambientLight intensity={ambientIntensity} />
-        <directionalLight position={[5, 5, 5]}  intensity={keyLightIntensity} castShadow shadow-mapSize={[1024, 1024]} shadow-camera-left={-1} shadow-camera-right={1} shadow-camera-top={1} shadow-camera-bottom={-1} shadow-camera-near={0.5} shadow-camera-far={15} shadow-bias={-0.0005} />
+        <directionalLight position={[5, 5, 5]}  intensity={keyLightIntensity} castShadow={!LOW_END} shadow-mapSize={[1024, 1024]} shadow-camera-left={-1} shadow-camera-right={1} shadow-camera-top={1} shadow-camera-bottom={-1} shadow-camera-near={0.5} shadow-camera-far={15} shadow-bias={-0.0005} />
         <directionalLight position={[-5, 2, 5]} intensity={fillLightIntensity} />
         <directionalLight position={[0, 4, -5]} intensity={rimLightIntensity} />
         <Suspense fallback={<Loader placeholderSrc={placeholderSrc} />}>
