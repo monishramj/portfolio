@@ -19,9 +19,28 @@ function Icon({ name }) {
     github: <path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7M15 22v-3.5c0-1 .1-1.4-.5-2 3.3-.4 6.7-1.6 6.7-7.3A5.7 5.7 0 0 0 19.7 5a5.3 5.3 0 0 0-.1-4s-1.3-.4-4.3 1.6a14.8 14.8 0 0 0-7.8 0C4.5.6 3.2 1 3.2 1a5.3 5.3 0 0 0-.1 4A5.7 5.7 0 0 0 1.6 9c0 5.7 3.4 6.9 6.7 7.3-.6.6-.6 1.2-.5 2V22" />,
     linkedin: <><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M7 10v7m0-10v.1M11 17v-7m0 3a3 3 0 0 1 6 0v4" /></>,
     mail: <><rect x="2" y="4" width="20" height="16" rx="3" /><path d="m3 6 9 7 9-7" /></>,
+    check: <path d="M4 12.5l5 5L20 6.5" />,
     resume: <><path d="M14 2H5v20h14V7zM14 2v5h5M8 12h8M8 16h6" /></>,
   };
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
+}
+
+const EMAIL = 'mrameshj@purdue.edu';
+
+// Copies the address instead of opening a mail app (which many visitors don't have set up).
+// If the clipboard isn't available (insecure context, permission denied) it falls back to mailto.
+function EmailButton() {
+  const [copied, setCopied] = useState(false);
+  const timer = useRef(0);
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(EMAIL); } catch { window.location.href = `mailto:${EMAIL}`; return; }
+    setCopied(true);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setCopied(false), 1800);
+  };
+  return <button type="button" className={copied ? 'copied' : undefined} aria-label="copy email address" title={copied ? 'copied!' : 'copy email'} onClick={copy}>
+    <Icon name={copied ? 'check' : 'mail'} /><span className="sr-only" role="status">{copied ? 'email copied to clipboard' : ''}</span>
+  </button>;
 }
 
 class Television extends Component {
@@ -66,8 +85,9 @@ export default function Home() {
         <div className="social-links" aria-label="social links">
           {[
             ['github', 'github', 'https://github.com/monishramj'], ['linkedin', 'linkedin', 'https://www.linkedin.com/in/monish-rj'],
-            ['mail', 'email', 'mailto:mrameshj@purdue.edu'], ['resume', 'résumé', `${base}resume.pdf`],
-          ].map(([icon, label, href]) => <a key={icon} href={href} aria-label={label} title={label} target={icon === 'mail' ? undefined : '_blank'} rel="noopener noreferrer"><Icon name={icon} /></a>)}
+          ].map(([icon, label, href]) => <a key={icon} href={href} aria-label={label} title={label} target="_blank" rel="noopener noreferrer"><Icon name={icon} /></a>)}
+          <EmailButton />
+          <a href={`${base}resume.pdf`} aria-label="résumé" title="résumé" target="_blank" rel="noopener noreferrer"><Icon name="resume" /></a>
         </div>
       </div>
     </aside>

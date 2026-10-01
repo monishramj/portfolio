@@ -77,7 +77,10 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
       if (width === 390 && ['projects', 'skills'].includes(name)) await page.screenshot({ path: `test-results/${name}-mobile.png`, fullPage: true });
     }
   }
-  await expect(page.getByRole('link', { name: 'email', exact: true })).toHaveAttribute('href', 'mailto:mrameshj@purdue.edu');
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('button', { name: 'copy email address' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'email copied' })).toHaveCount(1);
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('mrameshj@purdue.edu');
   await page.goto('http://127.0.0.1:5173/portfolio/#/?channel=doffy');
   await expect(page.getByRole('heading', { name: 'Doffy', exact: true })).toBeVisible();
   await page.goto('http://127.0.0.1:5173/portfolio/#/projects');
