@@ -53,7 +53,7 @@ h1 em { color: var(--accent); }
 .glass-edge::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 42% 42% at 0 100%, #000e 0%, #0009 32%, #0002 65%, transparent 100%), linear-gradient(0deg, #000 0%, transparent 9%); }
 @supports not (backdrop-filter: blur(1px)) { .glass-edge i { backdrop-filter: none; background: radial-gradient(ellipse at center, transparent 60%, var(--bg) 100%); } }
 
-.screen-caption { flex: 0 0 clamp(240px, 34vh, 340px); display: flex; flex-direction: column; padding: 16px 48px 40px 30px; } /* 40px bottom matches the left column, so the channel row shares the icons' line */
+.screen-caption { flex: none; height: clamp(240px, 34vh, 340px); min-height: 0; display: flex; flex-direction: column; padding: 16px 48px 40px 30px; } /* 40px bottom matches the left column, so the channel row shares the icons' line */
 .caption-body { flex: 1; min-height: 0; overflow-y: auto; }
 h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-transform: lowercase; }
 .screen-caption h2 { margin-bottom: 12px; }
