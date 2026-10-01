@@ -49,8 +49,9 @@ const DesktopControls = ({ target, min, max, zoomEnabled }) => {
 // When ModelInner suspends, the entire subtree (including groups) mounts atomically once
 // the model is ready, so refs are always fresh and there are no stale transform issues.
 const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standby', 'screennoise'];
-const STATIC_MS = 520; // minimum time the screen shows static between channels
-const STATIC_FRAME_MS = 65;
+const STATIC_MS = 320; // minimum time the screen shows static between channels
+const STATIC_FRAME_MS = 40;
+const STATIC_BRIGHTNESS = 0.18; // the model's noise frames are full-bright; this keeps the flicker subtle
 
 const ModelInner = ({
   url, pivot, initYaw, initPitch, defaultZoom, minZoom, maxZoom,
@@ -161,7 +162,14 @@ const ModelInner = ({
             screenMeshRef.current = o;
             o.visible = true;
           } else if (SCREEN_MESHES.some(s => n.includes(s))) {
-            if (n.includes('screennoise')) noiseMeshes.current.push(o);
+            if (n.includes('screennoise')) {
+              o.material = o.material.clone(); // own copy, so dimming the static leaves the rest of the model alone
+              // the noise frames are self-lit and glossy: dim the emission and colour, and drop the sky reflection
+              o.material.emissiveIntensity = STATIC_BRIGHTNESS;
+              o.material.color.setScalar(STATIC_BRIGHTNESS);
+              o.material.envMapIntensity = 0;
+              noiseMeshes.current.push(o);
+            }
             o.visible = false;
           }
         }
