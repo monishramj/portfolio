@@ -25,10 +25,10 @@ h1 { font: 400 clamp(48px, min(5vw, 9vh), 82px)/.95 var(--title-font); letter-sp
 h1 em { color: var(--accent); }
 .identity-note { font-size: 12px; margin-top: 22px; color: var(--text-muted); letter-spacing: .04em; }
 .identity-bottom nav { display: flex; flex-direction: column; gap: 14px; }
-.identity-bottom nav a { display: inline-flex; align-items: center; gap: 12px; width: fit-content; min-height: 28px; font-size: 11px; letter-spacing: .22em; color: var(--text-muted); }
-.identity-bottom nav a::before { content: ''; width: 24px; height: 1px; background: currentColor; transition: width .25s ease; }
+.identity-bottom nav a { display: inline-flex; align-items: center; gap: 12px; width: fit-content; min-height: 32px; font-size: 13px; letter-spacing: .2em; color: var(--text-muted); }
+.identity-bottom nav a::before { content: ''; width: 28px; height: 1px; background: currentColor; transition: width .25s ease; }
 .identity-bottom nav a:hover { color: var(--accent); }
-.identity-bottom nav a:hover::before, .identity-bottom nav a[aria-current='page']::before { width: 48px; }
+.identity-bottom nav a:hover::before, .identity-bottom nav a[aria-current='page']::before { width: 56px; }
 .identity-bottom nav a[aria-current='page'] { color: var(--accent); }
 
 .social-links { display: flex; width: fit-content; margin: 30px 0 0 -12px; }
