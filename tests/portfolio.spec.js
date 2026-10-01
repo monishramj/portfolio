@@ -88,7 +88,7 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   await page.goto('http://127.0.0.1:5173/portfolio/#/?view=unknown');
   await expect(nav.getByRole('link', { name: 'about me', exact: true })).toHaveAttribute('aria-current', 'page');
   await page.route('**/github-contributions-api.jogruber.de/**', route => route.fulfill({ status: 503, body: 'Unavailable' }));
-  await nav.getByRole('link', { name: 'skills', exact: true }).click();
+  await page.reload();
   await expect(page.getByRole('link', { name: 'View activity on GitHub' })).toBeVisible();
   expect(errors).toEqual([]);
 });
