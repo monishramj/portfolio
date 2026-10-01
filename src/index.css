@@ -45,10 +45,10 @@ h1 em { color: var(--accent); }
 /* frosted edge: the scene fades out at the borders while four blur layers ramp up towards them */
 .screen-stage > div:first-child { mask-image: linear-gradient(90deg, transparent, #000 16%), linear-gradient(0deg, transparent, #000 16%); mask-composite: intersect; }
 .glass-edge { position: absolute; z-index: 30; inset: 0; pointer-events: none; }
-.glass-edge i { position: absolute; inset: 0; --w: 36%; backdrop-filter: blur(2px); mask-image: linear-gradient(90deg, #000, transparent var(--w), transparent calc(100% - var(--w)), #000), linear-gradient(#000, transparent var(--w), transparent calc(100% - var(--w)), #000); }
-.glass-edge i:nth-child(2) { --w: 28%; backdrop-filter: blur(6px); }
-.glass-edge i:nth-child(3) { --w: 20%; backdrop-filter: blur(14px); }
-.glass-edge i:nth-child(4) { --w: 12%; backdrop-filter: blur(20px) saturate(1.3); }
+.glass-edge i { position: absolute; inset: 0; --w: 40%; backdrop-filter: blur(3px); mask-image: linear-gradient(90deg, #000, transparent var(--w), transparent calc(100% - var(--w)), #000), linear-gradient(#000, transparent var(--w), transparent calc(100% - var(--w)), #000); }
+.glass-edge i:nth-child(2) { --w: 32%; backdrop-filter: blur(9px); }
+.glass-edge i:nth-child(3) { --w: 24%; backdrop-filter: blur(18px); }
+.glass-edge i:nth-child(4) { --w: 15%; backdrop-filter: blur(28px) saturate(1.35); }
 /* bottom-left corner fades the scene into the page by the name column; the bottom edge melts into black */
 .glass-edge::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 55% at 0 100%, #000 0%, #000d 35%, #0004 65%, transparent 100%), linear-gradient(0deg, #000 0%, transparent 14%); }
 @supports not (backdrop-filter: blur(1px)) { .glass-edge i { backdrop-filter: none; background: radial-gradient(ellipse at center, transparent 60%, var(--bg) 100%); } }
