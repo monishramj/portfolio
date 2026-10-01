@@ -64,7 +64,7 @@ h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-trans
 .project-meta a { display: inline-flex; align-items: center; min-height: 32px; font-size: 12px; color: var(--text); }
 .project-meta a:hover { color: var(--accent); }
 .channels { flex: none; display: flex; align-items: center; height: 44px; gap: 2px; margin-left: -8px; color: var(--text-muted); }
-.channels a { display: grid; place-items: center; min-width: 28px; height: 44px; font-size: 18px; }
+.channels a { display: grid; place-items: center; min-width: 28px; height: 44px; font-size: 26px; line-height: 1; }
 .channels .tick::before { content: ''; width: 14px; height: 2px; border-radius: 1px; background: #ffffff30; transition: width .25s, background .25s; }
 .channels .tick:hover::before { background: #ffffff70; }
 .channels .tick[aria-current]::before { width: 26px; background: var(--accent); }
