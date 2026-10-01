@@ -50,7 +50,7 @@ const DesktopControls = ({ target, min, max, zoomEnabled }) => {
 // the model is ready, so refs are always fresh and there are no stale transform issues.
 const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standby', 'screennoise'];
 // channel change: the picture dims, swaps while dark, then comes back up
-const DIP_OUT = 0.12, DIP_IN = 0.2, DIP_LOW = 0.08;
+const DIP_OUT = 0.06, DIP_IN = 0.11, DIP_LOW = 0.12;
 const DOILY_SCALE = 1.22; // the white pixel-art doily draped over the TV's front-top, scaled up about its own centre
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
