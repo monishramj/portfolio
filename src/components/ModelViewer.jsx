@@ -49,13 +49,15 @@ const DesktopControls = ({ target, min, max, zoomEnabled }) => {
 // When ModelInner suspends, the entire subtree (including groups) mounts atomically once
 // the model is ready, so refs are always fresh and there are no stale transform issues.
 const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standby', 'screennoise'];
+// channel change: the picture dims, swaps while dark, then comes back up
+const DIP_OUT = 0.12, DIP_IN = 0.2, DIP_LOW = 0.08;
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
 const ModelInner = ({
   url, pivot, initYaw, initPitch, defaultZoom, minZoom, maxZoom,
   enableMouseParallax, enableManualRotation, enableHoverRotation, enableManualZoom,
   autoFrame, focusScreen, fadeIn, autoRotate, autoRotateSpeed, onLoaded,
-  modelXOffset, modelYOffset, screenTextureSrc, screenTextureFit, screenTextureFocus,
+  modelXOffset, modelYOffset, screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip,
   focus, instantFocus, children,
 }) => {
   const { scene } = useGLTF(url);
@@ -68,6 +70,8 @@ const ModelInner = ({
   const focusTarget = useRef(null);
   const focusCur = useRef(null);
   const screenMeshRef = useRef(null);
+  const screenMat = useRef(null); // one material for the screen; only its map changes between channels
+  const dip = useRef(null);
   const screenAspectRef = useRef(1);
   const { camera, gl, size: viewport } = useThree();
 
@@ -229,11 +233,34 @@ const ModelInner = ({
     invalidate();
   }, [camera, content, bounds, defaultZoom, focus, focusScreen, instantFocus, pivot, viewport.width, viewport.height]);
 
+  const hasScreen = !!screenTextureSrc;
+  useEffect(() => {
+    const mesh = screenMeshRef.current;
+    if (!hasScreen || !mesh) return;
+    const original = mesh.material;
+    const m = new THREE.MeshBasicMaterial({
+      color: 0x000000, toneMapped: false, side: original.side,
+      transparent: original.transparent, opacity: original.opacity,
+    });
+    screenMat.current = m;
+    mesh.material = m;
+    return () => {
+      screenMat.current = null; dip.current = null;
+      mesh.material = original;
+      m.map?.dispose();
+      m.dispose();
+    };
+  }, [content, hasScreen]);
+
+  // a new image starts the dim straight away, without waiting for it to load
+  useEffect(() => {
+    const m = screenMat.current;
+    if (screenDip && m?.map) dip.current = { phase: 'out', t: 0, start: m.color.r, pending: null };
+  }, [screenTextureSrc, screenDip]);
+
   useEffect(() => {
     if (!screenTextureSrc || !screenMeshRef.current) return;
-    const mesh = screenMeshRef.current;
-    const originalMaterial = mesh.material;
-    let texture, material;
+    let tex, apply;
     let cancelled = false;
     const img = new Image();
     img.onload = () => {
@@ -298,28 +325,26 @@ const ModelInner = ({
       glare.addColorStop(0.45, 'rgba(255,255,255,0)');
       ctx.fillStyle = glare;
       ctx.fillRect(0, 0, W, H);
-      const tex = texture = new THREE.CanvasTexture(canvas);
+      tex = new THREE.CanvasTexture(canvas);
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = 4;
       tex.flipY = true;
-      const m = material = new THREE.MeshBasicMaterial({
-        map: tex, toneMapped: false, side: originalMaterial.side,
-        transparent: originalMaterial.transparent, opacity: originalMaterial.opacity,
-      });
-      mesh.material = m;
+      const m = screenMat.current;
+      if (!m) return;
+      apply = () => { const old = m.map; m.map = tex; m.needsUpdate = true; old?.dispose(); tex = null; }; // the material owns it now
+      if (!screenDip) { apply(); m.color.setScalar(1); }
+      else if (!m.map) { apply(); dip.current = { phase: 'in', t: 0, start: 0 }; } // first picture fades up from black
+      else if (dip.current) dip.current.pending = apply;
+      else dip.current = { phase: 'out', t: 0, start: 1, pending: apply };
       invalidate();
     };
     img.src = screenTextureSrc;
     return () => {
       cancelled = true;
-      if (material) {
-        originalMaterial.opacity = material.opacity;
-        mesh.material = originalMaterial;
-        material.dispose();
-        texture.dispose();
-      }
+      if (dip.current?.pending === apply) dip.current.pending = null;
+      tex?.dispose();
     };
-  }, [screenTextureSrc, screenTextureFit, screenTextureFocus, content]);
+  }, [screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip, content]);
 
   useEffect(() => {
     if (!enableManualRotation || isTouch) return;
@@ -429,6 +454,21 @@ const ModelInner = ({
   useFrame((_, dt) => {
     if (!ready.current || !root.current) return;
 
+    const d = dip.current, sm = screenMat.current;
+    if (d && sm) {
+      d.t += dt;
+      const ease = k => k * k * (3 - 2 * k);
+      if (d.phase === 'out') {
+        const k = Math.min(1, d.t / DIP_OUT);
+        sm.color.setScalar(d.start + (DIP_LOW - d.start) * ease(k));
+        if (k >= 1 && d.pending) { d.pending(); dip.current = { phase: 'in', t: 0, start: DIP_LOW }; }
+      } else {
+        const k = Math.min(1, d.t / DIP_IN);
+        sm.color.setScalar(d.start + (1 - d.start) * ease(k));
+        if (k >= 1) dip.current = null;
+      }
+    }
+
     const ft = focusTarget.current, fc = focusCur.current;
     if (ft && fc) {
       const k = 1 - Math.exp(-dt * 4.5);
@@ -526,6 +566,7 @@ const ModelViewer = ({
   screenTextureSrc,
   screenTextureFit = 'cover',
   screenTextureFocus,
+  screenDip = false,
   focus,
   instantFocus = false,
   children,
@@ -615,6 +656,7 @@ const ModelViewer = ({
             screenTextureSrc={screenTextureSrc}
             screenTextureFit={screenTextureFit}
             screenTextureFocus={screenTextureFocus}
+            screenDip={screenDip}
             focus={focus}
             instantFocus={instantFocus}
           >

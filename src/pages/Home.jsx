@@ -34,7 +34,7 @@ class Television extends Component {
     return <Suspense fallback={fallback}><ModelViewer
       url={`${base}grandmas_tv.glb`} width="100%" height="100%"
       defaultRotationX={180} defaultRotationY={0} defaultZoom={1.9}
-      screenTextureSrc={channel.img} screenTextureFit={channel.fit} screenTextureFocus={channel.focus}
+      screenTextureSrc={channel.img} screenTextureFit={channel.fit} screenTextureFocus={channel.focus} screenDip={!reducedMotion}
       environmentPreset="dawn" enableManualZoom={false} enableManualRotation={false}
       enableMouseParallax={!reducedMotion} enableHoverRotation={!reducedMotion}
       showScreenshotButton={false} focusScreen autoFrame
