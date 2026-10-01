@@ -57,6 +57,11 @@ h1 em { color: var(--accent); }
 .glass-edge i:nth-child(4) { --w: 15%; backdrop-filter: blur(28px) saturate(1.35); }
 /* bottom-left corner fades the scene into the page by the name column; the bottom edge melts into black */
 .glass-edge::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 42% 42% at 0 100%, #000e 0%, #0009 32%, #0002 65%, transparent 100%), linear-gradient(0deg, #000 0%, transparent 9%); }
+/* weak devices (see src/perf.js): every backdrop-filter is re-blurred whenever the canvas underneath changes */
+.low-end .glass-edge i:nth-child(n+3) { display: none; }
+.low-end .image-preview { backdrop-filter: none; background: #15151af2; }
+.low-end .image-preview::backdrop { backdrop-filter: none; background: #040404d9; }
+.low-end .preview-close, .low-end .sr-only:focus-visible { backdrop-filter: none; }
 @supports not (backdrop-filter: blur(1px)) { .glass-edge i { backdrop-filter: none; background: radial-gradient(ellipse at center, transparent 60%, var(--bg) 100%); } }
 
 .screen-caption { flex: none; height: clamp(240px, 34vh, 340px); min-height: 0; display: flex; flex-direction: column; padding: clamp(16px, 3.5vh, 32px) 48px 40px 30px; } /* 40px bottom matches the left column, so the channel row shares the icons' line */
