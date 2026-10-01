@@ -26,7 +26,7 @@ function Icon({ name }) {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 
-const AUTOPLAY_MS = 5000; // how long each project stays up before the carousel moves on
+const AUTOPLAY_MS = 2000; // how long each project stays up before the carousel moves on
 const EMAIL = 'mrameshj@purdue.edu';
 // Same counter and key as the previous site, so the existing count carries on. Only production
 // loads count (/hit); local development just reads it (/get) so testing doesn't inflate it.
