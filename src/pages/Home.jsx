@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useRef, useState } from 'react';
+import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 // import ContributionGraph from '../components/ContributionGraph'; // hidden for now; see the commented usage below
 import VhsShelf from '../components/VhsShelf';
@@ -26,6 +26,9 @@ function Icon({ name }) {
 }
 
 const EMAIL = 'mrameshj@purdue.edu';
+// Same counter and key as the previous site, so the existing count carries on. Only production
+// loads count (/hit); local development just reads it (/get) so testing doesn't inflate it.
+const VISITS_URL = `https://abacus.jasoncameron.dev/${import.meta.env.PROD ? 'hit' : 'get'}/monishramj.dev/pageviews`;
 
 // Copies the address instead of opening a mail app (which many visitors don't have set up).
 // If the clipboard isn't available (insecure context, permission denied) it falls back to mailto.
@@ -70,8 +73,14 @@ export default function Home() {
   const index = Math.max(0, projectIndex);
   const channel = view === 'projects' ? CHANNELS[index] : ABOUT;
   const [selectedSkill, setSelectedSkill] = useState(0);
+  const [visits, setVisits] = useState(null);
   const [reducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const preview = useRef(null);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch(VISITS_URL, { signal: controller.signal }).then(r => r.json()).then(d => { if (typeof d.value === 'number') setVisits(d.value); }).catch(() => {});
+    return () => controller.abort();
+  }, []);
   const skill = SKILLS[selectedSkill];
   const previous = projectUrl((index + CHANNELS.length - 1) % CHANNELS.length);
   const next = projectUrl((index + 1) % CHANNELS.length);
@@ -111,6 +120,7 @@ export default function Home() {
         </div>
         {view === 'projects' && <div className="channels"><Link to={previous} aria-label="previous project">‹</Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick" />)}<Link to={next} aria-label="next project">›</Link></div>}
       </div>
+      {visits !== null && <span className="visits">{visits.toLocaleString()} visits</span>}
     </section>
     <dialog ref={preview} className="image-preview" aria-label={`${channel.title} image preview`} onClick={event => { if (event.target === event.currentTarget) preview.current.close(); }}>
       <div className="preview-body">

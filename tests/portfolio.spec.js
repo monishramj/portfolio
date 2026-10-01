@@ -23,10 +23,12 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   test.setTimeout(60000);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/abacus.jasoncameron.dev/**', route => route.fulfill({ json: { value: 1234 } }));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('http://127.0.0.1:5173/portfolio/');
   const nav = page.getByRole('navigation', { name: 'Main navigation' });
   await expect(page.locator('canvas')).toBeVisible();
+  await expect(page.getByText('1,234 visits')).toBeVisible();
   await expect(nav.getByRole('link', { name: 'about me', exact: true })).toHaveAttribute('aria-current', 'page');
   await expect(page.getByText('love movies, sketching, and I have an origami collection.')).toBeVisible();
   await expect(page.locator('.screen-stage')).toHaveText('');
