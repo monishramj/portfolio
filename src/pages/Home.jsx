@@ -34,7 +34,7 @@ class Television extends Component {
     return <Suspense fallback={fallback}><ModelViewer
       url={`${base}grandmas_tv.glb`} width="100%" height="100%"
       defaultRotationX={180} defaultRotationY={0} defaultZoom={1.9}
-      screenTextureSrc={channel.img} screenTextureFit={channel.fit} screenTextureFocus={channel.focus}
+      screenTextureSrc={channel.img} screenTextureFit={channel.fit} screenTextureFocus={channel.focus} screenTransition={!reducedMotion}
       environmentPreset="dawn" enableManualZoom={false} enableManualRotation={false}
       enableMouseParallax={!reducedMotion} enableHoverRotation={!reducedMotion}
       showScreenshotButton={false} focusScreen autoFrame
@@ -74,7 +74,6 @@ export default function Home() {
     <section className="screen-panel" id="screen-content" tabIndex={-1} aria-label="portfolio content">
       <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''}`} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => preview.current.showModal() : undefined}>
         <Television channel={channel} reducedMotion={reducedMotion} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
-        <div className="tuning-flash" key={channel.id} aria-hidden="true" />
         <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div>
       </div>
       {view === 'skills' && <div className="sr-only-group" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} className="sr-only" aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}>{item.name}</button>)}</div>}

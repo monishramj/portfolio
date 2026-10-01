@@ -40,8 +40,6 @@ h1 em { color: var(--accent); }
 .screen-panel:focus-visible { outline: 2px solid var(--accent); }
 .screen-stage { position: relative; flex: 1 1 0; min-height: 0; width: 100%; isolation: isolate; }
 .screen-stage.clickable { cursor: zoom-in; }
-.tuning-flash { position: absolute; inset: 14% 20% 18%; border-radius: 15%; pointer-events: none; opacity: 0; background: repeating-linear-gradient(0deg, #e8d9ff28 0 1px, #12101788 1px 4px); animation: tune-in 280ms ease-out; }
-@keyframes tune-in { 0% { opacity: .6; } 30% { opacity: .3; } 100% { opacity: 0; } }
 .screen-fallback { position: absolute; inset: 10%; width: 80%; height: 80%; object-fit: contain; border-radius: 24px; }
 
 /* frosted edge: the scene fades out at the borders while four blur layers ramp up towards them */

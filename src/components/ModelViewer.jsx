@@ -49,12 +49,14 @@ const DesktopControls = ({ target, min, max, zoomEnabled }) => {
 // When ModelInner suspends, the entire subtree (including groups) mounts atomically once
 // the model is ready, so refs are always fresh and there are no stale transform issues.
 const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standby', 'screennoise'];
+const STATIC_MS = 520; // minimum time the screen shows static between channels
+const STATIC_FRAME_MS = 65;
 
 const ModelInner = ({
   url, pivot, initYaw, initPitch, defaultZoom, minZoom, maxZoom,
   enableMouseParallax, enableManualRotation, enableHoverRotation, enableManualZoom,
   autoFrame, focusScreen, fadeIn, autoRotate, autoRotateSpeed, onLoaded,
-  modelXOffset, modelYOffset, screenTextureSrc, screenTextureFit, screenTextureFocus,
+  modelXOffset, modelYOffset, screenTextureSrc, screenTextureFit, screenTextureFocus, screenTransition,
   focus, instantFocus, children,
 }) => {
   const { scene } = useGLTF(url);
@@ -67,6 +69,10 @@ const ModelInner = ({
   const focusTarget = useRef(null);
   const focusCur = useRef(null);
   const screenMeshRef = useRef(null);
+  const noiseMeshes = useRef([]); // the model's own static-noise screen meshes
+  const transition = useRef(null);
+  const texReady = useRef(true);
+  const firstSrc = useRef(true);
   const screenAspectRef = useRef(1);
   const { camera, gl, size: viewport } = useThree();
 
@@ -80,6 +86,7 @@ const ModelInner = ({
 
   useLayoutEffect(() => {
     if (!root.current || !content) return;
+    noiseMeshes.current = [];
 
     const box = new THREE.Box3().setFromObject(content);
     if (box.isEmpty()) return;
@@ -154,6 +161,7 @@ const ModelInner = ({
             screenMeshRef.current = o;
             o.visible = true;
           } else if (SCREEN_MESHES.some(s => n.includes(s))) {
+            if (n.includes('screennoise')) noiseMeshes.current.push(o);
             o.visible = false;
           }
         }
@@ -219,6 +227,15 @@ const ModelInner = ({
     invalidate();
   }, [camera, content, bounds, defaultZoom, focus, focusScreen, instantFocus, pivot, viewport.width, viewport.height]);
 
+  // changing the image first runs the TV through its static frames, then reveals the new image
+  useEffect(() => {
+    if (firstSrc.current) { firstSrc.current = false; return; }
+    if (!screenTransition || !noiseMeshes.current.length) return;
+    noiseMeshes.current.sort((a, b) => a.name.localeCompare(b.name));
+    transition.current = { start: performance.now() };
+    texReady.current = false;
+  }, [screenTextureSrc, screenTransition]);
+
   useEffect(() => {
     if (!screenTextureSrc || !screenMeshRef.current) return;
     const mesh = screenMeshRef.current;
@@ -269,6 +286,7 @@ const ModelInner = ({
         transparent: originalMaterial.transparent, opacity: originalMaterial.opacity,
       });
       mesh.material = m;
+      texReady.current = true;
       invalidate();
     };
     img.src = screenTextureSrc;
@@ -391,6 +409,20 @@ const ModelInner = ({
   useFrame((_, dt) => {
     if (!ready.current || !root.current) return;
 
+    const tr = transition.current, sm = screenMeshRef.current;
+    if (tr && sm) {
+      const t = performance.now() - tr.start;
+      if (t > STATIC_MS && texReady.current) {
+        noiseMeshes.current.forEach(m => { m.visible = false; });
+        sm.visible = true;
+        transition.current = null;
+      } else {
+        sm.visible = false;
+        const frame = Math.floor(t / STATIC_FRAME_MS) % noiseMeshes.current.length;
+        noiseMeshes.current.forEach((m, i) => { m.visible = i === frame; });
+      }
+    }
+
     const ft = focusTarget.current, fc = focusCur.current;
     if (ft && fc) {
       const k = 1 - Math.exp(-dt * 4.5);
@@ -488,6 +520,7 @@ const ModelViewer = ({
   screenTextureSrc,
   screenTextureFit = 'cover',
   screenTextureFocus,
+  screenTransition = false,
   focus,
   instantFocus = false,
   children,
@@ -577,6 +610,7 @@ const ModelViewer = ({
             screenTextureSrc={screenTextureSrc}
             screenTextureFit={screenTextureFit}
             screenTextureFocus={screenTextureFocus}
+            screenTransition={screenTransition}
             focus={focus}
             instantFocus={instantFocus}
           >
