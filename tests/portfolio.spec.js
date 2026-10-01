@@ -29,6 +29,7 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   const nav = page.getByRole('navigation', { name: 'Main navigation' });
   await expect(page.locator('canvas')).toBeVisible();
   await expect(page.getByText('1,234 visits')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'experience' }).getByRole('listitem')).toHaveCount(3);
   await expect(nav.getByRole('link', { name: 'about me', exact: true })).toHaveAttribute('aria-current', 'page');
   await expect(page.getByText('love movies, sketching, and I have an origami collection.')).toBeVisible();
   await expect(page.locator('.screen-stage')).toHaveText('');

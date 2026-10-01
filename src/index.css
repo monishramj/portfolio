@@ -24,6 +24,10 @@ a:hover, button:hover { color: var(--accent); }
 h1 { font: 400 clamp(48px, min(5vw, 9vh), 82px)/.95 var(--title-font); letter-spacing: -.01em; }
 h1 em { color: var(--accent); }
 .identity-note { font-size: 12px; margin-top: 22px; color: var(--text-muted); letter-spacing: .04em; }
+.experience { list-style: none; padding: 0; display: grid; gap: 18px; text-transform: lowercase; } /* the middle child of .identity, so space-between centres it between the name and the nav */
+.experience li { display: grid; gap: 2px; }
+.experience li span:first-child { font-size: 14px; color: var(--text); }
+.experience li span:last-child { font-size: 12px; color: var(--text-muted); letter-spacing: .02em; }
 .identity-bottom nav { display: flex; flex-direction: column; gap: 14px; }
 .identity-bottom nav a { display: inline-flex; align-items: center; gap: 12px; width: fit-content; min-height: 32px; font-size: 13px; letter-spacing: .2em; color: var(--text-muted); }
 .identity-bottom nav a::before { content: ''; width: 28px; height: 1px; background: currentColor; transition: width .25s ease; }
@@ -105,6 +109,10 @@ html:has(dialog[open]) { overflow: hidden; }
 .contrib-cell[data-level="1"] { background: var(--contrib-1); }.contrib-cell[data-level="2"] { background: var(--contrib-2); }.contrib-cell[data-level="3"] { background: var(--contrib-3); }.contrib-cell[data-level="4"] { background: var(--contrib-4); }
 .contrib-message { color: var(--text-muted); font-size: 13px; padding: 14px 0; }.contrib-message a { color: var(--accent); text-decoration: underline; }
 
+@media (max-height: 780px) and (min-width: 761px) {
+  .identity { padding: 36px 0 28px 12px; gap: 16px; }
+  .experience { gap: 10px; }
+}
 @media (max-width: 1100px) {
   .portfolio { padding: 0 0 0 24px; gap: 12px; grid-template-columns: 240px minmax(0, 1fr); }
   h1 { font-size: 52px; }
