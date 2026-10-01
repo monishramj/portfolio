@@ -56,7 +56,7 @@ const DOILY_SCALE = 1.22; // the white pixel-art doily draped over the TV's fron
 const PIXELS_ACROSS = 341; // screen images are redrawn this many pixels wide, so they look slightly pixelated at any texture size
 const FRAME_DROP = 0.06; // frames a little above the subject, which sits the TV lower in its stage (share of the visible height)
 // Sky lighting hosted with the site (CC0, Poly Haven via pmndrs/drei-assets) instead of fetched from a third-party mirror on every load.
-const LOCAL_HDRI = { dawn: 'hdri/kiara_1_dawn_1k.hdr' };
+const LOCAL_HDRI = { dawn: 'hdri/kiara_1_dawn_512.hdr' };
 // first power-on: after the TV has been visible for a beat, a thin bright line opens up into the picture
 const POWER_ON_S = 0.55, POWER_BEAT_MS = 700;
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
