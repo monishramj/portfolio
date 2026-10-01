@@ -60,7 +60,7 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   await page.getByRole('button', { name: 'PyTorch', exact: true }).focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('.skill-detail')).toContainText('10 million+');
-  await expect(page.getByText('5 contributions', { exact: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: /5 contributions/ })).toBeVisible();
   await expect(page.getByRole('button', { name: 'PyTorch', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: 'Flutter', exact: true }).focus();
   await page.keyboard.press('Enter');

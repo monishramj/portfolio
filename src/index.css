@@ -89,8 +89,6 @@ html:has(dialog[open]) { overflow: hidden; }
 
 /* tall graph: one row per week, days across, newest week at the bottom next to the caption */
 .contrib-section { --cell: 13px; --gap: 4px; flex: 1; min-height: 80px; max-width: 320px; display: flex; flex-direction: column; }
-.contrib-header { flex: none; margin-top: 10px; color: var(--text-muted); font-size: 11px; }
-.contrib-header strong { color: var(--text); font-weight: 500; }
 .contrib-graph-wrap { position: relative; flex: 1; min-height: 0; }
 .contrib-graph { height: 100%; overflow-y: auto; }
 /* only the very top weeks dissolve into frosted glass under the name; two light blur layers */
