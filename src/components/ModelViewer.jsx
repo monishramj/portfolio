@@ -51,6 +51,7 @@ const DesktopControls = ({ target, min, max, zoomEnabled }) => {
 const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standby', 'screennoise'];
 const STATIC_MS = 320; // minimum time the screen shows static between channels
 const STATIC_FRAME_MS = 40;
+const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 const STATIC_BRIGHTNESS = 0.18; // the model's noise frames are full-bright; this keeps the flicker subtle
 
 const ModelInner = ({
@@ -180,6 +181,15 @@ const ModelInner = ({
         }
       }
     });
+
+    // The screen layers sit ~4 units behind the glass, so at an angle you can see past the image's
+    // edges. Pull them forward (all by the same amount, so the static still sits behind the image).
+    const glass = content.getObjectByName('TV_glass'), screenNode = screenMeshRef.current?.parent;
+    if (glass && screenNode) {
+      screenNode.userData.z0 ??= screenNode.position.z; // original depth, so a repeated effect run doesn't shift twice
+      const delta = (glass.position.z - screenNode.userData.z0) * SCREEN_FORWARD - (screenNode.position.z - screenNode.userData.z0);
+      [screenNode, ...noiseMeshes.current.map(m => m.parent)].forEach(n => { n.position.z += delta; });
+    }
 
     ready.current = true;
     invalidate();
