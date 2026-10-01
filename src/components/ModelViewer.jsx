@@ -58,7 +58,7 @@ const FRAME_DROP = 0.06; // frames a little above the subject, which sits the TV
 // Sky lighting hosted with the site (CC0, Poly Haven via pmndrs/drei-assets) instead of fetched from a third-party mirror on every load.
 const LOCAL_HDRI = { dawn: 'hdri/kiara_1_dawn_512.hdr' };
 // first power-on: after the TV has been visible for a beat, a thin bright line opens up into the picture
-const POWER_ON_S = 0.45, POWER_BEAT_MS = 450;
+const POWER_ON_S = 0.22, POWER_BEAT_MS = 450;
 const MAX_STEP = 1 / 30; // the longest slice of time one frame may advance an animation by
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
