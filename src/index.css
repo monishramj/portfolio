@@ -82,7 +82,6 @@ h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-trans
 .channels .tick[aria-current]::before { width: 26px; background: var(--accent); }
 
 .skill-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; max-width: 700px; }
-.skill-category { color: var(--accent); font-size: 11px; letter-spacing: .14em; text-transform: lowercase; }
 .skill-detail p { margin-bottom: 14px; text-transform: lowercase; }
 
 .visits { position: absolute; right: 48px; bottom: 40px; height: 44px; display: flex; align-items: center; color: var(--text-muted); font-size: 11px; letter-spacing: .04em; } /* same bottom offset and height as the icons and arrows, so all three share a line */
