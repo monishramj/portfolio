@@ -106,7 +106,7 @@ const ModelInner = ({
     };
     let tableMaterial = null;
     content.traverse(o => { if (o.isMesh && o.name.toLowerCase().includes('table')) tableMaterial = o.material; });
-    const parts = { table: part('table'), tableMaterial };
+    const parts = { table: part('table'), midShelf: part('vhs_reader001'), tableMaterial };
     boundsRef.current = { width: size.x * s, height: size.y * s, depth: size.z * s, bottomY: -size.y * s / 2, ...parts };
     setBounds(boundsRef.current);
 

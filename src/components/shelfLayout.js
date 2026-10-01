@@ -1,8 +1,7 @@
 // Shelf and tape geometry in the TV's normalised units. The shelf is a small cubby (floor, back,
 // sides) built inside the lower compartment of the model's own table, just under its mid shelf.
 export const COUNT = 10;
-const SLAB = 0.085; // bottom slab's share of the table height (measured from the GLB)
-const MID = 0.36; // underside of the mid shelf (holds the VCR), as a share of the table height from the top
+const SLAB = 0.068; // bottom slab's share of the table height (measured from the GLB: 0.16 of 2.36)
 const BOARD = 0.022;
 const UPRIGHT = 6; // the rest lean left against the last upright one, resting on each other
 const LEAN = 10 * Math.PI / 180;
@@ -14,7 +13,7 @@ export function layout(b) {
   const [x1, y1, z1] = b.table.max;
   const tableH = y1 - y0;
   const cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
-  const ceiling = y1 - MID * tableH;
+  const ceiling = b.midShelf.min[1]; // underside of the mid shelf that holds the VCR
   const floorTop = y0 + SLAB * tableH + BOARD;
   const innerW = (x1 - x0) * 0.86; // between the table legs
   const tapeH = (ceiling - floorTop) * 0.95;
