@@ -1,5 +1,5 @@
 import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 // import ContributionGraph from '../components/ContributionGraph'; // hidden for now; see the commented usage below
 import VhsShelf from '../components/VhsShelf';
 import { shelfFrame } from '../components/shelfLayout';
@@ -25,6 +25,7 @@ function Icon({ name }) {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 
+const AUTOPLAY_MS = 5000; // how long each project stays up before the carousel moves on
 const EMAIL = 'mrameshj@purdue.edu';
 // Same counter and key as the previous site, so the existing count carries on. Only production
 // loads count (/hit); local development just reads it (/get) so testing doesn't inflate it.
@@ -67,6 +68,7 @@ class Television extends Component {
 
 export default function Home() {
   const { search } = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(search);
   const projectIndex = CHANNELS.findIndex(project => project.id === params.get('channel'));
   const view = SECTIONS.includes(params.get('view')) ? params.get('view') : projectIndex >= 0 ? 'projects' : 'about';
@@ -74,6 +76,10 @@ export default function Home() {
   const channel = view === 'projects' ? CHANNELS[index] : ABOUT;
   const [selectedSkill, setSelectedSkill] = useState(0);
   const [visits, setVisits] = useState(null);
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [tabVisible, setTabVisible] = useState(() => !document.hidden);
   const [reducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const preview = useRef(null);
   useEffect(() => {
@@ -84,6 +90,22 @@ export default function Home() {
   const skill = SKILLS[selectedSkill];
   const previous = projectUrl((index + CHANNELS.length - 1) % CHANNELS.length);
   const next = projectUrl((index + 1) % CHANNELS.length);
+
+  useEffect(() => {
+    const onVisibility = () => setTabVisible(!document.hidden);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => document.removeEventListener('visibilitychange', onVisibility);
+  }, []);
+
+  // Automatic carousel: after AUTOPLAY_MS on a project, move to the next. Any pause condition (pointer over the
+  // stage/caption, keyboard focus inside it, popup open, hidden tab, reduced motion) stops it, and changing
+  // project by hand resets the clock because `index` is a dependency. Auto steps replace history entries.
+  const autoplay = view === 'projects' && !reducedMotion && tabVisible && !hovered && !focused && !previewOpen;
+  useEffect(() => {
+    if (!autoplay) return;
+    const timer = setTimeout(() => navigate(next, { replace: true }), AUTOPLAY_MS);
+    return () => clearTimeout(timer);
+  }, [autoplay, index, next, navigate]);
 
   return <main className="portfolio">
     <a className="skip-link" href="#screen-content" onClick={event => { event.preventDefault(); document.getElementById('screen-content').focus(); }}>skip to content</a>
@@ -100,13 +122,15 @@ export default function Home() {
         </div>
       </div>
     </aside>
-    <section className="screen-panel" id="screen-content" tabIndex={-1} aria-label="portfolio content">
-      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''}`} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => preview.current.showModal() : undefined}>
+    <section className="screen-panel" id="screen-content" tabIndex={-1} aria-label="portfolio content"
+      onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
+      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''}`} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
         <Television channel={channel} reducedMotion={reducedMotion} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
         <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div>
       </div>
       {view === 'skills' && <div className="sr-only-group" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} className="sr-only" aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}>{item.name}</button>)}</div>}
-      {view === 'projects' && <button className="sr-only" onClick={() => preview.current.showModal()}>enlarge image</button>}
+      {view === 'projects' && <button className="sr-only" onClick={() => { setPreviewOpen(true); preview.current.showModal(); }}>enlarge image</button>}
       <div className="screen-caption">
         <div className="caption-body">
           {view === 'about' && <><p>CS major and JMHC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p><p>love movies, sketching, and I have an origami collection.</p></>}
@@ -122,7 +146,7 @@ export default function Home() {
       </div>
       {visits !== null && <span className="visits">{visits.toLocaleString()} visits</span>}
     </section>
-    <dialog ref={preview} className="image-preview" aria-label={`${channel.title} image preview`} onClick={event => { if (event.target === event.currentTarget) preview.current.close(); }}>
+    <dialog ref={preview} className="image-preview" onClose={() => setPreviewOpen(false)} aria-label={`${channel.title} image preview`} onClick={event => { if (event.target === event.currentTarget) preview.current.close(); }}>
       <div className="preview-body">
         <img src={channel.img} alt={channel.title} />
         <div className="preview-caption"><span>{channel.title}</span>{channel.tech && <span>{channel.tech.join(' · ')}</span>}</div>
