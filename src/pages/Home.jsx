@@ -153,7 +153,7 @@ export default function Home() {
         <div className="caption-body">
           {view === 'about' && <><p>CS major and JMHC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p><p>love movies, sketching, and I have an origami collection.</p></>}
           {view === 'projects' && <>
-            <h2>{channel.title}</h2><p>{channel.desc}</p>
+            <h2 className="project-title">{channel.title}</h2><p>{channel.desc}</p>
             <div className="project-meta"><span>{channel.tech.join(' · ')}</span><div><a href={channel.github} target="_blank" rel="noopener noreferrer">source ↗</a>{channel.devpost && <a href={channel.devpost} target="_blank" rel="noopener noreferrer">devpost ↗</a>}{channel.store && <a href={channel.store} target="_blank" rel="noopener noreferrer">app ↗</a>}</div></div>
           </>}
           {view === 'skills' && <div className="skill-detail" aria-live="polite" aria-atomic="true">

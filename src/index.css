@@ -70,6 +70,7 @@ h1 em { color: var(--accent); }
 .caption-body { flex: 1; min-height: 0; overflow-y: auto; }
 h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-transform: lowercase; }
 .screen-caption h2 { margin-bottom: 12px; }
+.screen-caption .project-title { font: 400 34px/1.05 var(--title-font); letter-spacing: -.01em; margin-bottom: 10px; } /* the name font, a bit larger since the serif runs small */
 .screen-caption p { color: var(--text-muted); font-size: 13px; max-width: 760px; }
 .screen-caption p + p { margin-top: 12px; }
 .project-meta { margin-top: 10px; font-size: 10px; color: var(--text-muted); text-transform: lowercase; }
