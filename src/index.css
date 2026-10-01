@@ -37,6 +37,9 @@ h1 em { color: var(--accent); }
 .social-links { display: flex; width: fit-content; margin: 30px 0 0 -12px; }
 .social-links a, .social-links button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--text); opacity: .8; }
 .social-links a:hover, .social-links button:hover, .social-links .copied { opacity: 1; color: var(--accent); }
+.social-links button { position: relative; }
+.copy-toast { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); padding: 6px 12px; border-radius: 99px; background: #15151acc; backdrop-filter: blur(14px) saturate(1.4); color: var(--text); font-size: 12px; line-height: 1.2; white-space: nowrap; pointer-events: none; animation: toast-in .18s ease-out; }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 4px); } }
 
 .screen-panel { align-self: stretch; display: flex; flex-direction: column; min-height: 0; position: relative; min-width: 0; width: 100%; isolation: isolate; }
 .screen-panel:focus { outline: none; }
@@ -61,7 +64,7 @@ h1 em { color: var(--accent); }
 .low-end .glass-edge i:nth-child(n+3) { display: none; }
 .low-end .image-preview { backdrop-filter: none; background: #15151af2; }
 .low-end .image-preview::backdrop { backdrop-filter: none; background: #040404d9; }
-.low-end .preview-close, .low-end .sr-only:focus-visible { backdrop-filter: none; }
+.low-end .preview-close, .low-end .sr-only:focus-visible, .low-end .copy-toast { backdrop-filter: none; }
 @supports not (backdrop-filter: blur(1px)) { .glass-edge i { backdrop-filter: none; background: radial-gradient(ellipse at center, transparent 60%, var(--bg) 100%); } }
 
 .screen-caption { flex: none; height: clamp(240px, 34vh, 340px); min-height: 0; display: flex; flex-direction: column; padding: clamp(16px, 3.5vh, 32px) 48px 40px 30px; } /* 40px bottom matches the left column, so the channel row shares the icons' line */

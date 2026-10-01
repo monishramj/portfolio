@@ -44,7 +44,7 @@ function EmailButton() {
     timer.current = setTimeout(() => setCopied(false), 1800);
   };
   return <button type="button" className={copied ? 'copied' : undefined} aria-label="copy email address" title={copied ? 'copied!' : 'copy email'} onClick={copy}>
-    <Icon name={copied ? 'check' : 'mail'} /><span className="sr-only" role="status">{copied ? 'email copied to clipboard' : ''}</span>
+    <Icon name={copied ? 'check' : 'mail'} />{copied && <span className="copy-toast" aria-hidden="true">copied email!</span>}<span className="sr-only" role="status">{copied ? 'email copied to clipboard' : ''}</span>
   </button>;
 }
 
