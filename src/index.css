@@ -24,7 +24,9 @@ a:hover, button:hover { color: var(--accent); }
 h1 { font: 400 clamp(48px, min(5vw, 9vh), 82px)/.95 var(--title-font); letter-spacing: -.01em; }
 h1 em { color: var(--accent); }
 .identity-note { font-size: 12px; margin-top: 22px; color: var(--text-muted); letter-spacing: .04em; }
-.experience { list-style: none; padding: 0; display: grid; gap: 18px; text-transform: lowercase; } /* the middle child of .identity, so space-between centres it between the name and the nav */
+.experience { display: grid; gap: 14px; } /* the middle child of .identity, so space-between centres it between the name and the nav */
+.experience h2 { font: 400 11px/1 var(--body-font); letter-spacing: .22em; color: var(--text-muted); }
+.experience ul { list-style: none; padding: 0; display: grid; gap: 18px; text-transform: lowercase; }
 .experience li { display: grid; gap: 2px; }
 .experience li span:first-child { font-size: 14px; color: var(--text); }
 .experience li span:last-child { font-size: 12px; color: var(--text-muted); letter-spacing: .02em; }
@@ -111,7 +113,7 @@ html:has(dialog[open]) { overflow: hidden; }
 
 @media (max-height: 780px) and (min-width: 761px) {
   .identity { padding: 36px 0 28px 12px; gap: 16px; }
-  .experience { gap: 10px; }
+  .experience ul { gap: 10px; }
 }
 @media (max-width: 1100px) {
   .portfolio { padding: 0 0 0 24px; gap: 12px; grid-template-columns: 240px minmax(0, 1fr); }

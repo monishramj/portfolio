@@ -1,6 +1,6 @@
-// From public/resume.pdf
+// From public/resume.pdf (UPlate's title is Senior Engineer, which the PDF doesn't reflect yet)
 export const EXPERIENCE = [
   { role: 'Undergraduate Research Assistant', org: 'Aphasia Recovery Lab', when: 'Jan 2026 – Present' },
   { role: 'Contract Software Developer', org: 'Hill Mortgage Company', when: 'May 2026 – Jul 2026' },
-  { role: 'Founding Engineer', org: 'UPlate', when: 'Feb 2026 – Present' },
+  { role: 'Senior Engineer', org: 'UPlate', when: 'Feb 2026 – Present' },
 ];
