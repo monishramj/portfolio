@@ -41,10 +41,19 @@ function drawSpine(canvas, skill) {
   const x0 = 3, x1 = SPINE_W - 4, y0 = 6, y1 = SPINE_H - 7;
   for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) px(x, y, x === x0 || x === x1 || y === y0 || y === y1 ? RIM : CREAM);
   for (let y = y0 + 1; y < y0 + 11; y++) for (let x = x0 + 1; x < x1; x++) px(x, y, mix(skill.color, RIM, 0.45));
-  const thick = 12, len = y1 - (y0 + 14) - 1;
+  // brand logo, reduced to a 1-bit 16px mask just under the colour band
+  const IC = 16;
+  const ic = document.createElement('canvas');
+  ic.width = ic.height = IC;
+  const ig = ic.getContext('2d');
+  ig.scale(IC / 24, IC / 24);
+  ig.fill(new Path2D(skill.icon.path));
+  const { data } = ig.getImageData(0, 0, IC, IC);
+  for (let y = 0; y < IC; y++) for (let x = 0; x < IC; x++) if (data[(y * IC + x) * 4 + 3] > 110) px(x0 + 1 + x, y0 + 13 + y, INK);
+  const thick = 12, top = y0 + 13 + IC + 4, len = y1 - top - 1;
   const { mask } = textMask(skill.name.toLowerCase(), len, thick);
   for (let ty = 0; ty < thick; ty++) for (let tx = 0; tx < len; tx++) {
-    if (mask[ty * len + tx]) px(x0 + 3 + (thick - 1 - ty), y0 + 14 + tx, INK);
+    if (mask[ty * len + tx]) px(x0 + 3 + (thick - 1 - ty), top + tx, INK);
   }
 }
 
