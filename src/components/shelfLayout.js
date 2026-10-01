@@ -1,17 +1,24 @@
-// Shelf geometry, in the TV's normalised units, shared by the 3D shelf and the camera framing.
+// Tape geometry in the TV's normalised units. The tapes stand in the lower compartment of the
+// model's own table, on its bottom slab and up against the mid shelf, so no extra geometry is needed.
 export const COUNT = 10;
-export const BOARD = 0.035; // shelf board thickness, in TV-relative units
+const SLAB = 0.085; // each table slab's share of the table height (measured from the GLB)
+const MID = 0.36; // underside of the mid shelf (holds the VCR), as a share of the table height from the top
 
-// Everything is sized from the TV's normalised bounds so the shelf sits flush under it.
 export function layout(b) {
-  const tapeW = b.width * 0.06;
-  const pitch = tapeW * 1.14;
-  const tapeH = tapeW * 6.2;
-  const tapeD = Math.min(b.depth * 0.8, tapeW * 4);
-  const plateTop = b.bottomY;
-  const floorTop = plateTop - BOARD - tapeH - 0.012;
-  return { tapeW, pitch, tapeH, tapeD, plateTop, floorTop, bottom: floorTop - BOARD, rowW: pitch * COUNT };
+  const [x0, y0, z0] = b.table.min;
+  const [x1, y1, z1] = b.table.max;
+  const tableH = y1 - y0;
+  const floorTop = y0 + tableH * SLAB;
+  const cavityH = tableH * (1 - MID - SLAB); // lower compartment: bottom slab up to the mid shelf
+  const tapeH = cavityH * 0.94;
+  const pitch = Math.min(tapeH / 6.2 * 1.14, (x1 - x0) * 0.8 / COUNT);
+  const tapeW = pitch / 1.14;
+  const tapeD = Math.min(tapeW * 4, (z1 - z0) * 0.7);
+  return { tapeW, pitch, tapeH, tapeD, floorTop, cx: (x0 + x1) / 2, cz: (z0 + z1) / 2, top: y1, bottom: y0, width: x1 - x0 };
 }
 
-// Camera frame for the skills view: the lower part of the TV down to the shelf floor.
-export const shelfFrame = b => ({ top: b.bottomY + b.height * 0.28, bottom: layout(b).bottom, width: b.width });
+// Camera frame for the skills view: the table, with spare room below so the bottom fade doesn't eat the floor.
+export const shelfFrame = b => {
+  const l = layout(b);
+  return { top: l.top + 0.04, bottom: l.bottom - 0.1, width: l.width * 1.35 };
+};

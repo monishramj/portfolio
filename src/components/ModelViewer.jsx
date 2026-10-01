@@ -97,7 +97,15 @@ const ModelInner = ({
     tv.current.rotation.set(initPitch, initYaw, 0);
     pivot.set(0, 0, 0);
     // TV extents in normalised world units, so children (e.g. the shelf) can sit flush under it
-    boundsRef.current = { width: size.x * s, height: size.y * s, depth: size.z * s, bottomY: -size.y * s / 2 };
+    // named parts in the same normalised space (table, VCR/tape meshes), so the shelf can sit inside the table
+    root.current.updateMatrixWorld(true);
+    const part = match => {
+      const b = new THREE.Box3();
+      content.traverse(o => { if (o.isMesh && o.name.toLowerCase().includes(match)) b.expandByObject(o); });
+      return b.isEmpty() ? null : { min: b.min.toArray(), max: b.max.toArray() };
+    };
+    const parts = { table: part('table'), vhs: part('vhs_reader_tv'), vhs2: part('vhs_reader.001') };
+    boundsRef.current = { width: size.x * s, height: size.y * s, depth: size.z * s, bottomY: -size.y * s / 2, ...parts };
     setBounds(boundsRef.current);
 
     if (autoFrame && camera.isPerspectiveCamera) {

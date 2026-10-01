@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
-import { BOARD, COUNT, layout } from './shelfLayout';
+import { COUNT, layout } from './shelfLayout';
 
 function drawSpine(canvas, skill) {
   const ctx = canvas.getContext('2d');
@@ -48,7 +48,7 @@ function Tape({ skill, index, selected, active, onSelect, l, plastic }) {
     return () => { live = false; spine.dispose(); };
   }, [spine, skill]);
 
-  const baseX = (index - (COUNT - 1) / 2) * l.pitch;
+  const baseX = l.cx + (index - (COUNT - 1) / 2) * l.pitch;
   useFrame((_, dt) => {
     const g = group.current;
     if (!g) return;
@@ -64,7 +64,7 @@ function Tape({ skill, index, selected, active, onSelect, l, plastic }) {
   } : {};
 
   return (
-    <group ref={group} position={[baseX, l.floorTop + l.tapeH / 2, 0]} {...handlers}>
+    <group ref={group} position={[baseX, l.floorTop + l.tapeH / 2, l.cz]} {...handlers}>
       <mesh castShadow>
         <boxGeometry args={[l.tapeW, l.tapeH, l.tapeD]} />
         {[plastic, plastic, plastic, plastic].map((m, i) => <primitive key={i} object={m} attach={`material-${i}`} />)}
@@ -78,23 +78,8 @@ function Tape({ skill, index, selected, active, onSelect, l, plastic }) {
 export default function VhsShelf({ bounds, skills, selected, active, onSelect }) {
   const l = layout(bounds);
   const plastic = useMemo(() => new THREE.MeshStandardMaterial({ color: '#141317', roughness: 0.6 }), []);
-  const wood = '#241d22';
-  const depth = bounds.depth * 0.92;
-  const width = l.rowW + l.tapeW * 1.4;
   return (
     <group>
-      <mesh position={[0, l.plateTop - BOARD / 2, 0]} receiveShadow>
-        <boxGeometry args={[width, BOARD, depth]} />
-        <meshStandardMaterial color={wood} roughness={0.7} />
-      </mesh>
-      <mesh position={[0, l.floorTop - BOARD / 2, 0]} receiveShadow>
-        <boxGeometry args={[width, BOARD, depth]} />
-        <meshStandardMaterial color={wood} roughness={0.7} />
-      </mesh>
-      <mesh position={[0, (l.plateTop + l.floorTop) / 2 - BOARD / 2, -depth / 2 + 0.005]}>
-        <boxGeometry args={[width, l.plateTop - l.floorTop - BOARD, 0.01]} />
-        <meshStandardMaterial color="#0c0b0e" roughness={0.9} />
-      </mesh>
       {skills.map((skill, i) => (
         <Tape key={skill.name} skill={skill} index={i} selected={selected === i} active={active} onSelect={onSelect} l={l} plastic={plastic} />
       ))}
