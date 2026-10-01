@@ -55,7 +55,8 @@ h1 em { color: var(--accent); }
 .glass-edge::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 55% at 0 100%, #000 0%, #000d 35%, #0004 65%, transparent 100%), linear-gradient(0deg, #000 0%, transparent 14%); }
 @supports not (backdrop-filter: blur(1px)) { .glass-edge i { backdrop-filter: none; background: radial-gradient(ellipse at center, transparent 60%, var(--bg) 100%); } }
 
-.screen-caption { flex: 0 0 clamp(190px, 27vh, 280px); overflow-y: auto; padding: 16px 48px 24px 30px; }
+.screen-caption { flex: 0 0 clamp(240px, 34vh, 340px); display: flex; flex-direction: column; padding: 16px 48px 40px 30px; } /* 40px bottom matches the left column, so the channel row shares the icons' line */
+.caption-body { flex: 1; min-height: 0; overflow-y: auto; }
 h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-transform: lowercase; }
 .screen-caption h2 { margin-bottom: 12px; }
 .screen-caption p { color: var(--text-muted); font-size: 13px; max-width: 650px; }
@@ -64,8 +65,8 @@ h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-trans
 .project-meta > div { display: flex; gap: 20px; }
 .project-meta a { display: inline-flex; align-items: center; min-height: 40px; font-size: 12px; color: var(--text); }
 .project-meta a:hover { color: var(--accent); }
-.channels { display: flex; align-items: center; gap: 2px; margin-top: 8px; color: var(--text-muted); }
-.channels a { display: grid; place-items: center; min-width: 28px; height: 40px; font-size: 18px; }
+.channels { flex: none; display: flex; align-items: center; height: 44px; gap: 2px; margin-left: -8px; color: var(--text-muted); }
+.channels a { display: grid; place-items: center; min-width: 28px; height: 44px; font-size: 18px; }
 .channels .tick::before { content: ''; width: 14px; height: 2px; border-radius: 1px; background: #ffffff30; transition: width .25s, background .25s; }
 .channels .tick:hover::before { background: #ffffff70; }
 .channels .tick[aria-current]::before { width: 26px; background: var(--accent); }
@@ -114,7 +115,7 @@ html:has(dialog[open]) { overflow: hidden; }
   .identity-bottom nav { flex-direction: row; flex-wrap: wrap; gap: 4px 22px; }
   .social-links { margin-top: 12px; margin-left: -12px; }
   .screen-stage { height: clamp(360px, 95vw, 580px); flex: none; }
-  .screen-caption { height: 300px; padding: 16px 8px 0; }
+  .screen-caption { height: 340px; padding: 16px 8px 0; }
   .skill-detail .contrib-section { padding: 14px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
