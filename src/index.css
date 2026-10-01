@@ -88,7 +88,7 @@ html:has(dialog[open]) { overflow: hidden; }
 .not-found { padding: 100px 24px; max-width: 700px; margin: auto; }.not-found p { margin: 16px 0; }.not-found .btn { background: var(--text); color: var(--bg); padding: 12px 20px; border: 0; border-radius: 4px; }
 
 /* tall graph: one row per week, days across, newest week at the bottom next to the caption */
-.contrib-section { --cell: 11px; --gap: 3px; flex: 1; min-height: 80px; max-width: 320px; display: flex; flex-direction: column; }
+.contrib-section { --cell: 13px; --gap: 4px; flex: 1; min-height: 80px; max-width: 320px; display: flex; flex-direction: column; }
 .contrib-header { flex: none; margin-top: 10px; color: var(--text-muted); font-size: 11px; }
 .contrib-header strong { color: var(--text); font-weight: 500; }
 .contrib-graph-wrap { position: relative; flex: 1; min-height: 0; }
@@ -98,8 +98,8 @@ html:has(dialog[open]) { overflow: hidden; }
 .contrib-graph-wrap::before { height: 28%; backdrop-filter: blur(1.5px); mask-image: linear-gradient(#000 15%, transparent); }
 .contrib-graph-wrap::after { height: 16%; backdrop-filter: blur(4px); background: linear-gradient(#0008, #0000); mask-image: linear-gradient(#000 30%, transparent); }
 .contrib-scroll-inner { display: flex; gap: 8px; }
-.contrib-months { position: relative; flex: none; width: 24px; }
-.contrib-month-label { position: absolute; left: 0; color: var(--text-muted); font-size: 9px; line-height: 1; }
+.contrib-months { position: relative; flex: none; width: 28px; }
+.contrib-month-label { position: absolute; left: 0; color: var(--text-muted); font-size: 10px; line-height: 1; }
 .contrib-grid { display: grid; grid-template-columns: repeat(7, var(--cell)); grid-auto-rows: var(--cell); gap: var(--gap); }
 .contrib-cell { width: var(--cell); height: var(--cell); border-radius: 2px; background: var(--contrib-0); }
 .contrib-cell--empty { background: transparent; }
