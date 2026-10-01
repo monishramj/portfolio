@@ -8,6 +8,7 @@ import { layout } from './shelfLayout';
 const PLASTIC = ['#1a1a1c', '#232122', '#2c2829', '#373031'];
 const CREAM = '#b3bba2', RIM = '#514847', INK = '#1a1a1c';
 const SPINE_W = 24, SPINE_H = 150; // ~1:6.2, drawn at this size and never smoothed
+const DIM = 0.78; // the cubby is a bit darker than the open table: scales colour and sky reflection
 
 const mix = (hex, other, t) => {
   const c = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
@@ -130,7 +131,12 @@ function Cubby({ l, material }) {
   const back = useMemo(() => woodGeometry(l.innerW, l.ceiling - l.floorTop + l.board, 0.012, true), [l]);
   const side = useMemo(() => woodGeometry(0.014, l.ceiling - l.floorTop + l.board, l.depth, false), [l]);
   // the model's own atlas material, so the shelf is lit exactly like the table around it
-  const wood = material ? <primitive object={material} attach="material" /> : <meshStandardMaterial color="#3a2f2c" roughness={0.9} />;
+  const wood = useMemo(() => {
+    if (!material) return <meshStandardMaterial color="#3a2f2c" roughness={0.9} />;
+    const m = material.clone(); // copy, so dimming the cubby doesn't change the TV or the table
+    m.color.setScalar(DIM); m.envMapIntensity = material.envMapIntensity * DIM;
+    return <primitive object={m} attach="material" />;
+  }, [material]);
   const midY = (l.ceiling + l.floorTop - l.board) / 2;
   return (
     <group>
@@ -146,7 +152,7 @@ export default function VhsShelf({ bounds, skills, selected, active, onSelect })
   const l = layout(bounds);
   // same surface response as the model's own material (it is glossy, not matte), so the tapes are lit like the table
   const m = bounds.tableMaterial;
-  const gloss = useMemo(() => ({ roughness: m?.roughness ?? 0, metalness: m?.metalness ?? 0, envMapIntensity: m?.envMapIntensity ?? 1 }), [m]);
+  const gloss = useMemo(() => ({ roughness: m?.roughness ?? 0, metalness: m?.metalness ?? 0, envMapIntensity: (m?.envMapIntensity ?? 1) * DIM, color: new THREE.Color().setScalar(DIM) }), [m]);
   const plastic = useMemo(() => {
     const canvas = document.createElement('canvas');
     canvas.width = canvas.height = 16;
