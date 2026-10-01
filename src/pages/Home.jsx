@@ -36,15 +36,16 @@ const VISITS_URL = `https://abacus.jasoncameron.dev/${import.meta.env.PROD ? 'hi
 // If the clipboard isn't available (insecure context, permission denied) it falls back to mailto.
 function EmailButton() {
   const [copied, setCopied] = useState(false);
-  const timer = useRef(0);
+  const [fading, setFading] = useState(false); // the popup fades out very quickly before it is removed
+  const timers = useRef([]);
   const copy = async () => {
     try { await navigator.clipboard.writeText(EMAIL); } catch { window.location.href = `mailto:${EMAIL}`; return; }
-    setCopied(true);
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => setCopied(false), 1800);
+    timers.current.forEach(clearTimeout);
+    setCopied(true); setFading(false);
+    timers.current = [setTimeout(() => setFading(true), 1700), setTimeout(() => { setCopied(false); setFading(false); }, 1700 + 140)];
   };
   return <button type="button" className={copied ? 'copied' : undefined} aria-label="copy email address" title={copied ? 'copied!' : 'copy email'} onClick={copy}>
-    <Icon name={copied ? 'check' : 'mail'} />{copied && <span className="copy-toast" aria-hidden="true">copied email!</span>}<span className="sr-only" role="status">{copied ? 'email copied to clipboard' : ''}</span>
+    <Icon name={copied ? 'check' : 'mail'} />{copied && <span className={`copy-toast ${fading ? 'fading' : ''}`} aria-hidden="true">copied email!</span>}<span className="sr-only" role="status">{copied ? 'email copied to clipboard' : ''}</span>
   </button>;
 }
 

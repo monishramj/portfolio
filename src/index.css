@@ -40,6 +40,8 @@ h1 em { color: var(--accent); }
 .social-links button { position: relative; }
 .copy-toast { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); padding: 6px 12px; border-radius: 99px; background: #15151acc; backdrop-filter: blur(14px) saturate(1.4); color: var(--text); font-size: 12px; line-height: 1.2; white-space: nowrap; pointer-events: none; animation: toast-in .18s ease-out; }
 @keyframes toast-in { from { opacity: 0; transform: translate(-50%, 4px); } }
+.copy-toast.fading { animation: toast-out .14s ease-in forwards; }
+@keyframes toast-out { to { opacity: 0; transform: translate(-50%, -2px); } }
 
 .screen-panel { align-self: stretch; display: flex; flex-direction: column; min-height: 0; position: relative; min-width: 0; width: 100%; isolation: isolate; }
 .screen-panel:focus { outline: none; }
