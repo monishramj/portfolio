@@ -262,18 +262,46 @@ const ModelInner = ({
       ctx.fillRect(0, 0, W, H);
       // contain: sit the whole image over a blurred, dimmed copy of itself instead of black bars
       if (screenTextureFit === 'contain') draw('cover', 'blur(28px) brightness(.45)');
-      draw(screenTextureFit === 'contain' ? 'contain' : 'cover', 'contrast(1.08) saturate(.92)');
+      draw(screenTextureFit === 'contain' ? 'contain' : 'cover', 'contrast(1.12) saturate(.84) brightness(.97)');
       ctx.filter = 'none';
-      // CRT: scanlines, vignette, glare
-      ctx.fillStyle = 'rgba(0,0,0,.16)';
+      // CRT look, applied in the order light would pass through a tube:
+      // colour fringing, bloom, lifted blacks, phosphor tint, grain, scanlines, vignette, glare
+      const frame = ctx.getImageData(0, 0, W, H), px = frame.data, src = new Uint8ClampedArray(px), fringe = 2;
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+        const i = (y * W + x) * 4;
+        px[i] = src[(y * W + Math.min(W - 1, x + fringe)) * 4];
+        px[i + 2] = src[(y * W + Math.max(0, x - fringe)) * 4 + 2];
+      }
+      ctx.putImageData(frame, 0, 0);
+      const glow = document.createElement('canvas');
+      glow.width = W >> 2; glow.height = H >> 2;
+      glow.getContext('2d').drawImage(canvas, 0, 0, glow.width, glow.height);
+      ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.3;
+      ctx.drawImage(glow, 0, 0, W, H);
+      ctx.globalCompositeOperation = 'lighten'; ctx.globalAlpha = 1;
+      ctx.fillStyle = '#17141f';
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = 0.16;
+      ctx.fillStyle = '#d6c8ec';
+      ctx.fillRect(0, 0, W, H);
+      const grain = document.createElement('canvas');
+      grain.width = grain.height = 128;
+      const gg = grain.getContext('2d'), gd = gg.createImageData(128, 128);
+      for (let i = 0; i < gd.data.length; i += 4) { gd.data[i] = gd.data[i + 1] = gd.data[i + 2] = Math.random() * 255; gd.data[i + 3] = 255; }
+      gg.putImageData(gd, 0, 0);
+      ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.09;
+      ctx.fillStyle = ctx.createPattern(grain, 'repeat');
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+      ctx.fillStyle = 'rgba(0,0,0,.26)';
       for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
-      const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, Math.hypot(W, H) / 2);
+      const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, Math.hypot(W, H) / 2);
       vig.addColorStop(0, 'rgba(0,0,0,0)');
-      vig.addColorStop(1, 'rgba(0,0,0,.6)');
+      vig.addColorStop(1, 'rgba(0,0,0,.72)');
       ctx.fillStyle = vig;
       ctx.fillRect(0, 0, W, H);
       const glare = ctx.createLinearGradient(0, 0, W * 0.6, H * 0.6);
-      glare.addColorStop(0, 'rgba(255,255,255,.07)');
+      glare.addColorStop(0, 'rgba(255,255,255,.09)');
       glare.addColorStop(0.45, 'rgba(255,255,255,0)');
       ctx.fillStyle = glare;
       ctx.fillRect(0, 0, W, H);
