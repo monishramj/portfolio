@@ -1,13 +1,14 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 // import ContributionGraph from '../components/ContributionGraph'; // hidden for now; see the commented usage below
-import VhsShelf from '../components/VhsShelf';
 import { shelfFrame } from '../components/shelfLayout';
 import { PROJECTS } from '../data/projects';
 import { SKILLS } from '../data/skills';
 import { EXPERIENCE } from '../data/experience';
 
-const ModelViewer = lazy(() => import('../components/ModelViewer'));
+// The TV and its shelf (all of three.js) load together and only on desktop, so phones never download them.
+let VhsShelf;
+const ModelViewer = lazy(() => Promise.all([import('../components/ModelViewer'), import('../components/VhsShelf')]).then(([viewer, shelf]) => { VhsShelf = shelf.default; return viewer; }));
 const SECTIONS = ['about', 'projects', 'skills'];
 const LABELS = ['about me', 'projects', 'skills'];
 const base = import.meta.env.BASE_URL;
@@ -88,17 +89,17 @@ export default function Home() {
     query.addEventListener('change', update);
     return () => query.removeEventListener('change', update);
   }, []);
+  const [reducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   // mobile swaps (photo to photo, photo to skills and back): the old picture stays underneath while it blurs and fades out
   const shown = view === 'skills' ? null : channel.img; // null while the icon grid is up
   const [photo, setPhoto] = useState({ cur: shown, prev: null });
-  if (photo.cur !== shown) setPhoto({ cur: shown, prev: photo.cur });
+  if (photo.cur !== shown) setPhoto({ cur: shown, prev: reducedMotion ? null : photo.cur }); // no animation, so nothing to fade out
   const clearPrev = () => setPhoto(p => ({ ...p, prev: null }));
   const markTvReady = useCallback(() => setTvReady(true), []);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [tabVisible, setTabVisible] = useState(() => !document.hidden);
-  const [reducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   const preview = useRef(null);
   useEffect(() => {
     const controller = new AbortController();
