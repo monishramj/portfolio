@@ -32,8 +32,8 @@ h1 em { color: var(--accent); }
 .identity-bottom nav a[aria-current='page'] { color: var(--accent); }
 
 .social-links { display: flex; width: fit-content; margin: 30px 0 0 -12px; }
-.social-links a { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: var(--text); opacity: .8; }
-.social-links a:hover { opacity: 1; color: var(--accent); }
+.social-links a, .social-links button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--text); opacity: .8; }
+.social-links a:hover, .social-links button:hover, .social-links .copied { opacity: 1; color: var(--accent); }
 
 .screen-panel { align-self: stretch; display: flex; flex-direction: column; min-height: 0; position: relative; min-width: 0; width: 100%; isolation: isolate; }
 .screen-panel:focus { outline: none; }
@@ -73,6 +73,7 @@ h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-trans
 .skill-category { color: var(--accent); font-size: 11px; letter-spacing: .14em; text-transform: lowercase; }
 .skill-detail p { margin-bottom: 14px; text-transform: lowercase; }
 
+.visits { position: absolute; right: 48px; bottom: 40px; height: 44px; display: flex; align-items: center; color: var(--text-muted); font-size: 11px; letter-spacing: .04em; } /* same bottom offset and height as the icons and arrows, so all three share a line */
 html:has(dialog[open]) { overflow: hidden; }
 .image-preview { width: min(980px, calc(100% - 32px)); max-height: calc(100dvh - 48px); padding: 0; margin: auto; border: 0; border-radius: 22px; background: #15151aa6; backdrop-filter: blur(28px) saturate(1.5); box-shadow: 0 30px 80px #000a; color: var(--text); overflow: hidden; animation: preview-in .2s ease-out; }
 .image-preview::backdrop { background: #04040499; backdrop-filter: blur(14px); }
@@ -116,6 +117,7 @@ html:has(dialog[open]) { overflow: hidden; }
   h1 em br { display: none; }
   .identity-bottom nav { flex-direction: row; flex-wrap: wrap; gap: 4px 22px; }
   .social-links { margin-top: 12px; margin-left: -12px; }
+  .visits { position: static; justify-content: flex-end; height: 32px; padding-right: 8px; }
   .preview-close { width: 44px; height: 44px; top: 22px; right: 22px; }
   .screen-stage { height: clamp(360px, 95vw, 580px); flex: none; }
   .screen-caption { height: 340px; padding: 16px 8px 0; }

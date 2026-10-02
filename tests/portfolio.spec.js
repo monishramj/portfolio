@@ -23,10 +23,12 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   test.setTimeout(60000);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/abacus.jasoncameron.dev/**', route => route.fulfill({ json: { value: 1234 } }));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('http://127.0.0.1:5173/portfolio/');
   const nav = page.getByRole('navigation', { name: 'Main navigation' });
   await expect(page.locator('canvas')).toBeVisible();
+  await expect(page.getByText('1,234 visits')).toBeVisible();
   await expect(nav.getByRole('link', { name: 'about me', exact: true })).toHaveAttribute('aria-current', 'page');
   await expect(page.getByText('love movies, sketching, and I have an origami collection.')).toBeVisible();
   await expect(page.locator('.screen-stage')).toHaveText('');
@@ -77,7 +79,10 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
       if (width === 390 && ['projects', 'skills'].includes(name)) await page.screenshot({ path: `test-results/${name}-mobile.png`, fullPage: true });
     }
   }
-  await expect(page.getByRole('link', { name: 'email', exact: true })).toHaveAttribute('href', 'mailto:mrameshj@purdue.edu');
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('button', { name: 'copy email address' }).click();
+  await expect(page.getByRole('status').filter({ hasText: 'email copied' })).toHaveCount(1);
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('mrameshj@purdue.edu');
   await page.goto('http://127.0.0.1:5173/portfolio/#/?channel=doffy');
   await expect(page.getByRole('heading', { name: 'Doffy', exact: true })).toBeVisible();
   await page.goto('http://127.0.0.1:5173/portfolio/#/projects');
@@ -103,4 +108,21 @@ test('project carousel remains usable when the TV model cannot load', async ({ p
   await page.getByRole('button', { name: 'Python', exact: true }).focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('.skill-detail')).toContainText('140,000+');
+});
+
+test.describe('automatic carousel', () => {
+  test.use({ reducedMotion: 'no-preference' });
+
+  test('moves to the next project on its own and pauses while hovered', async ({ page }) => {
+    test.setTimeout(40000);
+    await page.route('**/abacus.jasoncameron.dev/**', route => route.fulfill({ json: { value: 1 } }));
+    await page.goto('http://127.0.0.1:5173/portfolio/#/?view=projects&channel=medvr-haptic-glove');
+    await expect(page.getByRole('heading', { name: 'MedVR Haptic Glove', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Monkish', exact: true })).toBeVisible({ timeout: 8000 });
+    await page.mouse.move(900, 300); // over the stage: the timer stops
+    await page.waitForTimeout(6500);
+    await expect(page.getByRole('heading', { name: 'Monkish', exact: true })).toBeVisible();
+    await page.mouse.move(5, 5); // pointer leaves: it carries on
+    await expect(page.getByRole('heading', { name: 'Passenger Princess', exact: true })).toBeVisible({ timeout: 8000 });
+  });
 });
