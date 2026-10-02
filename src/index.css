@@ -141,13 +141,13 @@ html:has(dialog[open]) { overflow: hidden; }
   .visits { position: static; justify-content: flex-end; height: 32px; padding-right: 8px; }
   .preview-close { width: 44px; height: 44px; top: 22px; right: 22px; }
   .screen-stage { flex: none; aspect-ratio: 4 / 3; }
-  .screen-stage:has(.skill-grid) { aspect-ratio: auto; }
+  .screen-stage { mask-image: linear-gradient(90deg, transparent, #000 13%, #000 87%, transparent), linear-gradient(transparent, #000 13%, #000 87%, transparent); mask-composite: intersect; } /* the photo and its frost melt into the dark at every edge */
+  .screen-stage:has(.skill-grid) { aspect-ratio: auto; mask-image: none; }
   .screen-stage > div.skill-grid { mask-image: none; }
   .screen-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .screen-photo.in { animation: frost-in .22s ease-out; }
   .screen-photo.out { animation: frost-out .22s ease-out forwards; }
   .glass-edge::after { display: none; } /* no black fade on phones */
-  .glass-edge { inset: -14px; } /* the frost spills 14px past the photo's edge */
   .glass-edge i:nth-child(n+3) { display: none; } /* one light blur rim over the photo's edges instead of the desktop's four heavy layers */
   .glass-edge i:first-child { --w: 18%; backdrop-filter: blur(6px) saturate(1.2); }
   .glass-edge i:nth-child(2) { --w: 10%; backdrop-filter: blur(16px) saturate(1.35); }
