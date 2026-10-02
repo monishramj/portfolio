@@ -22,21 +22,21 @@ export default function ContributionGraph() {
   }, []);
 
   useEffect(() => {
-    if (scrollRef.current) scrollRef.current.scrollLeft = scrollRef.current.scrollWidth;
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; // latest weeks sit at the bottom
   }, [calendar]);
 
   return (
     <div className="contrib-section" aria-busy={!calendar && !failed}>
       {!calendar ? <p className="contrib-message" role="status">{failed ? <>the calendar couldn’t load. <a href="https://github.com/monishramj" target="_blank" rel="noopener noreferrer">View activity on GitHub ↗</a></> : 'tuning in to github…'}</p> : <>
-        <div className="contrib-header"><span><strong>{calendar.total.toLocaleString()} contributions</strong> in the last year</span></div>
         <div className="contrib-graph-wrap">
-          <div className="contrib-graph" ref={scrollRef} tabIndex={0} role="region" aria-label="GitHub contribution calendar. Scroll horizontally to explore the last year.">
+          <div className="contrib-graph" ref={scrollRef} tabIndex={0} role="region" aria-label="GitHub contribution calendar. Scroll vertically to explore the last year.">
             <div className="contrib-scroll-inner">
-              <div className="contrib-months" aria-hidden="true">{calendar.months.map(({ week, label }) => <span key={week} className="contrib-month-label" style={{ left: `calc(${week} * (var(--cell) + var(--gap)))` }}>{label}</span>)}</div>
+              <div className="contrib-months" aria-hidden="true">{calendar.months.map(({ week, label }) => <span key={week} className="contrib-month-label" style={{ top: `calc(${week} * (var(--cell) + var(--gap)))` }}>{label}</span>)}</div>
               <div className="contrib-grid">{calendar.cells.map((day, index) => day ? <div key={day.date} className="contrib-cell" data-level={day.level} role="img" aria-label={`${day.count} contributions on ${day.date}`} title={`${day.count} contributions on ${day.date}`} /> : <div key={`empty-${index}`} className="contrib-cell contrib-cell--empty" />)}</div>
             </div>
           </div>
         </div>
+        <div className="contrib-header"><span><strong>{calendar.total.toLocaleString()} contributions</strong> in the last year</span></div>
       </>}
     </div>
   );

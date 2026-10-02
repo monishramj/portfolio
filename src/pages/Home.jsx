@@ -34,7 +34,7 @@ class Television extends Component {
     return <Suspense fallback={fallback}><ModelViewer
       url={`${base}grandmas_tv.glb`} width="100%" height="100%"
       defaultRotationX={180} defaultRotationY={0} defaultZoom={1.9}
-      screenTextureSrc={channel.img} screenTextureFit={channel.fit} screenTextureFocus={channel.focus}
+      screenTextureSrc={channel.img} screenTextureFit={channel.fit} screenTextureFocus={channel.focus} screenDip={!reducedMotion}
       environmentPreset="dawn" enableManualZoom={false} enableManualRotation={false}
       enableMouseParallax={!reducedMotion} enableHoverRotation={!reducedMotion}
       showScreenshotButton={false} focusScreen autoFrame
@@ -74,21 +74,22 @@ export default function Home() {
     <section className="screen-panel" id="screen-content" tabIndex={-1} aria-label="portfolio content">
       <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''}`} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => preview.current.showModal() : undefined}>
         <Television channel={channel} reducedMotion={reducedMotion} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
-        <div className="tuning-flash" key={channel.id} aria-hidden="true" />
         <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div>
       </div>
       {view === 'skills' && <div className="sr-only-group" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} className="sr-only" aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}>{item.name}</button>)}</div>}
       {view === 'projects' && <button className="sr-only" onClick={() => preview.current.showModal()}>enlarge image</button>}
       <div className="screen-caption">
-        {view === 'about' && <><p>CS major and JMHC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p><p>love movies, sketching, and I have an origami collection.</p></>}
-        {view === 'projects' && <>
-          <h2>{channel.title}</h2><p>{channel.desc}</p>
-          <div className="project-meta"><span>{channel.tech.join(' · ')}</span><div><a href={channel.github} target="_blank" rel="noopener noreferrer">source ↗</a>{channel.devpost && <a href={channel.devpost} target="_blank" rel="noopener noreferrer">devpost ↗</a>}{channel.store && <a href={channel.store} target="_blank" rel="noopener noreferrer">app ↗</a>}</div></div>
-          <div className="channels"><Link to={previous} aria-label="previous project">‹</Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick" />)}<Link to={next} aria-label="next project">›</Link></div>
-        </>}
-        {view === 'skills' && <div className="skill-detail" aria-live="polite" aria-atomic="true">
-          <span className="skill-category">{skill.category}</span><h2>{skill.name}</h2><p>{skill.detail}</p>
-        </div>}
+        <div className="caption-body">
+          {view === 'about' && <><p>CS major and JMHC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p><p>love movies, sketching, and I have an origami collection.</p></>}
+          {view === 'projects' && <>
+            <h2>{channel.title}</h2><p>{channel.desc}</p>
+            <div className="project-meta"><span>{channel.tech.join(' · ')}</span><div><a href={channel.github} target="_blank" rel="noopener noreferrer">source ↗</a>{channel.devpost && <a href={channel.devpost} target="_blank" rel="noopener noreferrer">devpost ↗</a>}{channel.store && <a href={channel.store} target="_blank" rel="noopener noreferrer">app ↗</a>}</div></div>
+          </>}
+          {view === 'skills' && <div className="skill-detail" aria-live="polite" aria-atomic="true">
+            <span className="skill-category">{skill.category}</span><h2>{skill.name}</h2><p>{skill.detail}</p>
+          </div>}
+        </div>
+        {view === 'projects' && <div className="channels"><Link to={previous} aria-label="previous project">‹</Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick" />)}<Link to={next} aria-label="next project">›</Link></div>}
       </div>
     </section>
     <dialog ref={preview} className="image-preview" aria-label={`${channel.title} image preview`} onClick={event => { if (event.target === event.currentTarget) preview.current.close(); }}><div className="preview-bar"><span>{channel.title}</span><button onClick={() => preview.current.close()} aria-label="close image preview">×</button></div><img src={channel.img} alt={channel.title} /></dialog>

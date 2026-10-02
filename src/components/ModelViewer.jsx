@@ -49,12 +49,17 @@ const DesktopControls = ({ target, min, max, zoomEnabled }) => {
 // When ModelInner suspends, the entire subtree (including groups) mounts atomically once
 // the model is ready, so refs are always fresh and there are no stale transform issues.
 const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standby', 'screennoise'];
+// channel change: the picture dims, swaps while dark, then comes back up
+const DIP_OUT = 0.06, DIP_IN = 0.11, DIP_LOW = 0.12;
+const DOILY_SCALE = 1.22; // the white pixel-art doily draped over the TV's front-top, scaled up about its own centre
+const PIXEL = 3; // screen images are drawn at 1/PIXEL of the texture's resolution, so they look slightly pixelated
+const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
 const ModelInner = ({
   url, pivot, initYaw, initPitch, defaultZoom, minZoom, maxZoom,
   enableMouseParallax, enableManualRotation, enableHoverRotation, enableManualZoom,
   autoFrame, focusScreen, fadeIn, autoRotate, autoRotateSpeed, onLoaded,
-  modelXOffset, modelYOffset, screenTextureSrc, screenTextureFit, screenTextureFocus,
+  modelXOffset, modelYOffset, screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip,
   focus, instantFocus, children,
 }) => {
   const { scene } = useGLTF(url);
@@ -67,6 +72,8 @@ const ModelInner = ({
   const focusTarget = useRef(null);
   const focusCur = useRef(null);
   const screenMeshRef = useRef(null);
+  const screenMat = useRef(null); // one material for the screen; only its map changes between channels
+  const dip = useRef(null);
   const screenAspectRef = useRef(1);
   const { camera, gl, size: viewport } = useThree();
 
@@ -80,6 +87,23 @@ const ModelInner = ({
 
   useLayoutEffect(() => {
     if (!root.current || !content) return;
+
+    // Enlarge the doily. Its vertices are the ones that map to its patch of the texture atlas
+    // (u > .40, v > .85) and sit on the front of the TV; the geometry is shared, so only do it once.
+    const tvGeo = content.getObjectByName('TV_Tv_0')?.geometry;
+    if (tvGeo && !tvGeo.userData.doilyScaled) {
+      tvGeo.userData.doilyScaled = true;
+      const pos = tvGeo.attributes.position, uv = tvGeo.attributes.uv, ids = [];
+      for (let i = 0; i < pos.count; i++) if (uv.getX(i) > 0.4 && uv.getY(i) > 0.85 && pos.getZ(i) > 3.8) ids.push(i);
+      if (ids.length) {
+        const c = new THREE.Vector3();
+        ids.forEach(i => c.add(new THREE.Vector3().fromBufferAttribute(pos, i)));
+        c.divideScalar(ids.length);
+        ids.forEach(i => pos.setXYZ(i, c.x + (pos.getX(i) - c.x) * DOILY_SCALE, c.y + (pos.getY(i) - c.y) * DOILY_SCALE, pos.getZ(i)));
+        pos.needsUpdate = true;
+        tvGeo.computeBoundingBox(); tvGeo.computeBoundingSphere();
+      }
+    }
 
     const box = new THREE.Box3().setFromObject(content);
     if (box.isEmpty()) return;
@@ -165,6 +189,15 @@ const ModelInner = ({
       }
     });
 
+    // The screen sits ~4 units behind the glass, so at an angle you can see past the image's edges.
+    // Pull it forward towards the glass.
+    const glass = content.getObjectByName('TV_glass'), screenNode = screenMeshRef.current?.parent;
+    if (glass && screenNode) {
+      screenNode.userData.z0 ??= screenNode.position.z; // original depth, so a repeated effect run doesn't shift twice
+      const delta = (glass.position.z - screenNode.userData.z0) * SCREEN_FORWARD - (screenNode.position.z - screenNode.userData.z0);
+      screenNode.position.z += delta;
+    }
+
     ready.current = true;
     invalidate();
 
@@ -219,11 +252,34 @@ const ModelInner = ({
     invalidate();
   }, [camera, content, bounds, defaultZoom, focus, focusScreen, instantFocus, pivot, viewport.width, viewport.height]);
 
+  const hasScreen = !!screenTextureSrc;
+  useEffect(() => {
+    const mesh = screenMeshRef.current;
+    if (!hasScreen || !mesh) return;
+    const original = mesh.material;
+    const m = new THREE.MeshBasicMaterial({
+      color: 0x000000, toneMapped: false, side: original.side,
+      transparent: original.transparent, opacity: original.opacity,
+    });
+    screenMat.current = m;
+    mesh.material = m;
+    return () => {
+      screenMat.current = null; dip.current = null;
+      mesh.material = original;
+      m.map?.dispose();
+      m.dispose();
+    };
+  }, [content, hasScreen]);
+
+  // a new image starts the dim straight away, without waiting for it to load
+  useEffect(() => {
+    const m = screenMat.current;
+    if (screenDip && m?.map) dip.current = { phase: 'out', t: 0, start: m.color.r, pending: null };
+  }, [screenTextureSrc, screenDip]);
+
   useEffect(() => {
     if (!screenTextureSrc || !screenMeshRef.current) return;
-    const mesh = screenMeshRef.current;
-    const originalMaterial = mesh.material;
-    let texture, material;
+    let tex, apply;
     let cancelled = false;
     const img = new Image();
     img.onload = () => {
@@ -245,43 +301,76 @@ const ModelInner = ({
       ctx.fillRect(0, 0, W, H);
       // contain: sit the whole image over a blurred, dimmed copy of itself instead of black bars
       if (screenTextureFit === 'contain') draw('cover', 'blur(28px) brightness(.45)');
-      draw(screenTextureFit === 'contain' ? 'contain' : 'cover', 'contrast(1.08) saturate(.92)');
+      draw(screenTextureFit === 'contain' ? 'contain' : 'cover', 'contrast(1.12) saturate(.84) brightness(.97)');
       ctx.filter = 'none';
-      // CRT: scanlines, vignette, glare
-      ctx.fillStyle = 'rgba(0,0,0,.16)';
+      // slight pixelation: redraw at 1/PIXEL resolution, then scale back up without smoothing
+      const small = document.createElement('canvas');
+      small.width = Math.round(W / PIXEL); small.height = Math.round(H / PIXEL);
+      small.getContext('2d').drawImage(canvas, 0, 0, small.width, small.height);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(small, 0, 0, W, H);
+      ctx.imageSmoothingEnabled = true;
+      // CRT look, applied in the order light would pass through a tube:
+      // colour fringing, bloom, lifted blacks, phosphor tint, grain, scanlines, vignette, glare
+      const frame = ctx.getImageData(0, 0, W, H), px = frame.data, src = new Uint8ClampedArray(px), fringe = 2;
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+        const i = (y * W + x) * 4;
+        px[i] = src[(y * W + Math.min(W - 1, x + fringe)) * 4];
+        px[i + 2] = src[(y * W + Math.max(0, x - fringe)) * 4 + 2];
+      }
+      ctx.putImageData(frame, 0, 0);
+      const glow = document.createElement('canvas');
+      glow.width = W >> 2; glow.height = H >> 2;
+      glow.getContext('2d').drawImage(canvas, 0, 0, glow.width, glow.height);
+      ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.3;
+      ctx.drawImage(glow, 0, 0, W, H);
+      ctx.globalCompositeOperation = 'lighten'; ctx.globalAlpha = 1;
+      ctx.fillStyle = '#17141f';
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = 0.16;
+      ctx.fillStyle = '#d6c8ec';
+      ctx.fillRect(0, 0, W, H);
+      const grain = document.createElement('canvas');
+      grain.width = grain.height = 128;
+      const gg = grain.getContext('2d'), gd = gg.createImageData(128, 128);
+      for (let i = 0; i < gd.data.length; i += 4) { gd.data[i] = gd.data[i + 1] = gd.data[i + 2] = Math.random() * 255; gd.data[i + 3] = 255; }
+      gg.putImageData(gd, 0, 0);
+      ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.09;
+      ctx.fillStyle = ctx.createPattern(grain, 'repeat');
+      ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+      ctx.fillStyle = 'rgba(0,0,0,.26)';
       for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
-      const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.35, W / 2, H / 2, Math.hypot(W, H) / 2);
+      const vig = ctx.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, Math.hypot(W, H) / 2);
       vig.addColorStop(0, 'rgba(0,0,0,0)');
-      vig.addColorStop(1, 'rgba(0,0,0,.6)');
+      vig.addColorStop(1, 'rgba(0,0,0,.72)');
       ctx.fillStyle = vig;
       ctx.fillRect(0, 0, W, H);
       const glare = ctx.createLinearGradient(0, 0, W * 0.6, H * 0.6);
-      glare.addColorStop(0, 'rgba(255,255,255,.07)');
+      glare.addColorStop(0, 'rgba(255,255,255,.09)');
       glare.addColorStop(0.45, 'rgba(255,255,255,0)');
       ctx.fillStyle = glare;
       ctx.fillRect(0, 0, W, H);
-      const tex = texture = new THREE.CanvasTexture(canvas);
+      tex = new THREE.CanvasTexture(canvas);
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = 4;
       tex.flipY = true;
-      const m = material = new THREE.MeshBasicMaterial({
-        map: tex, toneMapped: false, side: originalMaterial.side,
-        transparent: originalMaterial.transparent, opacity: originalMaterial.opacity,
-      });
-      mesh.material = m;
+      const m = screenMat.current;
+      if (!m) return;
+      apply = () => { const old = m.map; m.map = tex; m.needsUpdate = true; old?.dispose(); tex = null; }; // the material owns it now
+      if (!screenDip) { apply(); m.color.setScalar(1); }
+      else if (!m.map) { apply(); dip.current = { phase: 'in', t: 0, start: 0 }; } // first picture fades up from black
+      else if (dip.current) dip.current.pending = apply;
+      else dip.current = { phase: 'out', t: 0, start: 1, pending: apply };
       invalidate();
     };
     img.src = screenTextureSrc;
     return () => {
       cancelled = true;
-      if (material) {
-        originalMaterial.opacity = material.opacity;
-        mesh.material = originalMaterial;
-        material.dispose();
-        texture.dispose();
-      }
+      if (dip.current?.pending === apply) dip.current.pending = null;
+      tex?.dispose();
     };
-  }, [screenTextureSrc, screenTextureFit, screenTextureFocus, content]);
+  }, [screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip, content]);
 
   useEffect(() => {
     if (!enableManualRotation || isTouch) return;
@@ -391,6 +480,21 @@ const ModelInner = ({
   useFrame((_, dt) => {
     if (!ready.current || !root.current) return;
 
+    const d = dip.current, sm = screenMat.current;
+    if (d && sm) {
+      d.t += dt;
+      const ease = k => k * k * (3 - 2 * k);
+      if (d.phase === 'out') {
+        const k = Math.min(1, d.t / DIP_OUT);
+        sm.color.setScalar(d.start + (DIP_LOW - d.start) * ease(k));
+        if (k >= 1 && d.pending) { d.pending(); dip.current = { phase: 'in', t: 0, start: DIP_LOW }; }
+      } else {
+        const k = Math.min(1, d.t / DIP_IN);
+        sm.color.setScalar(d.start + (1 - d.start) * ease(k));
+        if (k >= 1) dip.current = null;
+      }
+    }
+
     const ft = focusTarget.current, fc = focusCur.current;
     if (ft && fc) {
       const k = 1 - Math.exp(-dt * 4.5);
@@ -488,6 +592,7 @@ const ModelViewer = ({
   screenTextureSrc,
   screenTextureFit = 'cover',
   screenTextureFocus,
+  screenDip = false,
   focus,
   instantFocus = false,
   children,
@@ -577,6 +682,7 @@ const ModelViewer = ({
             screenTextureSrc={screenTextureSrc}
             screenTextureFit={screenTextureFit}
             screenTextureFocus={screenTextureFocus}
+            screenDip={screenDip}
             focus={focus}
             instantFocus={instantFocus}
           >
