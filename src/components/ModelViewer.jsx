@@ -97,7 +97,17 @@ const ModelInner = ({
     tv.current.rotation.set(initPitch, initYaw, 0);
     pivot.set(0, 0, 0);
     // TV extents in normalised world units, so children (e.g. the shelf) can sit flush under it
-    boundsRef.current = { width: size.x * s, height: size.y * s, depth: size.z * s, bottomY: -size.y * s / 2 };
+    // named parts in the same normalised space (table, VCR/tape meshes), so the shelf can sit inside the table
+    root.current.updateMatrixWorld(true);
+    const part = match => {
+      const b = new THREE.Box3();
+      content.traverse(o => { if (o.isMesh && o.name.toLowerCase().includes(match)) b.expandByObject(o); });
+      return b.isEmpty() ? null : { min: b.min.toArray(), max: b.max.toArray() };
+    };
+    let tableMaterial = null;
+    content.traverse(o => { if (o.isMesh && o.name.toLowerCase().includes('table')) tableMaterial = o.material; });
+    const parts = { table: part('table'), midShelf: part('vhs_reader001'), tableMaterial };
+    boundsRef.current = { width: size.x * s, height: size.y * s, depth: size.z * s, bottomY: -size.y * s / 2, ...parts };
     setBounds(boundsRef.current);
 
     if (autoFrame && camera.isPerspectiveCamera) {
@@ -182,11 +192,12 @@ const ModelInner = ({
   useLayoutEffect(() => {
     if (!focusScreen || !screenMeshRef.current || !boundsRef.current) return;
     const tanHalf = Math.tan(deg2rad(camera.fov / 2));
-    let center, dist;
+    let center, dist, lift = 0;
     if (typeof focus === 'function') {
       // shelf framing: { top, bottom, width } in the same normalised units as bounds
       const f = focus(boundsRef.current);
       center = new THREE.Vector3(0, (f.top + f.bottom) / 2, 0);
+      lift = f.lift || 0;
       dist = Math.max(f.top - f.bottom, f.width / camera.aspect) * 1.4 / (2 * tanHalf);
     } else {
       tv.current.updateMatrixWorld(true);
@@ -195,14 +206,14 @@ const ModelInner = ({
       center = box.getCenter(new THREE.Vector3());
       dist = Math.max(size.y, size.x / camera.aspect) * defaultZoom / (2 * tanHalf);
     }
-    focusTarget.current = { center, dist };
+    focusTarget.current = { center, dist, lift };
     camera.near = dist / 100;
     camera.far = dist * 100;
     camera.updateProjectionMatrix();
     if (!focusCur.current || instantFocus) {
-      focusCur.current = { dist };
+      focusCur.current = { dist, lift };
       pivot.copy(center);
-      camera.position.set(center.x, center.y, center.z + dist);
+      camera.position.set(center.x, center.y + dist * lift, center.z + dist);
       camera.lookAt(pivot);
     }
     invalidate();
@@ -385,7 +396,8 @@ const ModelInner = ({
       const k = 1 - Math.exp(-dt * 4.5);
       pivot.lerp(ft.center, k);
       fc.dist += (ft.dist - fc.dist) * k;
-      camera.position.set(pivot.x, pivot.y, pivot.z + fc.dist);
+      fc.lift += (ft.lift - fc.lift) * k;
+      camera.position.set(pivot.x, pivot.y + fc.dist * fc.lift, pivot.z + fc.dist);
       camera.lookAt(pivot);
     }
 
@@ -536,7 +548,7 @@ const ModelViewer = ({
         <NullBackground />
         {environmentPreset !== 'none' && <Environment preset={environmentPreset} background={false} />}
         <ambientLight intensity={ambientIntensity} />
-        <directionalLight position={[5, 5, 5]}  intensity={keyLightIntensity} castShadow />
+        <directionalLight position={[5, 5, 5]}  intensity={keyLightIntensity} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-left={-1} shadow-camera-right={1} shadow-camera-top={1} shadow-camera-bottom={-1} shadow-camera-near={0.5} shadow-camera-far={15} shadow-bias={-0.0005} />
         <directionalLight position={[-5, 2, 5]} intensity={fillLightIntensity} />
         <directionalLight position={[0, 4, -5]} intensity={rimLightIntensity} />
         <ContactShadows ref={contactRef} position={[0, -0.5, 0]} opacity={0.35} scale={10} blur={2} />
