@@ -83,6 +83,7 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.getByRole('button', { name: 'copy email address' }).click();
   await expect(page.getByRole('status').filter({ hasText: 'email copied' })).toHaveCount(1);
+  await expect(page.getByText('copied email!')).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('mrameshj@purdue.edu');
   await page.goto('http://127.0.0.1:5173/portfolio/#/?channel=doffy');
   await expect(page.getByRole('heading', { name: 'Doffy', exact: true })).toBeVisible();
@@ -125,6 +126,8 @@ test.describe('automatic carousel', () => {
     await expect(page.getByRole('heading', { name: 'Monkish', exact: true })).toBeVisible();
     await page.mouse.move(5, 5); // pointer leaves: it carries on
     await expect(page.getByRole('heading', { name: 'Passenger Princess', exact: true })).toBeVisible({ timeout: 5000 });
+    await page.mouse.move(900, 740); // over the caption below the TV: only the TV stage pauses it
+    await expect(page.getByRole('heading', { name: 'DiabFit', exact: true })).toBeVisible({ timeout: 5000 });
   });
 });
 

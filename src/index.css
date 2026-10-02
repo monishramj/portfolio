@@ -30,15 +30,18 @@ h1 em { color: var(--accent); }
 .experience li span:first-child { font-size: 14px; color: var(--text); }
 .experience li span:last-child { font-size: 12px; color: var(--text-muted); letter-spacing: .02em; }
 .identity-bottom nav { display: flex; flex-direction: column; gap: 14px; }
-.identity-bottom nav a { display: inline-flex; align-items: center; gap: 12px; width: fit-content; min-height: 32px; font-size: 13px; letter-spacing: .2em; color: var(--text-muted); }
-.identity-bottom nav a::before { content: ''; width: 28px; height: 1px; background: currentColor; transition: width .25s ease; }
+.identity-bottom nav a { display: inline-flex; align-items: center; width: fit-content; min-height: 32px; font-size: 13px; letter-spacing: .2em; color: var(--text-muted); }
 .identity-bottom nav a:hover { color: var(--accent); }
-.identity-bottom nav a:hover::before, .identity-bottom nav a[aria-current='page']::before { width: 56px; }
 .identity-bottom nav a[aria-current='page'] { color: var(--accent); }
 
 .social-links { display: flex; width: fit-content; margin: 30px 0 0 -12px; }
 .social-links a, .social-links button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--text); opacity: .8; }
 .social-links a:hover, .social-links button:hover, .social-links .copied { opacity: 1; color: var(--accent); }
+.social-links button { position: relative; }
+.copy-toast { position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); padding: 6px 12px; border-radius: 99px; background: #15151acc; backdrop-filter: blur(14px) saturate(1.4); color: var(--text); font-size: 12px; line-height: 1.2; white-space: nowrap; pointer-events: none; animation: toast-in .18s ease-out; }
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 4px); } }
+.copy-toast.fading { animation: toast-out .14s ease-in forwards; }
+@keyframes toast-out { to { opacity: 0; transform: translate(-50%, -2px); } }
 
 .screen-panel { align-self: stretch; display: flex; flex-direction: column; min-height: 0; position: relative; min-width: 0; width: 100%; isolation: isolate; }
 .screen-panel:focus { outline: none; }
@@ -63,13 +66,14 @@ h1 em { color: var(--accent); }
 .low-end .glass-edge i:nth-child(n+3) { display: none; }
 .low-end .image-preview { backdrop-filter: none; background: #15151af2; }
 .low-end .image-preview::backdrop { backdrop-filter: none; background: #040404d9; }
-.low-end .preview-close, .low-end .sr-only:focus-visible { backdrop-filter: none; }
+.low-end .preview-close, .low-end .sr-only:focus-visible, .low-end .copy-toast { backdrop-filter: none; }
 @supports not (backdrop-filter: blur(1px)) { .glass-edge i { backdrop-filter: none; background: radial-gradient(ellipse at center, transparent 60%, var(--bg) 100%); } }
 
 .screen-caption { flex: none; height: clamp(240px, 34vh, 340px); min-height: 0; display: flex; flex-direction: column; padding: clamp(16px, 3.5vh, 32px) 48px 40px 30px; } /* 40px bottom matches the left column, so the channel row shares the icons' line */
 .caption-body { flex: 1; min-height: 0; overflow-y: auto; }
 h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-transform: lowercase; }
 .screen-caption h2 { margin-bottom: 12px; }
+.screen-caption .project-title, .skill-detail h2 { font: 400 34px/1.05 var(--title-font); letter-spacing: -.01em; margin-bottom: 10px; } /* the name font, a bit larger since the serif runs small */
 .screen-caption p { color: var(--text-muted); font-size: 13px; max-width: 760px; }
 .screen-caption p + p { margin-top: 12px; }
 .project-meta { margin-top: 10px; font-size: 10px; color: var(--text-muted); text-transform: lowercase; }
@@ -83,7 +87,6 @@ h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-trans
 .channels .tick[aria-current]::before { width: 26px; background: var(--accent); }
 
 .skill-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; max-width: 700px; }
-.skill-category { color: var(--accent); font-size: 11px; letter-spacing: .14em; text-transform: lowercase; }
 .skill-detail p { margin-bottom: 14px; text-transform: lowercase; }
 
 .visits { position: absolute; right: 48px; bottom: 40px; height: 44px; display: flex; align-items: center; color: var(--text-muted); font-size: 11px; letter-spacing: .04em; } /* same bottom offset and height as the icons and arrows, so all three share a line */
@@ -119,8 +122,9 @@ html:has(dialog[open]) { overflow: hidden; }
 .contrib-message { color: var(--text-muted); font-size: 13px; padding: 14px 0; }.contrib-message a { color: var(--accent); text-decoration: underline; }
 
 @media (max-height: 780px) and (min-width: 761px) {
-  .identity { padding: 36px 0 28px 12px; gap: 16px; }
+  .identity { padding: 36px 0 40px 12px; gap: 10px; } /* keep the 40px bottom so the icons stay on the arrows' line */
   .experience ul { gap: 10px; }
+  .screen-caption .project-title, .skill-detail h2 { font-size: 28px; margin-bottom: 6px; }
 }
 @media (max-width: 1100px) {
   .portfolio { padding: 0 0 0 24px; gap: 12px; grid-template-columns: 240px minmax(0, 1fr); }

@@ -36,15 +36,16 @@ const VISITS_URL = `https://abacus.jasoncameron.dev/${import.meta.env.PROD ? 'hi
 // If the clipboard isn't available (insecure context, permission denied) it falls back to mailto.
 function EmailButton() {
   const [copied, setCopied] = useState(false);
-  const timer = useRef(0);
+  const [fading, setFading] = useState(false); // the popup fades out very quickly before it is removed
+  const timers = useRef([]);
   const copy = async () => {
     try { await navigator.clipboard.writeText(EMAIL); } catch { window.location.href = `mailto:${EMAIL}`; return; }
-    setCopied(true);
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => setCopied(false), 1800);
+    timers.current.forEach(clearTimeout);
+    setCopied(true); setFading(false);
+    timers.current = [setTimeout(() => setFading(true), 1700), setTimeout(() => { setCopied(false); setFading(false); }, 1700 + 140)];
   };
   return <button type="button" className={copied ? 'copied' : undefined} aria-label="copy email address" title={copied ? 'copied!' : 'copy email'} onClick={copy}>
-    <Icon name={copied ? 'check' : 'mail'} /><span className="sr-only" role="status">{copied ? 'email copied to clipboard' : ''}</span>
+    <Icon name={copied ? 'check' : 'mail'} />{copied && <span className={`copy-toast ${fading ? 'fading' : ''}`} aria-hidden="true">copied email!</span>}<span className="sr-only" role="status">{copied ? 'email copied to clipboard' : ''}</span>
   </button>;
 }
 
@@ -116,7 +117,7 @@ export default function Home() {
   }, []);
 
   // Automatic carousel: after AUTOPLAY_MS on a project, move to the next. Any pause condition (pointer over the
-  // stage/caption, keyboard focus inside it, popup open, hidden tab, reduced motion) stops it, and changing
+  // TV stage (not the caption below it), keyboard focus inside it, popup open, hidden tab, reduced motion) stops it, and changing
   // project by hand resets the clock because `index` is a dependency. Auto steps replace history entries.
   const autoplay = view === 'projects' && !reducedMotion && tabVisible && !hovered && !focused && !previewOpen;
   useEffect(() => {
@@ -142,9 +143,8 @@ export default function Home() {
       </div>
     </aside>
     <section className="screen-panel" id="screen-content" tabIndex={-1} aria-label="portfolio content"
-      onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
-      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''} ${tvReady ? '' : 'booting'}`} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
+      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''} ${tvReady ? '' : 'booting'}`} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
         <Television channel={channel} reducedMotion={reducedMotion} onReady={markTvReady} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
         <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div>
       </div>
@@ -154,11 +154,11 @@ export default function Home() {
         <div className="caption-body">
           {view === 'about' && <><p>CS major and JMHC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p><p>love movies, sketching, and I have an origami collection.</p></>}
           {view === 'projects' && <>
-            <h2>{channel.title}</h2><p>{channel.desc}</p>
+            <h2 className="project-title">{channel.title}</h2><p>{channel.desc}</p>
             <div className="project-meta"><span>{channel.tech.join(' · ')}</span><div><a href={channel.github} target="_blank" rel="noopener noreferrer">source ↗</a>{channel.devpost && <a href={channel.devpost} target="_blank" rel="noopener noreferrer">devpost ↗</a>}{channel.store && <a href={channel.store} target="_blank" rel="noopener noreferrer">app ↗</a>}</div></div>
           </>}
           {view === 'skills' && <div className="skill-detail" aria-live="polite" aria-atomic="true">
-            <span className="skill-category">{skill.category}</span><h2>{skill.name}</h2><p>{skill.detail}</p>
+            <h2>{skill.name}</h2><p>{skill.detail}</p>
           </div>}
         </div>
         {view === 'projects' && <div className="channels"><Link to={previous} aria-label="previous project">‹</Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick" />)}<Link to={next} aria-label="next project">›</Link></div>}
