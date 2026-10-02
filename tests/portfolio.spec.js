@@ -151,11 +151,11 @@ test('phones get photos and an icon grid, no 3D TV', async ({ page }) => {
   await page.route('**/abacus.jasoncameron.dev/**', route => route.fulfill({ json: { value: 1 } }));
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:5173/portfolio/');
-  await expect(page.locator('.screen-photo')).toBeVisible();
+  await expect(page.locator('.screen-photo.in')).toBeVisible();
   await page.getByRole('link', { name: 'projects', exact: true }).click();
-  await expect(page.locator('.screen-photo')).toHaveAttribute('src', /vrglove.jpg$/);
+  await expect(page.locator('.screen-photo.in')).toHaveAttribute('src', /vrglove.jpg$/);
   await page.getByRole('link', { name: 'next project', exact: true }).click();
-  await expect(page.locator('.screen-photo')).toHaveAttribute('src', /chess_eval.png$/);
+  await expect(page.locator('.screen-photo.in')).toHaveAttribute('src', /chess_eval.png$/);
   await page.getByRole('link', { name: 'skills', exact: true }).click();
   await expect(page.locator('.skill-grid button')).toHaveCount(10);
   await page.getByRole('button', { name: 'Docker', exact: true }).click();
