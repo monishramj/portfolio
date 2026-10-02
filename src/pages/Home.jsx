@@ -1,4 +1,4 @@
-import { Component, lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 // import ContributionGraph from '../components/ContributionGraph'; // hidden for now; see the commented usage below
 import VhsShelf from '../components/VhsShelf';
@@ -51,14 +51,15 @@ function EmailButton() {
 class Television extends Component {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { this.props.onReady?.(); } // nothing to wait for: show the photo fallback
   render() {
-    const { channel, reducedMotion, view, selectedSkill, onSelectSkill } = this.props;
+    const { channel, reducedMotion, view, selectedSkill, onSelectSkill, onReady } = this.props;
     const fallback = <img className="screen-fallback" src={channel.img} alt={channel.title} />;
     if (this.state.failed) return fallback;
-    return <Suspense fallback={fallback}><ModelViewer
+    return <Suspense fallback={null}><ModelViewer
       url={`${base}grandmas_tv.glb`} width="100%" height="100%"
       defaultRotationX={180} defaultRotationY={0} defaultZoom={1.9}
-      screenTextureSrc={channel.img} screenTextureFit={channel.fit} screenTextureFocus={channel.focus} screenDip={!reducedMotion}
+      screenTextureSrc={channel.img} screenTextureFit={channel.fit} screenTextureFocus={channel.focus} screenDip={!reducedMotion} onReady={onReady}
       environmentPreset="dawn" enableManualZoom={false} enableManualRotation={false}
       enableMouseParallax={!reducedMotion} enableHoverRotation={!reducedMotion}
       showScreenshotButton={false} focusScreen autoFrame
@@ -77,6 +78,8 @@ export default function Home() {
   const channel = view === 'projects' ? CHANNELS[index] : ABOUT;
   const [selectedSkill, setSelectedSkill] = useState(0);
   const [visits, setVisits] = useState(null);
+  const [tvReady, setTvReady] = useState(false);
+  const markTvReady = useCallback(() => setTvReady(true), []);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -91,6 +94,20 @@ export default function Home() {
   const skill = SKILLS[selectedSkill];
   const previous = projectUrl((index + CHANNELS.length - 1) % CHANNELS.length);
   const next = projectUrl((index + 1) % CHANNELS.length);
+
+  // once the TV is up, quietly fetch every project photo so the carousel never waits on the network
+  useEffect(() => {
+    if (!tvReady) return;
+    const idle = window.requestIdleCallback || (fn => setTimeout(fn, 200));
+    const handle = idle(() => CHANNELS.forEach(item => { new Image().src = item.img; }));
+    return () => (window.cancelIdleCallback || clearTimeout)(handle);
+  }, [tvReady]);
+
+  // the stage stays hidden until the TV is fully ready (see ModelViewer's onReady); never wait forever, though
+  useEffect(() => {
+    const t = setTimeout(markTvReady, 10000);
+    return () => clearTimeout(t);
+  }, [markTvReady]);
 
   useEffect(() => {
     const onVisibility = () => setTabVisible(!document.hidden);
@@ -127,8 +144,8 @@ export default function Home() {
     <section className="screen-panel" id="screen-content" tabIndex={-1} aria-label="portfolio content"
       onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
-      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''}`} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
-        <Television channel={channel} reducedMotion={reducedMotion} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
+      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''} ${tvReady ? '' : 'booting'}`} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
+        <Television channel={channel} reducedMotion={reducedMotion} onReady={markTvReady} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
         <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div>
       </div>
       {view === 'skills' && <div className="sr-only-group" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} className="sr-only" aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}>{item.name}</button>)}</div>}

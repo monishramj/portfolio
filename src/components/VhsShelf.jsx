@@ -100,9 +100,10 @@ function Tape({ skill, index, selected, active, onSelect, l, plastic, gloss }) {
     return () => { live = false; spine.dispose(); };
   }, [spine, skill]);
 
-  useFrame((_, dt) => {
+  useFrame((_, rawDt) => {
     const g = group.current;
     if (!g) return;
+    const dt = Math.min(rawDt, 1 / 30); // a hitch frame must not make the slide jump to its end
     const pull = selected ? l.tapeD * 0.42 : active && hover.current ? l.tapeD * 0.2 : 0;
     const k = 1 - Math.exp(-dt * 10);
     g.position.z += (slot.z + pull - g.position.z) * k;
