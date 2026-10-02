@@ -82,6 +82,9 @@ export default function Home() {
   // phones get plain photos and an icon grid instead of the 3D TV (read once; no live resize switching)
   const [mobile] = useState(() => window.matchMedia('(max-width: 760px)').matches);
   const [tvReady, setTvReady] = useState(mobile);
+  // mobile photo swap: the previous photo stays underneath while it blurs and fades out
+  const [photo, setPhoto] = useState({ cur: channel.img, prev: null });
+  if (photo.cur !== channel.img) setPhoto({ cur: channel.img, prev: photo.cur });
   const markTvReady = useCallback(() => setTvReady(true), []);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -150,7 +153,7 @@ export default function Home() {
         {mobile
           ? view === 'skills'
             ? <div className="skill-grid" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} aria-label={item.name} aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon.path} fill={`#${item.icon.hex === '000000' ? 'ffffff' : item.icon.hex}`} /></svg></button>)}</div>
-            : <><img className="screen-photo" src={channel.img} alt={channel.title} /><div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div></>
+            : <>{photo.prev && <img className="screen-photo out" src={photo.prev} alt="" />}<img key={photo.cur} className="screen-photo in" src={photo.cur} alt={channel.title} onAnimationEnd={() => setPhoto(p => ({ ...p, prev: null }))} /><div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div></>
           : <><Television channel={channel} reducedMotion={reducedMotion} onReady={markTvReady} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
             <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div></>}
       </div>
