@@ -88,9 +88,11 @@ export default function Home() {
     query.addEventListener('change', update);
     return () => query.removeEventListener('change', update);
   }, []);
-  // mobile photo swap: the previous photo stays underneath while it blurs and fades out
-  const [photo, setPhoto] = useState({ cur: channel.img, prev: null });
-  if (photo.cur !== channel.img) setPhoto({ cur: channel.img, prev: photo.cur });
+  // mobile swaps (photo to photo, photo to skills and back): the old picture stays underneath while it blurs and fades out
+  const shown = view === 'skills' ? null : channel.img; // null while the icon grid is up
+  const [photo, setPhoto] = useState({ cur: shown, prev: null });
+  if (photo.cur !== shown) setPhoto({ cur: shown, prev: photo.cur });
+  const clearPrev = () => setPhoto(p => ({ ...p, prev: null }));
   const markTvReady = useCallback(() => setTvReady(true), []);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -157,9 +159,11 @@ export default function Home() {
       onFocus={() => setFocused(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
       <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''} ${tvReady ? '' : 'booting'}`} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role={mobile ? undefined : 'img'} aria-label={mobile ? undefined : `tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
         {mobile
-          ? view === 'skills'
-            ? <div className="skill-grid" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} aria-label={item.name} aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon.path} fill={`#${item.icon.hex === '000000' ? 'ffffff' : item.icon.hex}`} /></svg></button>)}</div>
-            : <>{photo.prev && <img className="screen-photo out" src={photo.prev} alt="" />}<img key={photo.cur} className="screen-photo in" src={photo.cur} alt={channel.title} onAnimationEnd={() => setPhoto(p => ({ ...p, prev: null }))} /><div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div></>
+          ? <>{photo.prev && <img className="screen-photo out" src={photo.prev} alt="" />}
+            {view === 'skills'
+              ? <div className="skill-grid" role="group" aria-label="skills" onAnimationEnd={clearPrev}>{SKILLS.map((item, i) => <button key={item.name} aria-label={item.name} aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon.path} fill={`#${item.icon.hex === '000000' ? 'ffffff' : item.icon.hex}`} /></svg></button>)}</div>
+              : <img key={photo.cur} className="screen-photo in" src={photo.cur} alt={channel.title} onAnimationEnd={clearPrev} />}
+            {(view !== 'skills' || photo.prev) && <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div>}</>
           : <><Television channel={channel} reducedMotion={reducedMotion} onReady={markTvReady} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
             <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div></>}
       </div>
