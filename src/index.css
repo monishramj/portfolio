@@ -144,11 +144,13 @@ html:has(dialog[open]) { overflow: hidden; }
   .screen-stage:has(.skill-grid) { aspect-ratio: auto; }
   .screen-stage > div.skill-grid { mask-image: none; }
   .screen-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-  .screen-photo.in { animation: frost-in .5s ease-out; }
-  .screen-photo.out { animation: frost-out .5s ease-out forwards; }
+  .screen-photo.in { animation: frost-in .22s ease-out; }
+  .screen-photo.out { animation: frost-out .22s ease-out forwards; }
   .glass-edge::after { display: none; } /* no black fade on phones */
-  .glass-edge i:nth-child(n+2) { display: none; } /* one light blur rim over the photo's edges instead of the desktop's four heavy layers */
-  .glass-edge i:first-child { --w: 9%; backdrop-filter: blur(6px); }
+  .glass-edge { inset: -14px; } /* the frost spills 14px past the photo's edge */
+  .glass-edge i:nth-child(n+3) { display: none; } /* one light blur rim over the photo's edges instead of the desktop's four heavy layers */
+  .glass-edge i:first-child { --w: 18%; backdrop-filter: blur(6px) saturate(1.2); }
+  .glass-edge i:nth-child(2) { --w: 10%; backdrop-filter: blur(16px) saturate(1.35); }
   .skill-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px 6px; align-content: start; justify-items: center; padding: 8px 0; }
   .skill-grid button { display: grid; place-items: center; width: 100%; min-height: 56px; padding: 0; border: 0; background: none; }
   .skill-grid svg { width: 36px; height: 36px; transition: transform .2s ease; }
