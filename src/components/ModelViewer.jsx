@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/immutability -- Three.js owns mutable camera and scene objects. */
 import { Suspense, useRef, useState, useLayoutEffect, useEffect, useMemo } from 'react';
 import { Canvas, useFrame, useThree, invalidate } from '@react-three/fiber';
-import { OrbitControls, useGLTF, useProgress, Html, Environment, ContactShadows } from '@react-three/drei';
+import { OrbitControls, useGLTF, useProgress, Html, Environment } from '@react-three/drei';
 import * as THREE from 'three';
+import { LOW_END } from '../perf';
 
 const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 const deg2rad = d => (d * Math.PI) / 180;
@@ -52,7 +53,7 @@ const SCREEN_MESHES = ['screennoise', 'screennosignal', 'screenchannel', 'standb
 // channel change: the picture dims, swaps while dark, then comes back up
 const DIP_OUT = 0.06, DIP_IN = 0.11, DIP_LOW = 0.12;
 const DOILY_SCALE = 1.22; // the white pixel-art doily draped over the TV's front-top, scaled up about its own centre
-const PIXEL = 3; // screen images are drawn at 1/PIXEL of the texture's resolution, so they look slightly pixelated
+const PIXELS_ACROSS = 341; // screen images are redrawn this many pixels wide, so they look slightly pixelated at any texture size
 const FRAME_DROP = 0.06; // frames a little above the subject, which sits the TV lower in its stage (share of the visible height)
 const SCREEN_FORWARD = 0.8; // how far the image moves from its recess towards the glass (0 = original, 1 = touching)
 
@@ -75,6 +76,7 @@ const ModelInner = ({
   const screenMeshRef = useRef(null);
   const screenMat = useRef(null); // one material for the screen; only its map changes between channels
   const dip = useRef(null);
+  const texCache = useRef(new Map()); // finished screen pictures by image+fit+focus, so each is drawn only once
   const screenAspectRef = useRef(1);
   const { camera, gl, size: viewport } = useThree();
 
@@ -259,6 +261,7 @@ const ModelInner = ({
     const mesh = screenMeshRef.current;
     if (!hasScreen || !mesh) return;
     const original = mesh.material;
+    const cache = texCache.current;
     const m = new THREE.MeshBasicMaterial({
       color: 0x000000, toneMapped: false, side: original.side,
       transparent: original.transparent, opacity: original.opacity,
@@ -268,26 +271,41 @@ const ModelInner = ({
     return () => {
       screenMat.current = null; dip.current = null;
       mesh.material = original;
-      m.map?.dispose();
       m.dispose();
+      cache.forEach(t => t.dispose());
+      cache.clear();
     };
   }, [content, hasScreen]);
 
   // a new image starts the dim straight away, without waiting for it to load
   useEffect(() => {
     const m = screenMat.current;
-    if (screenDip && m?.map) dip.current = { phase: 'out', t: 0, start: m.color.r, pending: null };
+    if (screenDip && m?.map) { dip.current = { phase: 'out', t: 0, start: m.color.r, pending: null }; invalidate(); }
   }, [screenTextureSrc, screenDip]);
 
   useEffect(() => {
     if (!screenTextureSrc || !screenMeshRef.current) return;
-    let tex, apply;
+    const key = `${screenTextureSrc}|${screenTextureFit}|${screenTextureFocus ?? ''}`;
+    let apply;
     let cancelled = false;
+    // hand a finished texture to the screen: first picture fades up, later ones dim, swap, brighten
+    const show = tex => {
+      const m = screenMat.current;
+      if (!m || m.map === tex) return;
+      apply = () => { m.map = tex; m.needsUpdate = true; };
+      if (!screenDip) { apply(); m.color.setScalar(1); }
+      else if (!m.map) { apply(); dip.current = { phase: 'in', t: 0, start: 0 }; }
+      else if (dip.current) dip.current.pending = apply;
+      else dip.current = { phase: 'out', t: 0, start: 1, pending: apply };
+      invalidate();
+    };
+    const cached = texCache.current.get(key);
+    if (cached) { show(cached); return () => { if (dip.current?.pending === apply) dip.current.pending = null; }; }
     const img = new Image();
     img.onload = () => {
       if (cancelled) return;
       const aspect = screenAspectRef.current || 1;
-      const W = 1024;
+      const W = LOW_END ? 640 : 1024;
       const H = Math.round(W / aspect);
       const canvas = document.createElement('canvas');
       canvas.width = W; canvas.height = H;
@@ -305,41 +323,45 @@ const ModelInner = ({
       if (screenTextureFit === 'contain') draw('cover', 'blur(28px) brightness(.45)');
       draw(screenTextureFit === 'contain' ? 'contain' : 'cover', 'contrast(1.12) saturate(.84) brightness(.97)');
       ctx.filter = 'none';
-      // slight pixelation: redraw at 1/PIXEL resolution, then scale back up without smoothing
+      // slight pixelation: redraw at PIXELS_ACROSS wide, then scale back up without smoothing
       const small = document.createElement('canvas');
-      small.width = Math.round(W / PIXEL); small.height = Math.round(H / PIXEL);
+      small.width = PIXELS_ACROSS; small.height = Math.round(H * PIXELS_ACROSS / W);
       small.getContext('2d').drawImage(canvas, 0, 0, small.width, small.height);
       ctx.imageSmoothingEnabled = false;
       ctx.drawImage(small, 0, 0, W, H);
       ctx.imageSmoothingEnabled = true;
       // CRT look, applied in the order light would pass through a tube:
       // colour fringing, bloom, lifted blacks, phosphor tint, grain, scanlines, vignette, glare
-      const frame = ctx.getImageData(0, 0, W, H), px = frame.data, src = new Uint8ClampedArray(px), fringe = 2;
-      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-        const i = (y * W + x) * 4;
-        px[i] = src[(y * W + Math.min(W - 1, x + fringe)) * 4];
-        px[i + 2] = src[(y * W + Math.max(0, x - fringe)) * 4 + 2];
+      if (!LOW_END) { // the per-pixel steps are skipped on weak devices
+        const frame = ctx.getImageData(0, 0, W, H), px = frame.data, src = new Uint8ClampedArray(px), fringe = 2;
+        for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+          const i = (y * W + x) * 4;
+          px[i] = src[(y * W + Math.min(W - 1, x + fringe)) * 4];
+          px[i + 2] = src[(y * W + Math.max(0, x - fringe)) * 4 + 2];
+        }
+        ctx.putImageData(frame, 0, 0);
+        const glow = document.createElement('canvas');
+        glow.width = W >> 2; glow.height = H >> 2;
+        glow.getContext('2d').drawImage(canvas, 0, 0, glow.width, glow.height);
+        ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.3;
+        ctx.drawImage(glow, 0, 0, W, H);
       }
-      ctx.putImageData(frame, 0, 0);
-      const glow = document.createElement('canvas');
-      glow.width = W >> 2; glow.height = H >> 2;
-      glow.getContext('2d').drawImage(canvas, 0, 0, glow.width, glow.height);
-      ctx.globalCompositeOperation = 'screen'; ctx.globalAlpha = 0.3;
-      ctx.drawImage(glow, 0, 0, W, H);
       ctx.globalCompositeOperation = 'lighten'; ctx.globalAlpha = 1;
       ctx.fillStyle = '#17141f';
       ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = 0.16;
       ctx.fillStyle = '#d6c8ec';
       ctx.fillRect(0, 0, W, H);
-      const grain = document.createElement('canvas');
-      grain.width = grain.height = 128;
-      const gg = grain.getContext('2d'), gd = gg.createImageData(128, 128);
-      for (let i = 0; i < gd.data.length; i += 4) { gd.data[i] = gd.data[i + 1] = gd.data[i + 2] = Math.random() * 255; gd.data[i + 3] = 255; }
-      gg.putImageData(gd, 0, 0);
-      ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.09;
-      ctx.fillStyle = ctx.createPattern(grain, 'repeat');
-      ctx.fillRect(0, 0, W, H);
+      if (!LOW_END) {
+        const grain = document.createElement('canvas');
+        grain.width = grain.height = 128;
+        const gg = grain.getContext('2d'), gd = gg.createImageData(128, 128);
+        for (let i = 0; i < gd.data.length; i += 4) { gd.data[i] = gd.data[i + 1] = gd.data[i + 2] = Math.random() * 255; gd.data[i + 3] = 255; }
+        gg.putImageData(gd, 0, 0);
+        ctx.globalCompositeOperation = 'overlay'; ctx.globalAlpha = 0.09;
+        ctx.fillStyle = ctx.createPattern(grain, 'repeat');
+        ctx.fillRect(0, 0, W, H);
+      }
       ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
       ctx.fillStyle = 'rgba(0,0,0,.26)';
       for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
@@ -353,24 +375,17 @@ const ModelInner = ({
       glare.addColorStop(0.45, 'rgba(255,255,255,0)');
       ctx.fillStyle = glare;
       ctx.fillRect(0, 0, W, H);
-      tex = new THREE.CanvasTexture(canvas);
+      const tex = new THREE.CanvasTexture(canvas);
       tex.colorSpace = THREE.SRGBColorSpace;
       tex.anisotropy = 4;
       tex.flipY = true;
-      const m = screenMat.current;
-      if (!m) return;
-      apply = () => { const old = m.map; m.map = tex; m.needsUpdate = true; old?.dispose(); tex = null; }; // the material owns it now
-      if (!screenDip) { apply(); m.color.setScalar(1); }
-      else if (!m.map) { apply(); dip.current = { phase: 'in', t: 0, start: 0 }; } // first picture fades up from black
-      else if (dip.current) dip.current.pending = apply;
-      else dip.current = { phase: 'out', t: 0, start: 1, pending: apply };
-      invalidate();
+      texCache.current.set(key, tex);
+      show(tex);
     };
     img.src = screenTextureSrc;
     return () => {
       cancelled = true;
       if (dip.current?.pending === apply) dip.current.pending = null;
-      tex?.dispose();
     };
   }, [screenTextureSrc, screenTextureFit, screenTextureFocus, screenDip, content]);
 
@@ -528,6 +543,15 @@ const ModelInner = ({
     root.current.rotation.x += vel.current.y;
     vel.current.x *= INERTIA;
     vel.current.y *= INERTIA;
+
+    // frameloop="demand": keep drawing only while something is still easing, then go idle
+    const near = (a, b) => Math.abs(a - b) < 3e-4; // well under a pixel at this scene's scale
+    const settling = d || dip.current || autoRotate
+      || Math.abs(vel.current.x) > 1e-5 || Math.abs(vel.current.y) > 1e-5
+      || !near(tPar.current.x, cPar.current.x) || !near(tPar.current.y, cPar.current.y)
+      || !near(tHov.current.x, cHov.current.x) || !near(tHov.current.y, cHov.current.y)
+      || (ft && fc && (pivot.distanceToSquared(ft.center) > 1e-6 || !near(fc.dist, ft.dist) || !near(fc.lift, ft.lift)));
+    if (settling) invalidate();
   });
 
   return (
@@ -601,7 +625,6 @@ const ModelViewer = ({
 }) => {
   useEffect(() => void useGLTF.preload(url), [url]);
   const pivot = useMemo(() => new THREE.Vector3(), []);
-  const contactRef  = useRef(null);
   const rendererRef = useRef(null);
   const sceneRef    = useRef(null);
   const cameraRef   = useRef(null);
@@ -618,13 +641,11 @@ const ModelViewer = ({
     s.traverse(o => {
       if (o.isLight && 'castShadow' in o) { tmp.push({ l: o, cast: o.castShadow }); o.castShadow = false; }
     });
-    if (contactRef.current) contactRef.current.visible = false;
     g.render(s, c);
     const png = g.domElement.toDataURL('image/png');
     Object.assign(document.createElement('a'), { download: 'model.png', href: png }).click();
     g.shadowMap.enabled = true;
     tmp.forEach(({ l, cast }) => (l.castShadow = cast));
-    if (contactRef.current) contactRef.current.visible = true;
     invalidate();
   };
 
@@ -639,9 +660,10 @@ const ModelViewer = ({
         </button>
       )}
       <Canvas
-        shadows
-        frameloop="always"
-        gl={{ preserveDrawingBuffer: true }}
+        shadows={!LOW_END}
+        dpr={LOW_END ? 1 : [1, 1.5]} // retina would otherwise render at 2x, which is ~78% more pixels than 1.5x for no visible gain here
+        frameloop="demand"
+        gl={{ antialias: !LOW_END, preserveDrawingBuffer: showScreenshotButton }} // only the screenshot button needs the buffer kept
         onCreated={({ gl, scene, camera }) => {
           rendererRef.current = gl;
           sceneRef.current    = scene;
@@ -653,12 +675,11 @@ const ModelViewer = ({
         style={{ touchAction: 'pan-y pinch-zoom' }}
       >
         <NullBackground />
-        {environmentPreset !== 'none' && <Environment preset={environmentPreset} background={false} />}
+        {environmentPreset !== 'none' && <Environment preset={environmentPreset} background={false} resolution={LOW_END ? 64 : 128} />}
         <ambientLight intensity={ambientIntensity} />
-        <directionalLight position={[5, 5, 5]}  intensity={keyLightIntensity} castShadow shadow-mapSize={[2048, 2048]} shadow-camera-left={-1} shadow-camera-right={1} shadow-camera-top={1} shadow-camera-bottom={-1} shadow-camera-near={0.5} shadow-camera-far={15} shadow-bias={-0.0005} />
+        <directionalLight position={[5, 5, 5]}  intensity={keyLightIntensity} castShadow={!LOW_END} shadow-mapSize={[1024, 1024]} shadow-camera-left={-1} shadow-camera-right={1} shadow-camera-top={1} shadow-camera-bottom={-1} shadow-camera-near={0.5} shadow-camera-far={15} shadow-bias={-0.0005} />
         <directionalLight position={[-5, 2, 5]} intensity={fillLightIntensity} />
         <directionalLight position={[0, 4, -5]} intensity={rimLightIntensity} />
-        <ContactShadows ref={contactRef} position={[0, -0.5, 0]} opacity={0.35} scale={10} blur={2} />
         <Suspense fallback={<Loader placeholderSrc={placeholderSrc} />}>
           <ModelInner
             url={url}

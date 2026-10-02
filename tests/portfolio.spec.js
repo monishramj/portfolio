@@ -29,6 +29,7 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   const nav = page.getByRole('navigation', { name: 'Main navigation' });
   await expect(page.locator('canvas')).toBeVisible();
   await expect(page.getByText('1,234 visits')).toBeVisible();
+  await expect(page.getByRole('region', { name: 'experience' }).getByRole('listitem')).toHaveCount(3);
   await expect(nav.getByRole('link', { name: 'about me', exact: true })).toHaveAttribute('aria-current', 'page');
   await expect(page.getByText('love movies, sketching, and I have an origami collection.')).toBeVisible();
   await expect(page.locator('.screen-stage')).toHaveText('');
@@ -114,15 +115,15 @@ test.describe('automatic carousel', () => {
   test.use({ reducedMotion: 'no-preference' });
 
   test('moves to the next project on its own and pauses while hovered', async ({ page }) => {
-    test.setTimeout(40000);
+    test.setTimeout(30000);
     await page.route('**/abacus.jasoncameron.dev/**', route => route.fulfill({ json: { value: 1 } }));
     await page.goto('http://127.0.0.1:5173/portfolio/#/?view=projects&channel=medvr-haptic-glove');
     await expect(page.getByRole('heading', { name: 'MedVR Haptic Glove', exact: true })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Monkish', exact: true })).toBeVisible({ timeout: 8000 });
+    await expect(page.getByRole('heading', { name: 'Monkish', exact: true })).toBeVisible({ timeout: 5000 });
     await page.mouse.move(900, 300); // over the stage: the timer stops
-    await page.waitForTimeout(6500);
+    await page.waitForTimeout(4500); // more than two intervals
     await expect(page.getByRole('heading', { name: 'Monkish', exact: true })).toBeVisible();
     await page.mouse.move(5, 5); // pointer leaves: it carries on
-    await expect(page.getByRole('heading', { name: 'Passenger Princess', exact: true })).toBeVisible({ timeout: 8000 });
+    await expect(page.getByRole('heading', { name: 'Passenger Princess', exact: true })).toBeVisible({ timeout: 5000 });
   });
 });

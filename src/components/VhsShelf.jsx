@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { invalidate, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 import { layout } from './shelfLayout';
@@ -95,6 +95,7 @@ function Tape({ skill, index, selected, active, onSelect, l, plastic, gloss }) {
       if (!live) return;
       drawSpine(spine.image, skill);
       spine.needsUpdate = true;
+      invalidate();
     });
     return () => { live = false; spine.dispose(); };
   }, [spine, skill]);
@@ -105,11 +106,15 @@ function Tape({ skill, index, selected, active, onSelect, l, plastic, gloss }) {
     const pull = selected ? l.tapeD * 0.42 : active && hover.current ? l.tapeD * 0.2 : 0;
     const k = 1 - Math.exp(-dt * 10);
     g.position.z += (slot.z + pull - g.position.z) * k;
+    if (Math.abs(slot.z + pull - g.position.z) > 1e-4) invalidate(); // on-demand rendering: keep going until it arrives
   });
 
+  // selecting a tape, or the shelf becoming interactive, needs a frame to start the slide
+  useEffect(() => { invalidate(); }, [selected, active]);
+
   const handlers = active ? {
-    onPointerOver: e => { e.stopPropagation(); hover.current = true; document.body.style.cursor = 'pointer'; },
-    onPointerOut: () => { hover.current = false; document.body.style.cursor = ''; },
+    onPointerOver: e => { e.stopPropagation(); hover.current = true; document.body.style.cursor = 'pointer'; invalidate(); },
+    onPointerOut: () => { hover.current = false; document.body.style.cursor = ''; invalidate(); },
     onClick: e => { e.stopPropagation(); onSelect(index); },
   } : {};
 
