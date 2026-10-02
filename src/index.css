@@ -25,10 +25,10 @@ h1 { font: 400 clamp(48px, min(5vw, 9vh), 82px)/.95 var(--title-font); letter-sp
 h1 em { color: var(--accent); }
 .identity-note { font-size: 12px; margin-top: 22px; color: var(--text-muted); letter-spacing: .04em; }
 .identity-bottom nav { display: flex; flex-direction: column; gap: 14px; }
-.identity-bottom nav a { display: inline-flex; align-items: center; gap: 12px; width: fit-content; min-height: 28px; font-size: 11px; letter-spacing: .22em; color: var(--text-muted); }
-.identity-bottom nav a::before { content: ''; width: 24px; height: 1px; background: currentColor; transition: width .25s ease; }
+.identity-bottom nav a { display: inline-flex; align-items: center; gap: 12px; width: fit-content; min-height: 32px; font-size: 13px; letter-spacing: .2em; color: var(--text-muted); }
+.identity-bottom nav a::before { content: ''; width: 28px; height: 1px; background: currentColor; transition: width .25s ease; }
 .identity-bottom nav a:hover { color: var(--accent); }
-.identity-bottom nav a:hover::before, .identity-bottom nav a[aria-current='page']::before { width: 48px; }
+.identity-bottom nav a:hover::before, .identity-bottom nav a[aria-current='page']::before { width: 56px; }
 .identity-bottom nav a[aria-current='page'] { color: var(--accent); }
 
 .social-links { display: flex; width: fit-content; margin: 30px 0 0 -12px; }
@@ -45,23 +45,23 @@ h1 em { color: var(--accent); }
 /* frosted edge: the scene fades out at the borders while four blur layers ramp up towards them */
 .screen-stage > div:first-child { mask-image: linear-gradient(90deg, transparent, #000 16%), linear-gradient(0deg, transparent, #000 16%); mask-composite: intersect; }
 .glass-edge { position: absolute; z-index: 30; inset: 0; pointer-events: none; }
-.glass-edge i { position: absolute; inset: 0; --w: 36%; backdrop-filter: blur(2px); mask-image: linear-gradient(90deg, #000, transparent var(--w), transparent calc(100% - var(--w)), #000), linear-gradient(#000, transparent var(--w), transparent calc(100% - var(--w)), #000); }
-.glass-edge i:nth-child(2) { --w: 28%; backdrop-filter: blur(6px); }
-.glass-edge i:nth-child(3) { --w: 20%; backdrop-filter: blur(14px); }
-.glass-edge i:nth-child(4) { --w: 12%; backdrop-filter: blur(20px) saturate(1.3); }
+.glass-edge i { position: absolute; inset: 0; --w: 40%; backdrop-filter: blur(3px); mask-image: linear-gradient(90deg, #000, transparent var(--w), transparent calc(100% - var(--w)), #000), linear-gradient(#000, transparent var(--w), transparent calc(100% - var(--w)), #000); }
+.glass-edge i:nth-child(2) { --w: 32%; backdrop-filter: blur(9px); }
+.glass-edge i:nth-child(3) { --w: 24%; backdrop-filter: blur(18px); }
+.glass-edge i:nth-child(4) { --w: 15%; backdrop-filter: blur(28px) saturate(1.35); }
 /* bottom-left corner fades the scene into the page by the name column; the bottom edge melts into black */
-.glass-edge::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 55% 55% at 0 100%, #000 0%, #000d 35%, #0004 65%, transparent 100%), linear-gradient(0deg, #000 0%, transparent 14%); }
+.glass-edge::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 42% 42% at 0 100%, #000e 0%, #0009 32%, #0002 65%, transparent 100%), linear-gradient(0deg, #000 0%, transparent 9%); }
 @supports not (backdrop-filter: blur(1px)) { .glass-edge i { backdrop-filter: none; background: radial-gradient(ellipse at center, transparent 60%, var(--bg) 100%); } }
 
-.screen-caption { flex: 0 0 clamp(240px, 34vh, 340px); display: flex; flex-direction: column; padding: 16px 48px 40px 30px; } /* 40px bottom matches the left column, so the channel row shares the icons' line */
+.screen-caption { flex: none; height: clamp(240px, 34vh, 340px); min-height: 0; display: flex; flex-direction: column; padding: clamp(16px, 3.5vh, 32px) 48px 40px 30px; } /* 40px bottom matches the left column, so the channel row shares the icons' line */
 .caption-body { flex: 1; min-height: 0; overflow-y: auto; }
 h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-transform: lowercase; }
 .screen-caption h2 { margin-bottom: 12px; }
-.screen-caption p { color: var(--text-muted); font-size: 13px; max-width: 650px; }
+.screen-caption p { color: var(--text-muted); font-size: 13px; max-width: 760px; }
 .screen-caption p + p { margin-top: 12px; }
-.project-meta { margin-top: 14px; font-size: 10px; color: var(--text-muted); text-transform: lowercase; }
+.project-meta { margin-top: 10px; font-size: 10px; color: var(--text-muted); text-transform: lowercase; }
 .project-meta > div { display: flex; gap: 20px; }
-.project-meta a { display: inline-flex; align-items: center; min-height: 40px; font-size: 12px; color: var(--text); }
+.project-meta a { display: inline-flex; align-items: center; min-height: 32px; font-size: 12px; color: var(--text); }
 .project-meta a:hover { color: var(--accent); }
 .channels { flex: none; display: flex; align-items: center; height: 44px; gap: 2px; margin-left: -8px; color: var(--text-muted); }
 .channels a { display: grid; place-items: center; min-width: 28px; height: 44px; font-size: 18px; }
@@ -87,8 +87,10 @@ html:has(dialog[open]) { overflow: hidden; }
 .contrib-header strong { color: var(--text); font-weight: 500; }
 .contrib-graph-wrap { position: relative; flex: 1; min-height: 0; }
 .contrib-graph { height: 100%; overflow-y: auto; }
-/* older weeks dissolve into frosted glass under the name */
-.contrib-graph-wrap::after { content: ''; position: absolute; inset: 0 0 auto 0; height: 60%; pointer-events: none; backdrop-filter: blur(5px); background: linear-gradient(#000 8%, #0000); mask-image: linear-gradient(#000 30%, transparent); }
+/* only the very top weeks dissolve into frosted glass under the name; two light blur layers */
+.contrib-graph-wrap::before, .contrib-graph-wrap::after { content: ''; position: absolute; inset: 0 0 auto 0; pointer-events: none; }
+.contrib-graph-wrap::before { height: 28%; backdrop-filter: blur(1.5px); mask-image: linear-gradient(#000 15%, transparent); }
+.contrib-graph-wrap::after { height: 16%; backdrop-filter: blur(4px); background: linear-gradient(#0008, #0000); mask-image: linear-gradient(#000 30%, transparent); }
 .contrib-scroll-inner { display: flex; gap: 8px; }
 .contrib-months { position: relative; flex: none; width: 24px; }
 .contrib-month-label { position: absolute; left: 0; color: var(--text-muted); font-size: 9px; line-height: 1; }
