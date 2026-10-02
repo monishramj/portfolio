@@ -141,16 +141,16 @@ html:has(dialog[open]) { overflow: hidden; }
   .visits { position: static; justify-content: flex-end; height: 32px; padding-right: 8px; }
   .preview-close { width: 44px; height: 44px; top: 22px; right: 22px; }
   .screen-stage { flex: none; aspect-ratio: 4 / 3; }
-  .screen-stage { mask-image: linear-gradient(90deg, transparent, #000 13%, #000 87%, transparent), linear-gradient(transparent, #000 13%, #000 87%, transparent); mask-composite: intersect; } /* the photo and its frost melt into the dark at every edge */
-  .screen-stage:has(.skill-grid) { mask-image: none; } /* same stage height as the photos, so the page never changes size between sections */
-  .screen-stage > div.skill-grid { mask-image: none; }
+  /* same stage height as the photos, so the page never changes size between sections */
   .screen-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .screen-photo.in { animation: frost-in .22s ease-out; }
   .screen-photo.out { animation: frost-out .22s ease-out forwards; }
   .glass-edge::after { display: none; } /* no black fade on phones */
-  .glass-edge i:nth-child(n+3) { display: none; } /* one light blur rim over the photo's edges instead of the desktop's four heavy layers */
-  .glass-edge i:first-child { --w: 18%; backdrop-filter: blur(6px) saturate(1.2); }
-  .glass-edge i:nth-child(2) { --w: 10%; backdrop-filter: blur(16px) saturate(1.35); }
+  /* progressive blur: four layers, each narrower and blurrier towards the photo edge */
+  .glass-edge i { --w: 20%; backdrop-filter: blur(1.5px); }
+  .glass-edge i:nth-child(2) { --w: 15%; backdrop-filter: blur(4px); }
+  .glass-edge i:nth-child(3) { --w: 10%; backdrop-filter: blur(9px); }
+  .glass-edge i:nth-child(4) { --w: 6%; backdrop-filter: blur(16px); }
   .skill-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px 6px; align-content: center; justify-items: center; height: 100%; }
   .skill-grid button { display: grid; place-items: center; width: 100%; min-height: 56px; padding: 0; border: 0; background: none; }
   .skill-grid svg { width: 36px; height: 36px; transition: transform .2s ease; }
