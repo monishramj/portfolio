@@ -147,7 +147,7 @@ test('the stage stays hidden until the TV is ready, with no placeholder photo fl
 
 test('phones get photos and an icon grid, no 3D TV', async ({ page }) => {
   const glb = [];
-  page.on('request', r => { if (r.url().endsWith('.glb')) glb.push(r.url()); });
+  page.on('request', r => { if (/\.glb$|three/.test(r.url())) glb.push(r.url()); }); // the model, or any three.js chunk
   await page.route('**/abacus.jasoncameron.dev/**', route => route.fulfill({ json: { value: 1 } }));
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('http://127.0.0.1:5173/portfolio/');
@@ -158,6 +158,7 @@ test('phones get photos and an icon grid, no 3D TV', async ({ page }) => {
   await expect(page.locator('.screen-photo.in')).toHaveAttribute('src', /chess_eval.png$/);
   await page.getByRole('link', { name: 'skills', exact: true }).click();
   await expect(page.locator('.skill-grid button')).toHaveCount(10);
+  await expect(page.locator('.screen-photo, .glass-edge')).toHaveCount(0); // nothing of the photo is left behind the icons
   await page.getByRole('button', { name: 'Docker', exact: true }).click();
   await expect(page.locator('.skill-detail')).toContainText('Container tooling');
   await page.screenshot({ path: 'test-results/skills-phone.png', fullPage: true });
