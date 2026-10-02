@@ -23,8 +23,6 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   test.setTimeout(60000);
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  const today = new Date().toISOString().slice(0, 10);
-  await page.route('**/github-contributions-api.jogruber.de/**', route => route.fulfill({ json: { contributions: [{ date: today, count: 5, level: 2 }] } }));
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('http://127.0.0.1:5173/portfolio/');
   const nav = page.getByRole('navigation', { name: 'Main navigation' });
@@ -60,7 +58,6 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   await page.getByRole('button', { name: 'PyTorch', exact: true }).focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('.skill-detail')).toContainText('10 million+');
-  await expect(page.getByText('5 contributions', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'PyTorch', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: 'Flutter', exact: true }).focus();
   await page.keyboard.press('Enter');
@@ -87,9 +84,6 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   await expect(page.getByRole('heading', { name: titles[0], exact: true })).toBeVisible();
   await page.goto('http://127.0.0.1:5173/portfolio/#/?view=unknown');
   await expect(nav.getByRole('link', { name: 'about me', exact: true })).toHaveAttribute('aria-current', 'page');
-  await page.route('**/github-contributions-api.jogruber.de/**', route => route.fulfill({ status: 503, body: 'Unavailable' }));
-  await page.reload();
-  await expect(page.getByRole('link', { name: 'View activity on GitHub' })).toBeVisible();
   expect(errors).toEqual([]);
 });
 

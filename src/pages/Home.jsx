@@ -1,6 +1,6 @@
 import { Component, lazy, Suspense, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import ContributionGraph from '../components/ContributionGraph';
+// import ContributionGraph from '../components/ContributionGraph'; // hidden for now; see the commented usage below
 import VhsShelf from '../components/VhsShelf';
 import { shelfFrame } from '../components/shelfLayout';
 import { PROJECTS } from '../data/projects';
@@ -61,7 +61,7 @@ export default function Home() {
     <a className="skip-link" href="#screen-content" onClick={event => { event.preventDefault(); document.getElementById('screen-content').focus(); }}>skip to content</a>
     <aside className="identity">
       <div><h1>monish<br /><em>ramesh <br />jayakumar</em></h1><p className="identity-note">cs honors @ purdue</p></div>
-      <ContributionGraph />
+      {/* <ContributionGraph /> hidden for now: re-enable together with the import above (and the graph test in tests/portfolio.spec.js) */}
       <div className="identity-bottom"><nav aria-label="Main navigation">{SECTIONS.map((id, i) => <Link key={id} to={id === 'about' ? '/' : `/?view=${id}`} aria-current={view === id ? 'page' : undefined}>{LABELS[i]}</Link>)}</nav>
         <div className="social-links" aria-label="social links">
           {[
