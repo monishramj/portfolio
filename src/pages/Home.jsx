@@ -79,9 +79,15 @@ export default function Home() {
   const channel = view === 'projects' ? CHANNELS[index] : ABOUT;
   const [selectedSkill, setSelectedSkill] = useState(0);
   const [visits, setVisits] = useState(null);
-  // phones get plain photos and an icon grid instead of the 3D TV (read once; no live resize switching)
-  const [mobile] = useState(() => window.matchMedia('(max-width: 760px)').matches);
+  // phones get plain photos and an icon grid instead of the 3D TV; follows the window as it is resized or rotated
+  const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 760px)').matches);
   const [tvReady, setTvReady] = useState(mobile);
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 760px)');
+    const update = () => { setMobile(query.matches); setTvReady(query.matches); }; // the TV fades in again when it comes back
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
   // mobile photo swap: the previous photo stays underneath while it blurs and fades out
   const [photo, setPhoto] = useState({ cur: channel.img, prev: null });
   if (photo.cur !== channel.img) setPhoto({ cur: channel.img, prev: photo.cur });
