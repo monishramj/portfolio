@@ -151,6 +151,7 @@ html:has(dialog[open]) { overflow: hidden; }
   .glass-edge i:nth-child(2) { --w: 15%; backdrop-filter: blur(4px); }
   .glass-edge i:nth-child(3) { --w: 10%; backdrop-filter: blur(9px); }
   .glass-edge i:nth-child(4) { --w: 6%; backdrop-filter: blur(16px); }
+  .screen-stage > div.skill-grid { mask-image: none; } /* the desktop edge fade must not reach the icons */
   .skill-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px 6px; align-content: center; justify-items: center; height: 100%; }
   .skill-grid button { display: grid; place-items: center; width: 100%; min-height: 56px; padding: 0; border: 0; background: none; }
   .skill-grid svg { width: 36px; height: 36px; transition: transform .2s ease; }
