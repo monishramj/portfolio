@@ -149,8 +149,8 @@ export default function Home() {
       <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''} ${tvReady ? '' : 'booting'}`} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role={mobile ? undefined : 'img'} aria-label={mobile ? undefined : `tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
         {mobile
           ? view === 'skills'
-            ? <div className="skill-grid" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon.path} fill="currentColor" /></svg><span>{item.name}</span></button>)}</div>
-            : <img className="screen-photo" src={channel.img} alt={channel.title} />
+            ? <div className="skill-grid" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} aria-label={item.name} aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon.path} fill={`#${item.icon.hex === '000000' ? 'ffffff' : item.icon.hex}`} /></svg></button>)}</div>
+            : <><img className="screen-photo" src={channel.img} alt={channel.title} /><div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div></>
           : <><Television channel={channel} reducedMotion={reducedMotion} onReady={markTvReady} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
             <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div></>}
       </div>
