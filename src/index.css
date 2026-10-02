@@ -140,7 +140,16 @@ html:has(dialog[open]) { overflow: hidden; }
   .social-links { margin-top: 12px; margin-left: -12px; }
   .visits { position: static; justify-content: flex-end; height: 32px; padding-right: 8px; }
   .preview-close { width: 44px; height: 44px; top: 22px; right: 22px; }
-  .screen-stage { height: clamp(360px, 95vw, 580px); flex: none; }
-  .screen-caption { height: 340px; padding: 16px 8px 0; }
+  .screen-stage { flex: none; aspect-ratio: 4 / 3; }
+  .screen-stage > div:first-child { mask-image: none; }
+  .screen-stage:has(.skill-grid) { aspect-ratio: auto; }
+  .screen-photo { width: 100%; height: 100%; object-fit: cover; border-radius: 18px; display: block; }
+  .skill-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 10px; align-content: start; }
+  .skill-grid button { display: grid; justify-items: center; align-content: center; gap: 6px; min-height: 72px; padding: 10px 4px; border: 1px solid var(--border); border-radius: 14px; background: #ffffff08; color: var(--text-muted); }
+  .skill-grid button[aria-pressed='true'] { color: var(--accent); border-color: var(--accent); background: #b9a0d814; }
+  .skill-grid svg { width: 28px; height: 28px; }
+  .skill-grid span { font-size: 11px; line-height: 1.2; }
+  .screen-caption { height: auto; min-height: 200px; padding: 18px 8px 0; }
+  .caption-body { overflow: visible; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }

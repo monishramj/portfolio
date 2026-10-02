@@ -79,7 +79,9 @@ export default function Home() {
   const channel = view === 'projects' ? CHANNELS[index] : ABOUT;
   const [selectedSkill, setSelectedSkill] = useState(0);
   const [visits, setVisits] = useState(null);
-  const [tvReady, setTvReady] = useState(false);
+  // phones get plain photos and an icon grid instead of the 3D TV (read once; no live resize switching)
+  const [mobile] = useState(() => window.matchMedia('(max-width: 760px)').matches);
+  const [tvReady, setTvReady] = useState(mobile);
   const markTvReady = useCallback(() => setTvReady(true), []);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -144,12 +146,16 @@ export default function Home() {
     </aside>
     <section className="screen-panel" id="screen-content" tabIndex={-1} aria-label="portfolio content"
       onFocus={() => setFocused(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
-      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''} ${tvReady ? '' : 'booting'}`} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role="img" aria-label={`tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
-        <Television channel={channel} reducedMotion={reducedMotion} onReady={markTvReady} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
-        <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div>
+      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''} ${tvReady ? '' : 'booting'}`} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role={mobile ? undefined : 'img'} aria-label={mobile ? undefined : `tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
+        {mobile
+          ? view === 'skills'
+            ? <div className="skill-grid" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon.path} fill="currentColor" /></svg><span>{item.name}</span></button>)}</div>
+            : <img className="screen-photo" src={channel.img} alt={channel.title} />
+          : <><Television channel={channel} reducedMotion={reducedMotion} onReady={markTvReady} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
+            <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div></>}
       </div>
-      {view === 'skills' && <div className="sr-only-group" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} className="sr-only" aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}>{item.name}</button>)}</div>}
-      {view === 'projects' && <button className="sr-only" onClick={() => { setPreviewOpen(true); preview.current.showModal(); }}>enlarge image</button>}
+      {view === 'skills' && !mobile && <div className="sr-only-group" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} className="sr-only" aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}>{item.name}</button>)}</div>}
+      {view === 'projects' && !mobile && <button className="sr-only" onClick={() => { setPreviewOpen(true); preview.current.showModal(); }}>enlarge image</button>}
       <div className="screen-caption">
         <div className="caption-body">
           {view === 'about' && <><p>CS major and JMHC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p><p>love movies, sketching, and I have an origami collection.</p></>}
