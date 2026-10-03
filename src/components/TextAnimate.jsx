@@ -5,10 +5,12 @@ import { AnimatePresence, motion } from 'motion/react';
 
 const motionElements = { div: motion.div, h1: motion.h1, p: motion.p, span: motion.span };
 
+// `transform` instead of motion's `y`: `y` is driven from JS every frame, so it stuttered while the
+// TV's shaders compiled underneath; opacity/filter/transform all hand off to the compositor
 const item = {
-  hidden: { opacity: 0, filter: 'blur(10px)', y: 20 },
-  show: { opacity: 1, filter: 'blur(0px)', y: 0, transition: { y: { duration: 0.3 }, opacity: { duration: 0.4 }, filter: { duration: 0.3 } } },
-  exit: { opacity: 0, filter: 'blur(10px)', y: 20, transition: { y: { duration: 0.3 }, opacity: { duration: 0.4 }, filter: { duration: 0.3 } } },
+  hidden: { opacity: 0, filter: 'blur(10px)', transform: 'translateY(20px)' },
+  show: { opacity: 1, filter: 'blur(0px)', transform: 'translateY(0px)', transition: { transform: { duration: 0.3 }, opacity: { duration: 0.4 }, filter: { duration: 0.3 } } },
+  exit: { opacity: 0, filter: 'blur(10px)', transform: 'translateY(20px)', transition: { transform: { duration: 0.3 }, opacity: { duration: 0.4 }, filter: { duration: 0.3 } } },
 };
 
 function TextAnimateBase({ children, delay = 0, duration = 0.3, as = 'p', by = 'word', style, ...props }) {
