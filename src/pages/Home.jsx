@@ -31,6 +31,19 @@ function Icon({ name }) {
 // brand logo in its own colour (black ones flipped to white so they show on the dark page)
 const SkillIcon = ({ skill }) => <svg viewBox="0 0 24 24" aria-hidden="true"><path d={skill.icon.path} fill={`#${skill.icon.hex === '000000' ? 'ffffff' : skill.icon.hex}`} /></svg>;
 
+// Hand-drawn "click a tape" note: fades in once the skills view has been up for HINT_DELAY_MS, and fades back out
+// as soon as a tape is clicked (or the section is left). Clicking first means it never shows. Resets on reload.
+const HINT_DELAY_MS = 4000;
+function ClickHint({ active }) {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    if (!active) return;
+    const timer = setTimeout(() => setOn(true), HINT_DELAY_MS);
+    return () => { clearTimeout(timer); setOn(false); };
+  }, [active]);
+  return <img className={`click-hint ${on ? 'shown' : ''}`} src={`${base}images/click-left.png`} alt="" aria-hidden="true" />;
+}
+
 const AUTOPLAY_MS = 2000; // how long each project stays up before the carousel moves on
 const EMAIL = 'mrameshj@purdue.edu';
 // Same counter and key as the previous site, so the existing count carries on. Only production
@@ -110,6 +123,9 @@ export default function Home() {
     fetch(VISITS_URL, { signal: controller.signal }).then(r => r.json()).then(d => { if (typeof d.value === 'number') setVisits(d.value); }).catch(() => {});
     return () => controller.abort();
   }, []);
+  const [skillClicked, setSkillClicked] = useState(false);
+  const openPreview = () => { setPreviewOpen(true); preview.current.showModal(); };
+  const pickSkill = i => { setSkillClicked(true); setSelectedSkill(i); };
   const skill = SKILLS[selectedSkill];
   const previous = projectUrl((index + CHANNELS.length - 1) % CHANNELS.length);
   const next = projectUrl((index + 1) % CHANNELS.length);
@@ -149,7 +165,7 @@ export default function Home() {
     <aside className="identity">
       <div><h1>monish<br /><em>ramesh <br />jayakumar</em></h1><p className="identity-note">cs @ purdue honors</p></div>
       <section className="experience" aria-label="experience"><ul>{EXPERIENCE.map(item => <li key={item.role}><span>{item.role}</span><span>{item.org} · {item.when}</span></li>)}
-        <li className="orgs"><div>{ORGS.map(org => <a key={org.name} href={org.href} aria-label={org.name} title={org.name} target="_blank" rel="noopener noreferrer"><img src={`${base}images/${org.logo}`} alt="" /></a>)}</div><span>organizations</span></li></ul></section>
+        <li className="orgs"><div>{ORGS.map(org => <a key={org.name} href={org.href} aria-label={org.name} title={org.name} target="_blank" rel="noopener noreferrer"><img src={`${base}images/${org.logo}`} alt="" /></a>)}</div><span>orgs im a part of</span></li></ul></section>
       {/* <ContributionGraph /> hidden for now: re-enable together with the import above (and the graph test in tests/portfolio.spec.js) */}
       <div className="identity-bottom"><nav aria-label="Main navigation">{SECTIONS.map((id, i) => <Link key={id} to={id === 'about' ? '/' : `/?view=${id}`} aria-current={view === id ? 'page' : undefined}>{LABELS[i]}</Link>)}</nav>
         <div className="social-links" aria-label="social links">
@@ -163,18 +179,19 @@ export default function Home() {
     </aside>
     <section className="screen-panel" id="screen-content" tabIndex={-1} aria-label="portfolio content"
       onFocus={() => setFocused(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false); }}>
-      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''} ${tvReady ? '' : 'booting'}`} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role={mobile ? undefined : 'img'} aria-label={mobile ? undefined : `tv showing ${channel.title}`} onClick={view === 'projects' ? () => { setPreviewOpen(true); preview.current.showModal(); } : undefined}>
+      <div className={`screen-stage ${view === 'projects' ? 'clickable' : ''} ${tvReady ? '' : 'booting'}`} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role={mobile ? undefined : 'img'} aria-label={mobile ? undefined : `tv showing ${channel.title}`} onClick={view === 'projects' ? openPreview : undefined}>
         {mobile
           ? <>{photo.prev && <img className="screen-photo out" src={photo.prev} alt="" />}
             {view === 'skills'
               ? <div className="skill-grid" role="group" aria-label="skills" onAnimationEnd={clearPrev}>{SKILLS.map((item, i) => <button key={item.name} aria-label={item.name} aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}><SkillIcon skill={item} /></button>)}</div>
               : <img key={photo.cur} className="screen-photo in" src={photo.cur} alt={channel.title} onAnimationEnd={clearPrev} />}
             {(view !== 'skills' || photo.prev) && <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div>}</>
-          : <><Television channel={channel} reducedMotion={reducedMotion} onReady={markTvReady} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
+          : <><Television channel={channel} reducedMotion={reducedMotion} onReady={markTvReady} view={view} selectedSkill={selectedSkill} onSelectSkill={pickSkill} />
             <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div></>}
       </div>
-      {view === 'skills' && !mobile && <div className="sr-only-group" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} className="sr-only" aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}>{item.name}</button>)}</div>}
-      {view === 'projects' && !mobile && <button className="sr-only" onClick={() => { setPreviewOpen(true); preview.current.showModal(); }}>enlarge image</button>}
+      {view === 'skills' && !mobile && <div className="sr-only-group" role="group" aria-label="skills">{SKILLS.map((item, i) => <button key={item.name} className="sr-only" aria-pressed={selectedSkill === i} onClick={() => pickSkill(i)}>{item.name}</button>)}</div>}
+      {view === 'projects' && !mobile && <button className="sr-only" onClick={openPreview}>enlarge image</button>}
+      {!mobile && <ClickHint active={view === 'skills' && tvReady && !skillClicked} />}
       <div className="screen-caption">
         <div className="caption-body">
           {view === 'about' && <><p>CS major and JMHC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p><p>love movies, sketching, and I have an origami collection.</p></>}

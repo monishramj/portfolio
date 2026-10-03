@@ -29,6 +29,7 @@ h1 em { color: var(--accent); }
 .experience li { display: grid; gap: 2px; }
 .experience li span:first-child { font-size: 14px; color: var(--text); }
 .experience li span:last-child { font-size: 12px; color: var(--text-muted); letter-spacing: .02em; }
+.orgs { margin-top: 14px; } /* extra space above, so the block (centred between the name and the nav) grows and experience rises while organizations drops */
 .orgs div { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
 .orgs a { display: block; opacity: .6; transition: opacity .2s; }
 .orgs a:hover, .orgs a:focus-visible { opacity: 1; }
@@ -73,6 +74,8 @@ h1 em { color: var(--accent); }
 .low-end .preview-close, .low-end .sr-only:focus-visible, .low-end .copy-toast { backdrop-filter: none; }
 @supports not (backdrop-filter: blur(1px)) { .glass-edge i { backdrop-filter: none; background: radial-gradient(ellipse at center, transparent 60%, var(--bg) 100%); } }
 
+.click-hint { position: absolute; width: 124px; left: 100px; top: 34%; pointer-events: none; z-index: 3; opacity: 0; filter: blur(10px); transition: opacity .4s ease-out, filter .4s ease-out; } /* hand-drawn "click" note over the TV's left edge; faded and blurred until .shown */
+.click-hint.shown { opacity: 1; filter: none; }
 .screen-caption { flex: none; height: clamp(240px, 34vh, 340px); min-height: 0; display: flex; flex-direction: column; padding: clamp(16px, 3.5vh, 32px) 48px 40px 30px; } /* 40px bottom matches the left column, so the channel row shares the icons' line */
 .caption-body { flex: 1; min-height: 0; overflow-y: auto; }
 h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-transform: lowercase; }
