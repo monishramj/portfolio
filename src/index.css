@@ -30,8 +30,8 @@ h1 em { color: var(--accent); }
 .experience li span:first-child { font-size: 14px; color: var(--text); }
 .experience li span:last-child { font-size: 12px; color: var(--text-muted); letter-spacing: .02em; }
 .orgs div { display: flex; align-items: center; gap: 16px; }
-.orgs a { display: block; transition: transform .2s; }
-.orgs a:hover, .orgs a:focus-visible { transform: translateY(-2px); }
+.orgs a { display: block; opacity: .6; transition: opacity .2s; }
+.orgs a:hover, .orgs a:focus-visible { opacity: 1; }
 .orgs img { display: block; width: 28px; height: 28px; object-fit: contain; } /* every logo in the same square */
 .identity-bottom nav { display: flex; flex-direction: column; gap: 14px; }
 .identity-bottom nav a { display: inline-flex; align-items: center; width: fit-content; min-height: 32px; font-size: 13px; letter-spacing: .2em; color: var(--text-muted); }
