@@ -35,20 +35,19 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   await expect(page.locator('.screen-stage')).toHaveText('');
   await page.screenshot({ path: 'test-results/about-desktop.png' });
   await nav.getByRole('link', { name: 'projects', exact: true }).click();
-  const titles = ['MedVR Haptic Glove', 'Monkish', 'Passenger Princess', 'DiabFit', 'Drone Survey Mission', 'ESP32 DOOM', 'Doffy'];
+  const titles = ['MedVR Haptic Glove', 'Monkish', 'Passenger Princess', 'ESP32 DOOM'];
   for (const title of titles) {
     await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
     await expect(page.getByRole('img', { name: `tv showing ${title}`, exact: true })).toBeVisible();
     await expect(page.getByRole('link', { name: 'source ↗', exact: true })).toHaveAttribute('href', /github.com/);
-    if (title === 'DiabFit') await expect(page.getByRole('link', { name: 'app ↗', exact: true })).toHaveAttribute('href', /play.google.com/);
     if (title === 'Passenger Princess') await expect(page.getByRole('link', { name: 'devpost ↗', exact: true })).toHaveAttribute('href', /devpost.com/);
     await page.getByRole('link', { name: 'next project', exact: true }).click();
   }
   await expect(page.getByRole('heading', { name: titles[0], exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'previous project', exact: true }).click();
-  await expect(page.getByRole('heading', { name: 'Doffy', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'ESP32 DOOM', exact: true })).toBeVisible();
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Doffy', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'ESP32 DOOM', exact: true })).toBeVisible();
   await page.goBack();
   await expect(page.getByRole('heading', { name: titles[0], exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'enlarge image' }).focus();
@@ -85,8 +84,8 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   await expect(page.getByRole('status').filter({ hasText: 'email copied' })).toHaveCount(1);
   await expect(page.getByText('copied email!')).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('mrameshj@purdue.edu');
-  await page.goto('http://127.0.0.1:5173/#/?channel=doffy');
-  await expect(page.getByRole('heading', { name: 'Doffy', exact: true })).toBeVisible();
+  await page.goto('http://127.0.0.1:5173/#/?channel=esp32-doom');
+  await expect(page.getByRole('heading', { name: 'ESP32 DOOM', exact: true })).toBeVisible();
   await page.goto('http://127.0.0.1:5173/#/projects');
   await expect(page.getByRole('heading', { name: titles[0], exact: true })).toBeVisible();
   await page.goto('http://127.0.0.1:5173/#/?view=unknown');
@@ -127,7 +126,7 @@ test.describe('automatic carousel', () => {
     await page.mouse.move(5, 5); // pointer leaves: it carries on
     await expect(page.getByRole('heading', { name: 'Passenger Princess', exact: true })).toBeVisible({ timeout: 5000 });
     await page.mouse.move(900, 740); // over the caption below the TV: only the TV stage pauses it
-    await expect(page.getByRole('heading', { name: 'DiabFit', exact: true })).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole('heading', { name: 'ESP32 DOOM', exact: true })).toBeVisible({ timeout: 5000 });
   });
 });
 
