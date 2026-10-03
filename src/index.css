@@ -89,8 +89,11 @@ h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-trans
 .skill-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; max-width: 700px; }
 .skill-detail p { margin-bottom: 14px; text-transform: lowercase; }
 
-.visits { position: absolute; right: 48px; bottom: 40px; height: 44px; display: flex; align-items: center; color: var(--text-muted); font-size: 11px; letter-spacing: .04em; } /* same bottom offset and height as the icons and arrows, so all three share a line */
+.visits { position: absolute; right: 48px; bottom: 40px; height: 44px; display: flex; align-items: center; color: var(--text-muted); font-size: 11px; letter-spacing: .04em; animation: frost-in .6s ease-out; } /* fades in since the count arrives late over the network; same bottom offset and height as the icons and arrows, so all three share a line */
 html:has(dialog[open]) { overflow: hidden; }
+.intro { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: var(--bg); pointer-events: none; }
+.intro p { font: 400 clamp(40px, 7vw, 88px)/1 var(--title-font); letter-spacing: -.01em; }
+.intro em { color: var(--accent); }
 .image-preview { width: min(980px, calc(100% - 32px)); max-height: calc(100dvh - 48px); padding: 0; margin: auto; border: 0; border-radius: 22px; background: #15151aa6; backdrop-filter: blur(28px) saturate(1.5); box-shadow: 0 30px 80px #000a; color: var(--text); overflow: hidden; animation: preview-in .2s ease-out; }
 .image-preview::backdrop { background: #04040499; backdrop-filter: blur(14px); }
 @keyframes preview-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }
