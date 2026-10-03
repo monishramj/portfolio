@@ -25,7 +25,7 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   page.on('pageerror', error => errors.push(error.message));
   await page.route('**/abacus.jasoncameron.dev/**', route => route.fulfill({ json: { value: 1234 } }));
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await page.goto('http://127.0.0.1:5173/portfolio/');
+  await page.goto('http://127.0.0.1:5173/');
   const nav = page.getByRole('navigation', { name: 'Main navigation' });
   await expect(page.locator('canvas')).toBeVisible();
   await expect(page.getByText('1,234 visits')).toBeVisible();
@@ -85,18 +85,18 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   await expect(page.getByRole('status').filter({ hasText: 'email copied' })).toHaveCount(1);
   await expect(page.getByText('copied email!')).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('mrameshj@purdue.edu');
-  await page.goto('http://127.0.0.1:5173/portfolio/#/?channel=doffy');
+  await page.goto('http://127.0.0.1:5173/#/?channel=doffy');
   await expect(page.getByRole('heading', { name: 'Doffy', exact: true })).toBeVisible();
-  await page.goto('http://127.0.0.1:5173/portfolio/#/projects');
+  await page.goto('http://127.0.0.1:5173/#/projects');
   await expect(page.getByRole('heading', { name: titles[0], exact: true })).toBeVisible();
-  await page.goto('http://127.0.0.1:5173/portfolio/#/?view=unknown');
+  await page.goto('http://127.0.0.1:5173/#/?view=unknown');
   await expect(nav.getByRole('link', { name: 'about me', exact: true })).toHaveAttribute('aria-current', 'page');
   expect(errors).toEqual([]);
 });
 
 test('project carousel remains usable when the TV model cannot load', async ({ page }) => {
   await page.route('**/grandmas_tv.glb', route => route.abort());
-  await page.goto('http://127.0.0.1:5173/portfolio/');
+  await page.goto('http://127.0.0.1:5173/');
   await expect(page.locator('.screen-fallback')).toBeVisible();
   await page.getByRole('link', { name: 'projects', exact: true }).click();
   await expect(page.locator('.screen-fallback')).toHaveAttribute('src', /vrglove.jpg$/);
@@ -118,7 +118,7 @@ test.describe('automatic carousel', () => {
   test('moves to the next project on its own and pauses while hovered', async ({ page }) => {
     test.setTimeout(30000);
     await page.route('**/abacus.jasoncameron.dev/**', route => route.fulfill({ json: { value: 1 } }));
-    await page.goto('http://127.0.0.1:5173/portfolio/#/?view=projects&channel=medvr-haptic-glove');
+    await page.goto('http://127.0.0.1:5173/#/?view=projects&channel=medvr-haptic-glove');
     await expect(page.getByRole('heading', { name: 'MedVR Haptic Glove', exact: true })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Monkish', exact: true })).toBeVisible({ timeout: 5000 });
     await page.mouse.move(900, 300); // over the stage: the timer stops
@@ -138,7 +138,7 @@ test('the stage stays hidden until the TV is ready, with no placeholder photo fl
     window.__sawPlaceholder = false;
     new MutationObserver(() => { if (document.querySelector('.screen-fallback')) window.__sawPlaceholder = true; }).observe(document, { childList: true, subtree: true });
   });
-  await page.goto('http://127.0.0.1:5173/portfolio/');
+  await page.goto('http://127.0.0.1:5173/');
   await expect(page.locator('.screen-stage')).toHaveClass(/booting/); // hidden while loading
   await expect(page.locator('.screen-stage:not(.booting)')).toBeVisible({ timeout: 30000 }); // revealed once ready
   await expect(page.locator('canvas')).toBeVisible();
@@ -150,7 +150,7 @@ test('phones get photos and an icon grid, no 3D TV', async ({ page }) => {
   page.on('request', r => { if (/\.glb$|three/.test(r.url())) glb.push(r.url()); }); // the model, or any three.js chunk
   await page.route('**/abacus.jasoncameron.dev/**', route => route.fulfill({ json: { value: 1 } }));
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('http://127.0.0.1:5173/portfolio/');
+  await page.goto('http://127.0.0.1:5173/');
   await expect(page.locator('.screen-photo.in')).toBeVisible();
   await page.getByRole('link', { name: 'projects', exact: true }).click();
   await expect(page.locator('.screen-photo.in')).toHaveAttribute('src', /vrglove.jpg$/);
@@ -170,7 +170,7 @@ test('phones get photos and an icon grid, no 3D TV', async ({ page }) => {
 test('the layout follows the window between phone and desktop without a reload', async ({ page }) => {
   await page.route('**/abacus.jasoncameron.dev/**', route => route.fulfill({ json: { value: 1 } }));
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('http://127.0.0.1:5173/portfolio/');
+  await page.goto('http://127.0.0.1:5173/');
   await expect(page.locator('.screen-photo.in')).toBeVisible();
   await page.setViewportSize({ width: 1440, height: 1000 });
   await expect(page.locator('canvas')).toBeVisible({ timeout: 30000 });

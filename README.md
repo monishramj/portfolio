@@ -10,7 +10,7 @@ npm install
 npm run dev
 ```
 
-Open the Vite URL at `/portfolio/`. The left panel holds the name and navigation; the right panel shows the TV, framed around its screen with the original dawn environment. Channel arrows browse the original bio and seven projects. GitHub activity and contact use the same right panel. Selection is saved in the URL, and `#/projects` opens the first project.
+Open the Vite URL. The left panel holds the name and navigation; the right panel shows the TV, framed around its screen with the original dawn environment. Channel arrows browse the original bio and seven projects. GitHub activity and contact use the same right panel. Selection is saved in the URL, and `#/projects` opens the first project.
 
 ## Checks
 
