@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { shelfFrame } from '../components/shelfLayout';
 import { PROJECTS } from '../data/projects';
 import { SKILLS } from '../data/skills';
-import { EXPERIENCE } from '../data/experience';
+import { EXPERIENCE, ORGS } from '../data/experience';
 
 // The TV and its shelf (all of three.js) load together and only on desktop, so phones never download them.
 let VhsShelf;
@@ -145,7 +145,8 @@ export default function Home() {
     <a className="skip-link" href="#screen-content" onClick={event => { event.preventDefault(); document.getElementById('screen-content').focus(); }}>skip to content</a>
     <aside className="identity">
       <div><h1>monish<br /><em>ramesh <br />jayakumar</em></h1><p className="identity-note">cs @ purdue honors</p></div>
-      <section className="experience" aria-label="experience"><ul>{EXPERIENCE.map(item => <li key={item.role}><span>{item.role}</span><span>{item.when ? `${item.org} · ${item.when}` : item.org}</span></li>)}</ul></section>
+      <section className="experience" aria-label="experience"><ul>{EXPERIENCE.map(item => <li key={item.role}><span>{item.role}</span><span>{item.org} · {item.when}</span></li>)}
+        <li className="orgs"><div>{ORGS.map(org => <a key={org.name} href={org.href} aria-label={org.name} title={org.name} target="_blank" rel="noopener noreferrer"><img src={`${base}images/${org.logo}`} alt="" /></a>)}</div><span>organizations</span></li></ul></section>
       {/* <ContributionGraph /> hidden for now: re-enable together with the import above (and the graph test in tests/portfolio.spec.js) */}
       <div className="identity-bottom"><nav aria-label="Main navigation">{SECTIONS.map((id, i) => <Link key={id} to={id === 'about' ? '/' : `/?view=${id}`} aria-current={view === id ? 'page' : undefined}>{LABELS[i]}</Link>)}</nav>
         <div className="social-links" aria-label="social links">
