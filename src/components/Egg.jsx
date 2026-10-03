@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { Component, useMemo } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Center, OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
@@ -55,14 +55,21 @@ function Model() {
   return <Center><primitive object={egg} /></Center>;
 }
 
+// If either model fails to load, the egg just isn't there; the rest of the page carries on.
+class Hide extends Component {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() { return this.state.failed ? null : this.props.children; }
+}
+
 // Drag to spin it; it turns slowly on its own unless the visitor prefers reduced motion.
 export default function Egg({ reducedMotion }) {
-  return <div className="egg" title="egg">
+  return <Hide><div className="egg" title="egg">
     <Canvas dpr={1} camera={{ position: [0, 0.1, 1.15], fov: 30 }} gl={{ antialias: false }}>
       <ambientLight intensity={1.4} />
       <directionalLight position={[1, 2, 2]} intensity={2.2} />
       <Model />
       <OrbitControls enableZoom={false} enablePan={false} autoRotate={!reducedMotion} autoRotateSpeed={3} />
     </Canvas>
-  </div>;
+  </div></Hide>;
 }
