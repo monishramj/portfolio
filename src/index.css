@@ -32,7 +32,7 @@ h1 em { color: var(--accent); }
 .orgs div { display: flex; align-items: center; gap: 16px; }
 .orgs a { display: block; transition: transform .2s; }
 .orgs a:hover, .orgs a:focus-visible { transform: translateY(-2px); }
-.orgs img { display: block; height: 28px; width: auto; }
+.orgs img { display: block; width: 28px; height: 28px; object-fit: contain; } /* every logo in the same square */
 .identity-bottom nav { display: flex; flex-direction: column; gap: 14px; }
 .identity-bottom nav a { display: inline-flex; align-items: center; width: fit-content; min-height: 32px; font-size: 13px; letter-spacing: .2em; color: var(--text-muted); }
 .identity-bottom nav a:hover { color: var(--accent); }
