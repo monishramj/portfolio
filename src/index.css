@@ -28,7 +28,7 @@ h1 em { color: var(--accent); }
 .experience ul { list-style: none; padding: 0; display: grid; gap: 18px; text-transform: lowercase; }
 .experience li { display: grid; gap: 2px; }
 .experience li span:first-child { font-size: 14px; color: var(--text); }
-.experience li span:last-child { font-size: 12px; color: var(--text-muted); letter-spacing: .02em; }
+.experience li span + span { font-size: 12px; color: var(--text-muted); letter-spacing: .02em; }
 .identity-bottom nav { display: flex; flex-direction: column; gap: 14px; }
 .identity-bottom nav a { display: inline-flex; align-items: center; width: fit-content; min-height: 32px; font-size: 13px; letter-spacing: .2em; color: var(--text-muted); }
 .identity-bottom nav a:hover { color: var(--accent); }

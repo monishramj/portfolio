@@ -3,4 +3,6 @@ export const EXPERIENCE = [
   { role: 'Undergraduate Research Assistant', org: 'Aphasia Recovery Lab', when: 'Jan 2026 – Present' },
   { role: 'SWE Intern', org: 'Hill Mortgage Company', when: 'May 2026 – Jul 2026' },
   { role: 'Senior Engineer', org: 'UPlate', when: 'Feb 2026 – Present' },
+  { role: 'Purdue Hackers' }, // orgs: just the name, no second line
+  { role: 'ML@Purdue' },
 ];
