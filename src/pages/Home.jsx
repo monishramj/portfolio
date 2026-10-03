@@ -28,6 +28,9 @@ function Icon({ name }) {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
 }
 
+// brand logo in its own colour (black ones flipped to white so they show on the dark page)
+const SkillIcon = ({ skill }) => <svg viewBox="0 0 24 24" aria-hidden="true"><path d={skill.icon.path} fill={`#${skill.icon.hex === '000000' ? 'ffffff' : skill.icon.hex}`} /></svg>;
+
 const AUTOPLAY_MS = 2000; // how long each project stays up before the carousel moves on
 const EMAIL = 'mrameshj@purdue.edu';
 // Same counter and key as the previous site, so the existing count carries on. Only production
@@ -164,7 +167,7 @@ export default function Home() {
         {mobile
           ? <>{photo.prev && <img className="screen-photo out" src={photo.prev} alt="" />}
             {view === 'skills'
-              ? <div className="skill-grid" role="group" aria-label="skills" onAnimationEnd={clearPrev}>{SKILLS.map((item, i) => <button key={item.name} aria-label={item.name} aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}><svg viewBox="0 0 24 24" aria-hidden="true"><path d={item.icon.path} fill={`#${item.icon.hex === '000000' ? 'ffffff' : item.icon.hex}`} /></svg></button>)}</div>
+              ? <div className="skill-grid" role="group" aria-label="skills" onAnimationEnd={clearPrev}>{SKILLS.map((item, i) => <button key={item.name} aria-label={item.name} aria-pressed={selectedSkill === i} onClick={() => setSelectedSkill(i)}><SkillIcon skill={item} /></button>)}</div>
               : <img key={photo.cur} className="screen-photo in" src={photo.cur} alt={channel.title} onAnimationEnd={clearPrev} />}
             {(view !== 'skills' || photo.prev) && <div className="glass-edge" aria-hidden="true"><i /><i /><i /><i /></div>}</>
           : <><Television channel={channel} reducedMotion={reducedMotion} onReady={markTvReady} view={view} selectedSkill={selectedSkill} onSelectSkill={setSelectedSkill} />
@@ -180,7 +183,7 @@ export default function Home() {
             <div className="project-meta"><span>{channel.tech.join(' · ')}</span><div><a href={channel.github} target="_blank" rel="noopener noreferrer">source ↗</a>{channel.devpost && <a href={channel.devpost} target="_blank" rel="noopener noreferrer">devpost ↗</a>}{channel.store && <a href={channel.store} target="_blank" rel="noopener noreferrer">app ↗</a>}</div></div>
           </>}
           {view === 'skills' && <div className="skill-detail" aria-live="polite" aria-atomic="true">
-            <h2>{skill.name}</h2><p>{skill.detail}</p>
+            <h2><SkillIcon skill={skill} />{skill.name}</h2><p>{skill.detail}</p>
           </div>}
         </div>
         {view === 'projects' && <div className="channels"><Link to={previous} aria-label="previous project">‹</Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick" />)}<Link to={next} aria-label="next project">›</Link></div>}

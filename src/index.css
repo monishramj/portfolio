@@ -91,6 +91,8 @@ h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-trans
 .channels .tick[aria-current]::before { width: 26px; background: var(--accent); }
 
 .skill-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; max-width: 700px; }
+.skill-detail h2 { display: flex; align-items: center; gap: 12px; }
+.skill-detail h2 svg { width: .8em; height: .8em; flex: none; }
 .skill-detail p { margin-bottom: 14px; text-transform: lowercase; }
 
 .corner { position: absolute; right: 48px; bottom: 40px; height: 44px; display: flex; align-items: center; gap: 8px; } /* same bottom offset and height as the icons and arrows, so all three share a line */
