@@ -7,7 +7,7 @@ import * as THREE from 'three';
 // (the same atlas patch the VHS cubby uses, u .44-.66 v .04-.42), shifted from brown to tan and never smoothed.
 const url = `${import.meta.env.BASE_URL}egg.glb`;
 const TV_URL = `${import.meta.env.BASE_URL}grandmas_tv.glb`;
-const DARK = [168, 138, 95], LIGHT = [227, 209, 173]; // tan ramp the wood's light/dark grain is mapped onto
+const DARK = [207, 186, 150], LIGHT = [242, 231, 210]; // tan ramp the wood's light/dark grain is mapped onto
 
 function tanWood(image) {
   const [x, y, w, h] = [0.44 * image.width, 0.04 * image.height, 0.22 * image.width, 0.38 * image.height].map(Math.round);
