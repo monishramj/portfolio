@@ -89,7 +89,10 @@ h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-trans
 .skill-detail { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; max-width: 700px; }
 .skill-detail p { margin-bottom: 14px; text-transform: lowercase; }
 
-.visits { position: absolute; right: 48px; bottom: 40px; height: 44px; display: flex; align-items: center; color: var(--text-muted); font-size: 11px; letter-spacing: .04em; animation: frost-in .6s ease-out; } /* fades in since the count arrives late over the network; same bottom offset and height as the icons and arrows, so all three share a line */
+.corner { position: absolute; right: 48px; bottom: 40px; height: 44px; display: flex; align-items: center; gap: 8px; } /* same bottom offset and height as the icons and arrows, so all three share a line */
+.egg { width: 44px; height: 44px; cursor: grab; animation: frost-in .6s ease-out; }
+.egg:active { cursor: grabbing; }
+.visits { color: var(--text-muted); font-size: 11px; letter-spacing: .04em; animation: frost-in .6s ease-out; } /* fades in since the count arrives late over the network */
 html:has(dialog[open]) { overflow: hidden; }
 .intro { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: var(--bg); pointer-events: none; }
 .intro p { font: 400 clamp(40px, 7vw, 88px)/1 var(--title-font); letter-spacing: -.01em; }
@@ -141,7 +144,7 @@ html:has(dialog[open]) { overflow: hidden; }
   h1 em br { display: none; }
   .identity-bottom nav { flex-direction: row; flex-wrap: wrap; gap: 4px 22px; }
   .social-links { margin-top: 12px; margin-left: -12px; }
-  .visits { position: static; justify-content: flex-end; height: 32px; padding-right: 8px; }
+  .corner { position: static; justify-content: flex-end; height: 32px; padding-right: 8px; }
   .preview-close { width: 44px; height: 44px; top: 22px; right: 22px; }
   .screen-stage { flex: none; aspect-ratio: 4 / 3; }
   /* same stage height as the photos, so the page never changes size between sections */

@@ -27,7 +27,7 @@ test('image-only TV, project carousel, skill tapes, history and mobile layout', 
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('http://127.0.0.1:5173/');
   const nav = page.getByRole('navigation', { name: 'Main navigation' });
-  await expect(page.locator('canvas')).toBeVisible();
+  await expect(page.locator('.screen-stage canvas')).toBeVisible();
   await expect(page.getByText('1,234 visits')).toBeVisible();
   await expect(page.getByRole('region', { name: 'experience' }).getByRole('listitem')).toHaveCount(3);
   await expect(nav.getByRole('link', { name: 'about me', exact: true })).toHaveAttribute('aria-current', 'page');
@@ -141,7 +141,7 @@ test('the stage stays hidden until the TV is ready, with no placeholder photo fl
   await page.goto('http://127.0.0.1:5173/');
   await expect(page.locator('.screen-stage')).toHaveClass(/booting/); // hidden while loading
   await expect(page.locator('.screen-stage:not(.booting)')).toBeVisible({ timeout: 30000 }); // revealed once ready
-  await expect(page.locator('canvas')).toBeVisible();
+  await expect(page.locator('.screen-stage canvas')).toBeVisible();
   expect(await page.evaluate(() => window.__sawPlaceholder)).toBe(false);
 });
 
@@ -173,7 +173,7 @@ test('the layout follows the window between phone and desktop without a reload',
   await page.goto('http://127.0.0.1:5173/');
   await expect(page.locator('.screen-photo.in')).toBeVisible();
   await page.setViewportSize({ width: 1440, height: 1000 });
-  await expect(page.locator('canvas')).toBeVisible({ timeout: 30000 });
+  await expect(page.locator('.screen-stage canvas')).toBeVisible({ timeout: 30000 });
   await expect(page.locator('.screen-photo')).toHaveCount(0);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.locator('.screen-photo.in')).toBeVisible();

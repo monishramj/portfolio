@@ -9,6 +9,7 @@ import { EXPERIENCE } from '../data/experience';
 // The TV and its shelf (all of three.js) load together and only on desktop, so phones never download them.
 let VhsShelf;
 const ModelViewer = lazy(() => Promise.all([import('../components/ModelViewer'), import('../components/VhsShelf')]).then(([viewer, shelf]) => { VhsShelf = shelf.default; return viewer; }));
+const Egg = lazy(() => import('../components/Egg'));
 const SECTIONS = ['about', 'projects', 'skills'];
 const LABELS = ['about me', 'projects', 'skills'];
 const base = import.meta.env.BASE_URL;
@@ -183,7 +184,10 @@ export default function Home() {
         </div>
         {view === 'projects' && <div className="channels"><Link to={previous} aria-label="previous project">‹</Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick" />)}<Link to={next} aria-label="next project">›</Link></div>}
       </div>
-      {visits !== null && <span className="visits">{visits.toLocaleString()} visits</span>}
+      <div className="corner">
+        {!mobile && <Suspense fallback={null}><Egg reducedMotion={reducedMotion} /></Suspense>}
+        {visits !== null && <span className="visits">{visits.toLocaleString()} visits</span>}
+      </div>
     </section>
     <dialog ref={preview} className="image-preview" onClose={() => setPreviewOpen(false)} aria-label={`${channel.title} image preview`} onClick={event => { if (event.target === event.currentTarget) preview.current.close(); }}>
       <div className="preview-body">
