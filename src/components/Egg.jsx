@@ -3,22 +3,30 @@ import { Canvas } from '@react-three/fiber';
 import { Center, OrbitControls, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 
-// Quaternius' low-poly egg (CC0, poly.pizza/m/ngjyRi84lk), reskinned with the same never-smoothed
-// pixel-art treatment as the VHS spines: a tiny canvas of shell tones with a few brown speckles.
-const SHELL = ['#dcc8a3', '#d2bc95', '#c8b088', '#e3d3b2', '#bea47c', '#d7c29b'];
-const SPECK = '#8a6f4d';
-const TEX_W = 16, TEX_H = 12; // texels around and up the shell; each lands a few screen pixels wide
+// Quaternius' low-poly egg (CC0, poly.pizza/m/ngjyRi84lk), skinned with the TV model's own wood
+// (the same atlas patch the VHS cubby uses, u .44-.66 v .04-.42), shifted from brown to tan and never smoothed.
 const url = `${import.meta.env.BASE_URL}egg.glb`;
+const TV_URL = `${import.meta.env.BASE_URL}grandmas_tv.glb`;
+const DARK = [168, 138, 95], LIGHT = [227, 209, 173]; // tan ramp the wood's light/dark grain is mapped onto
 
-function shellTexture() {
+function tanWood(image) {
+  const [x, y, w, h] = [0.44 * image.width, 0.04 * image.height, 0.22 * image.width, 0.38 * image.height].map(Math.round);
   const canvas = document.createElement('canvas');
-  canvas.width = TEX_W; canvas.height = TEX_H;
+  canvas.width = w; canvas.height = h;
   const g = canvas.getContext('2d');
-  for (let y = 0; y < TEX_H; y++) for (let x = 0; x < TEX_W; x++) {
-    const n = (x * 73 + y * 151 + x * y * 7) % 97; // cheap fixed hash, so the pattern doesn't read as stripes
-    g.fillStyle = n < 5 ? SPECK : SHELL[n % SHELL.length];
-    g.fillRect(x, y, 1, 1);
+  g.drawImage(image, x, y, w, h, 0, 0, w, h);
+  const img = g.getImageData(0, 0, w, h), d = img.data;
+  const lum = i => 0.3 * d[i] + 0.59 * d[i + 1] + 0.11 * d[i + 2];
+  // stretch the middle 90% of the grain over the ramp, so a few stray pixels don't flatten the rest
+  const sorted = [];
+  for (let i = 0; i < d.length; i += 4) sorted.push(lum(i));
+  sorted.sort((p, q) => p - q);
+  const lo = sorted[Math.floor(sorted.length * 0.05)], hi = sorted[Math.floor(sorted.length * 0.95)];
+  for (let i = 0; i < d.length; i += 4) {
+    const t = Math.min(1, Math.max(0, (lum(i) - lo) / (hi - lo || 1)));
+    for (let c = 0; c < 3; c++) d[i + c] = DARK[c] + (LIGHT[c] - DARK[c]) * t;
   }
+  g.putImageData(img, 0, 0);
   const tex = new THREE.CanvasTexture(canvas);
   tex.colorSpace = THREE.SRGBColorSpace;
   tex.magFilter = tex.minFilter = THREE.NearestFilter;
@@ -28,12 +36,13 @@ function shellTexture() {
 
 function Model() {
   const { scene } = useGLTF(url);
+  const tv = useGLTF(TV_URL); // already loaded (and cached) by the TV itself
   const egg = useMemo(() => {
     const copy = scene.clone();
-    const material = new THREE.MeshStandardMaterial({ map: shellTexture(), roughness: 0.8, flatShading: true });
+    const material = new THREE.MeshStandardMaterial({ map: tanWood(tv.materials.material.map.image), roughness: 0.8, flatShading: true });
     copy.traverse(o => {
       if (!o.isMesh) return;
-      // the model's own UVs cover a sliver of its atlas, so wrap ours around the long (local z) axis instead
+      // the egg's own UVs cover a sliver of its atlas, so wrap ours around the long (local z) axis instead
       o.geometry = o.geometry.clone();
       const pos = o.geometry.attributes.position, uv = o.geometry.attributes.uv;
       o.geometry.computeBoundingBox();
@@ -42,7 +51,7 @@ function Model() {
       o.material = material;
     });
     return copy;
-  }, [scene]);
+  }, [scene, tv]);
   return <Center><primitive object={egg} /></Center>;
 }
 
