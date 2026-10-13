@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { invalidate, useFrame } from '@react-three/fiber';
+import { invalidate, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
 import { layout } from './shelfLayout';
@@ -89,6 +89,7 @@ function woodGeometry(w, h, d, grainAlongX) {
 }
 
 function Tape({ skill, index, selected, active, onSelect, l, plastic, side, gloss }) {
+  const canvas = useThree(state => state.gl.domElement);
   const group = useRef(null);
   const hover = useRef(false);
   const slot = l.slots[index];
@@ -124,9 +125,16 @@ function Tape({ skill, index, selected, active, onSelect, l, plastic, side, glos
   // selecting a tape, or the shelf becoming interactive, needs a frame to start the slide
   useEffect(() => { invalidate(); }, [selected, active]);
 
+  useEffect(() => () => {
+    if (hover.current) {
+      hover.current = false;
+      canvas.style.removeProperty('cursor');
+    }
+  }, [active, canvas]);
+
   const handlers = active ? {
-    onPointerOver: e => { e.stopPropagation(); hover.current = true; document.body.style.cursor = 'pointer'; invalidate(); },
-    onPointerOut: () => { hover.current = false; document.body.style.cursor = ''; invalidate(); },
+    onPointerOver: e => { e.stopPropagation(); hover.current = true; canvas.style.setProperty('cursor', 'pointer'); invalidate(); },
+    onPointerOut: () => { hover.current = false; canvas.style.removeProperty('cursor'); invalidate(); },
     onClick: e => { e.stopPropagation(); onSelect(index); },
   } : {};
 
