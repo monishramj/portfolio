@@ -2,6 +2,25 @@ const base = import.meta.env.BASE_URL;
 
 export const PROJECTS = [
   {
+    title: 'Campout',
+    desc: 'A multiplayer survival game that runs in the browser, built from scratch. Up to 50 players share one world in real time, backed by a custom game server.',
+    tech: ['C++', 'FastAPI', 'PostgreSQL', 'Docker', 'WebSockets'],
+    img: `${base}images/campout.png`,
+    fit: 'contain',
+    github: 'https://github.com/monishramj/campout',
+    featured: true,
+  },
+  {
+    title: 'FlyBy',
+    desc: 'HackGT 13 winner (#2 overall). Agentic drone search-and-rescue triage: a local model ranks every detector flag and proposes an action, an LLM parses radio intel, and a commander approves in one click.',
+    tech: ['Python', 'Grok', 'MongoDB Atlas', 'Three.js'],
+    img: `${base}images/flyby.png`,
+    fit: 'contain',
+    github: 'https://github.com/monishramj/flyby',
+    devpost: 'https://devpost.com/software/flyby-fdxcua',
+    featured: true,
+  },
+  {
     title: 'MedVR Haptic Glove',
     desc: 'Wearable glove that simulates touch feedback. Real-time finger tracking + custom Unity simulation with an Oculus Quest.',
     tech: ['Arduino', 'Unity', 'C#'],
@@ -17,21 +36,5 @@ export const PROJECTS = [
     fit: 'contain',
     github: 'https://github.com/monishramj/monkish',
     featured: true,
-  },
-  {
-    title: 'Passenger Princess',
-    desc: 'Wearable hardware co-pilot using real-time IMU sensor fusion to coach drivers with hands-free audio feedback. Built at StarkHacks 2026.',
-    tech: ['C++', 'ESP32-S3', 'WebSockets', 'ElevenLabs'],
-    img: `${base}images/starkhacks2.jpg`,
-    github: 'https://github.com/ethannsie/Amoeba-StarkHacks',
-    devpost: 'https://devpost.com/software/passenger-princess',
-    featured: true,
-  },
-  {
-    title: 'ESP32 DOOM',
-    desc: 'DOOM rendered on a 128 x 64 OLED display running on an ESP32-S3 microcontroller.',
-    tech: ['C', 'ESP32-S3', 'ESP-IDF'],
-    img: `${base}images/esp32doom.jpg`,
-    github: 'https://github.com/monishramj/esp32-doom',
   },
 ];

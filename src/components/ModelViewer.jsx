@@ -10,9 +10,9 @@ const deg2rad = d => (d * Math.PI) / 180;
 const ROTATE_SPEED = 0.005;
 const INERTIA = 0.925;
 const DECIDE = 8;
-const PARALLAX_MAG = 0.05;
+const PARALLAX_MAG = 0.015;
 const PARALLAX_EASE = 0.12;
-const HOVER_MAG = deg2rad(6);
+const HOVER_MAG = deg2rad(2);
 const HOVER_EASE = 0.15;
 
 const Loader = ({ placeholderSrc }) => {
