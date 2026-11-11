@@ -1,5 +1,6 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion } from 'motion/react';
 // import ContributionGraph from '../components/ContributionGraph'; // hidden for now; see the commented usage below
 import { shelfFrame } from '../components/shelfLayout';
 import { PROJECTS } from '../data/projects';
@@ -23,6 +24,7 @@ function Icon({ name }) {
     linkedin: <><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M7 10v7m0-10v.1M11 17v-7m0 3a3 3 0 0 1 6 0v4" /></>,
     mail: <><rect x="2" y="4" width="20" height="16" rx="3" /><path d="m3 6 9 7 9-7" /></>,
     check: <path d="M4 12.5l5 5L20 6.5" />,
+    link: <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />,
     resume: <><path d="M14 2H5v20h14V7zM14 2v5h5M8 12h8M8 16h6" /></>,
   };
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
@@ -194,16 +196,17 @@ export default function Home() {
       {!mobile && <ClickHint active={view === 'skills' && tvReady && !skillClicked} />}
       <div className="screen-caption">
         <div className="caption-body">
-          {view === 'about' && <><p>CS major and JMHC Honors student at Purdue. My main interests lie in ML + AI, yet i've worked with VR, mobile apps, simulation/game dev, and embedded systems.</p><p>love movies, sketching, and I have an origami collection.</p></>}
+          {view === 'about' && <><p>hi! i'm monish - learning to code, bit by bit 🐌</p><p>CS @ Purdue, concentrating in ML & AI. i have experience w/ UX and backend work.</p><p>love movies, sketching, and I have an origami collection.</p></>}
           {view === 'projects' && <>
             <h2 className="project-title">{channel.title}</h2><p>{channel.desc}</p>
-            <div className="project-meta"><span>{channel.tech.join(' · ')}</span><div><a href={channel.github} target="_blank" rel="noopener noreferrer">source ↗</a>{channel.devpost && <a href={channel.devpost} target="_blank" rel="noopener noreferrer">devpost ↗</a>}{channel.store && <a href={channel.store} target="_blank" rel="noopener noreferrer">app ↗</a>}</div></div>
+            <div className="project-meta">{channel.tech.join(' · ')}</div>
           </>}
           {view === 'skills' && <div className="skill-detail" aria-live="polite" aria-atomic="true">
             <h2><SkillIcon skill={skill} />{skill.name}</h2><p>{skill.detail}</p>
           </div>}
         </div>
-        {view === 'projects' && <div className="channels"><Link to={previous} aria-label="previous project">‹</Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick" />)}<Link to={next} aria-label="next project">›</Link></div>}
+        {view === 'projects' && <div className="project-links">{[['github', channel.github, 'source on github'], ['link', channel.devpost, 'devpost'], ['link', channel.store, 'app store']].filter(l => l[1]).map(([icon, href, label]) => <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} title={label}><Icon name={icon} /></a>)}</div>}
+        {view === 'projects' && <div className="channels"><Link to={previous} aria-label="previous project">‹</Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick">{i === index && <motion.span layoutId="tick-active" className="tick-active" transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }} />}</Link>)}<Link to={next} aria-label="next project">›</Link></div>}
       </div>
       <div className="corner">
         {!mobile && <Suspense fallback={null}><Egg reducedMotion={reducedMotion} /></Suspense>}
