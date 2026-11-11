@@ -9,5 +9,4 @@ export const EXPERIENCE = [
 export const ORGS = [
   { name: 'Purdue Hackers', logo: 'purdue-hackers.svg', href: 'https://purduehackers.com' },
   { name: 'ML@Purdue', logo: 'mlp.png', href: 'https://www.mlpurdue.com' },
-  { name: 'Embedded Systems @ Purdue', logo: 'esap.svg', href: 'https://www.esap.dev' },
 ];
