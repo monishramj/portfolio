@@ -5,7 +5,7 @@ import { motion } from 'motion/react';
 import { shelfFrame } from '../components/shelfLayout';
 import { PROJECTS } from '../data/projects';
 import { SKILLS } from '../data/skills';
-import { EXPERIENCE, ORGS } from '../data/experience';
+import { EXPERIENCE } from '../data/experience';
 
 // The TV and its shelf (all of three.js) load together and only on desktop, so phones never download them.
 let VhsShelf;
@@ -20,6 +20,8 @@ const projectUrl = index => `/?view=projects&channel=${CHANNELS[index].id}`;
 
 function Icon({ name }) {
   const paths = {
+    prev: <path d="M15 18l-6-6 6-6" />,
+    next: <path d="M9 18l6-6-6-6" />,
     github: <path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7M15 22v-3.5c0-1 .1-1.4-.5-2 3.3-.4 6.7-1.6 6.7-7.3A5.7 5.7 0 0 0 19.7 5a5.3 5.3 0 0 0-.1-4s-1.3-.4-4.3 1.6a14.8 14.8 0 0 0-7.8 0C4.5.6 3.2 1 3.2 1a5.3 5.3 0 0 0-.1 4A5.7 5.7 0 0 0 1.6 9c0 5.7 3.4 6.9 6.7 7.3-.6.6-.6 1.2-.5 2V22" />,
     linkedin: <><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M7 10v7m0-10v.1M11 17v-7m0 3a3 3 0 0 1 6 0v4" /></>,
     mail: <><rect x="2" y="4" width="20" height="16" rx="3" /><path d="m3 6 9 7 9-7" /></>,
@@ -166,8 +168,7 @@ export default function Home() {
     <a className="skip-link" href="#screen-content" onClick={event => { event.preventDefault(); document.getElementById('screen-content').focus(); }}>skip to content</a>
     <aside className="identity">
       <div><h1>monish<br /><em>ramesh <br />jayakumar</em></h1><p className="identity-note">cs @ purdue honors</p></div>
-      <section className="experience" aria-label="experience"><ul>{EXPERIENCE.map(item => <li key={item.role}><span>{item.role}</span><span>{item.org} · {item.when}</span></li>)}
-        <li className="orgs"><div>{ORGS.map(org => <a key={org.name} href={org.href} aria-label={org.name} title={org.name} target="_blank" rel="noopener noreferrer"><img src={`${base}images/${org.logo}`} alt="" /></a>)}</div></li></ul></section>
+      <section className="experience" aria-label="experience"><ul>{EXPERIENCE.map(item => <li key={item.role}><span>{item.role}</span><span>{item.org} · {item.when}</span></li>)}</ul></section>
       {/* <ContributionGraph /> hidden for now: re-enable together with the import above (and the graph test in tests/portfolio.spec.js) */}
       <div className="identity-bottom"><nav aria-label="Main navigation">{SECTIONS.map((id, i) => <Link key={id} to={id === 'about' ? '/' : `/?view=${id}`} aria-current={view === id ? 'page' : undefined}>{LABELS[i]}</Link>)}</nav>
         <div className="social-links" aria-label="social links">
@@ -176,6 +177,11 @@ export default function Home() {
           ].map(([icon, label, href]) => <a key={icon} href={href} aria-label={label} title={label} target="_blank" rel="noopener noreferrer"><Icon name={icon} /></a>)}
           <EmailButton />
           <a href={`${base}resume.pdf`} aria-label="résumé" title="résumé" target="_blank" rel="noopener noreferrer"><Icon name="resume" /></a>
+          <nav className="webring" aria-label="Purdue Hackers webring">
+            <a href="https://ring.purduehackers.com/previous" aria-label="previous site" title="previous site"><Icon name="prev" /></a>
+            <a href="https://ring.purduehackers.com/" aria-label="Purdue Hackers webring" title="Purdue Hackers webring"><img src={`${base}images/purdue-hackers.svg`} alt="" /></a>
+            <a href="https://ring.purduehackers.com/next" aria-label="next site" title="next site"><Icon name="next" /></a>
+          </nav>
         </div>
       </div>
     </aside>
@@ -210,11 +216,6 @@ export default function Home() {
       </div>
       <div className="corner">
         {!mobile && <Suspense fallback={null}><Egg reducedMotion={reducedMotion} /></Suspense>}
-        <nav className="webring" aria-label="Purdue Hackers webring">
-          <a href="https://ring.purduehackers.com/previous">‹</a>
-          <a href="https://ring.purduehackers.com/" aria-label="Purdue Hackers webring" title="Purdue Hackers webring"><img src={`${base}images/purdue-hackers.svg`} alt="" /></a>
-          <a href="https://ring.purduehackers.com/next">›</a>
-        </nav>
         {visits !== null && <span className="visits">{visits.toLocaleString()} visits</span>}
       </div>
     </section>
