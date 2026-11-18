@@ -5,8 +5,3 @@ export const EXPERIENCE = [
   { role: 'Senior Engineer', org: 'UPlate', when: 'Feb 2026 – Present' },
 ];
 
-// The clubs' own logos, in their own colours, shown as a row of links under the experience list, with a small "organizations" label.
-export const ORGS = [
-  { name: 'Purdue Hackers', logo: 'purdue-hackers.svg', href: 'https://purduehackers.com' },
-  { name: 'ML@Purdue', logo: 'mlp.png', href: 'https://www.mlpurdue.com' },
-];
