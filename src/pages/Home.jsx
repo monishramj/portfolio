@@ -210,6 +210,11 @@ export default function Home() {
       </div>
       <div className="corner">
         {!mobile && <Suspense fallback={null}><Egg reducedMotion={reducedMotion} /></Suspense>}
+        <nav className="webring" aria-label="Purdue Hackers webring">
+          <a href="https://ring.purduehackers.com/previous">‹</a>
+          <a href="https://ring.purduehackers.com/">purdue hackers webring</a>
+          <a href="https://ring.purduehackers.com/next">›</a>
+        </nav>
         {visits !== null && <span className="visits">{visits.toLocaleString()} visits</span>}
       </div>
     </section>
