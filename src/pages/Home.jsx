@@ -167,7 +167,7 @@ export default function Home() {
     <aside className="identity">
       <div><h1>monish<br /><em>ramesh <br />jayakumar</em></h1><p className="identity-note">cs @ purdue honors</p></div>
       <section className="experience" aria-label="experience"><ul>{EXPERIENCE.map(item => <li key={item.role}><span>{item.role}</span><span>{item.org} · {item.when}</span></li>)}
-        <li className="orgs"><div>{ORGS.map(org => <a key={org.name} href={org.href} aria-label={org.name} title={org.name} target="_blank" rel="noopener noreferrer"><img src={`${base}images/${org.logo}`} alt="" /></a>)}</div><span>orgs i'm a part of</span></li></ul></section>
+        <li className="orgs"><div>{ORGS.map(org => <a key={org.name} href={org.href} aria-label={org.name} title={org.name} target="_blank" rel="noopener noreferrer"><img src={`${base}images/${org.logo}`} alt="" /></a>)}</div></li></ul></section>
       {/* <ContributionGraph /> hidden for now: re-enable together with the import above (and the graph test in tests/portfolio.spec.js) */}
       <div className="identity-bottom"><nav aria-label="Main navigation">{SECTIONS.map((id, i) => <Link key={id} to={id === 'about' ? '/' : `/?view=${id}`} aria-current={view === id ? 'page' : undefined}>{LABELS[i]}</Link>)}</nav>
         <div className="social-links" aria-label="social links">
@@ -212,7 +212,7 @@ export default function Home() {
         {!mobile && <Suspense fallback={null}><Egg reducedMotion={reducedMotion} /></Suspense>}
         <nav className="webring" aria-label="Purdue Hackers webring">
           <a href="https://ring.purduehackers.com/previous">‹</a>
-          <a href="https://ring.purduehackers.com/">purdue hackers webring</a>
+          <a href="https://ring.purduehackers.com/" aria-label="Purdue Hackers webring" title="Purdue Hackers webring"><img src={`${base}images/purdue-hackers.svg`} alt="" /></a>
           <a href="https://ring.purduehackers.com/next">›</a>
         </nav>
         {visits !== null && <span className="visits">{visits.toLocaleString()} visits</span>}
