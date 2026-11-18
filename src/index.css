@@ -29,17 +29,12 @@ h1 em { color: var(--accent); }
 .experience li { display: grid; gap: 2px; }
 .experience li span:first-child { font-size: 14px; color: var(--text); }
 .experience li span:last-child { font-size: 12px; color: var(--text-muted); letter-spacing: .02em; }
-.orgs { margin-top: 14px; } /* extra space above, so the block (centred between the name and the nav) grows and experience rises while organizations drops */
-.orgs div { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-.orgs a { display: block; opacity: .6; transition: opacity .2s; }
-.orgs a:hover, .orgs a:focus-visible { opacity: 1; }
-.orgs img { display: block; width: 28px; height: 28px; object-fit: contain; } /* every logo in the same square */
-.identity-bottom nav { display: flex; flex-direction: column; gap: 14px; }
-.identity-bottom nav a { display: inline-flex; align-items: center; width: fit-content; min-height: 32px; font-size: 13px; letter-spacing: .2em; color: var(--text-muted); }
-.identity-bottom nav a:hover { color: var(--accent); }
-.identity-bottom nav a[aria-current='page'] { color: var(--accent); }
+.identity-bottom > nav { display: flex; flex-direction: column; gap: 14px; }
+.identity-bottom > nav a { display: inline-flex; align-items: center; width: fit-content; min-height: 32px; font-size: 13px; letter-spacing: .2em; color: var(--text-muted); }
+.identity-bottom > nav a:hover { color: var(--accent); }
+.identity-bottom > nav a[aria-current='page'] { color: var(--accent); }
 
-.social-links { display: flex; width: fit-content; margin: 30px 0 0 -12px; }
+.social-links { display: flex; flex-wrap: wrap; align-items: center; width: fit-content; margin: 30px 0 0 -12px; }
 .social-links a, .social-links button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--text); opacity: .8; }
 .social-links a:hover, .social-links button:hover, .social-links .copied { opacity: 1; color: var(--accent); }
 .social-links button { position: relative; }
@@ -103,11 +98,11 @@ h2 { font: 500 25px/1.2 var(--display-font); letter-spacing: -.035em; text-trans
 .corner { position: absolute; right: 48px; bottom: 40px; height: 44px; display: flex; align-items: center; gap: 8px; } /* same bottom offset and height as the icons and arrows, so all three share a line */
 .egg { width: 44px; height: 44px; cursor: grab; animation: frost-in .6s ease-out; }
 .egg:active { cursor: grabbing; }
-.webring { display: flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: .04em; }
-.webring a { color: var(--text-muted); text-decoration: none; }
-.webring img { display: block; width: 20px; height: 20px; object-fit: contain; opacity: .6; transition: opacity .2s; }
-.webring a:hover img { opacity: 1; }
-.webring a:hover { color: inherit; }
+/* fixed bottom centre of the viewport; static and centred on phones */
+.webring { display: flex; align-items: center; gap: 4px; margin-left: 8px; } /* sits at the end of the icon row, so it shares their line */
+.webring a { display: grid; place-items: center; width: auto; min-width: 28px; height: 44px; } /* narrower than the round .social-links buttons; colour, fade and hover come from those */
+.webring img { display: block; width: 28px; height: 28px; }
+.webring a:has(img) { opacity: 1; } /* logo stays at full colour */
 .visits { color: var(--text-muted); font-size: 11px; letter-spacing: .04em; animation: frost-in .6s ease-out; } /* fades in since the count arrives late over the network */
 html:has(dialog[open]) { overflow: hidden; }
 .intro { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: var(--bg); pointer-events: none; }
@@ -158,7 +153,7 @@ html:has(dialog[open]) { overflow: hidden; }
   .identity { overflow: visible; margin-left: 0; padding: 0 8px; gap: 24px; }
   h1 { font-size: clamp(54px, 15vw, 72px); }
   h1 em br { display: none; }
-  .identity-bottom nav { flex-direction: row; flex-wrap: wrap; gap: 4px 22px; }
+  .identity-bottom > nav { flex-direction: row; flex-wrap: wrap; gap: 4px 22px; }
   .social-links { margin-top: 12px; margin-left: -12px; }
   .corner { position: static; justify-content: flex-end; height: 32px; padding-right: 8px; }
   .preview-close { width: 44px; height: 44px; top: 22px; right: 22px; }
