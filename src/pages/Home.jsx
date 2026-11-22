@@ -24,6 +24,7 @@ function Icon({ name }) {
     next: <path d="M9 18l6-6-6-6" />,
     github: <path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7M15 22v-3.5c0-1 .1-1.4-.5-2 3.3-.4 6.7-1.6 6.7-7.3A5.7 5.7 0 0 0 19.7 5a5.3 5.3 0 0 0-.1-4s-1.3-.4-4.3 1.6a14.8 14.8 0 0 0-7.8 0C4.5.6 3.2 1 3.2 1a5.3 5.3 0 0 0-.1 4A5.7 5.7 0 0 0 1.6 9c0 5.7 3.4 6.9 6.7 7.3-.6.6-.6 1.2-.5 2V22" />,
     linkedin: <><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M7 10v7m0-10v.1M11 17v-7m0 3a3 3 0 0 1 6 0v4" /></>,
+    x: <><path d="M4 4l11.7 16H20L8.3 4H4z" /><path d="M4 20l6.8-6.8m2.4-2.4L20 4" /></>,
     mail: <><rect x="2" y="4" width="20" height="16" rx="3" /><path d="m3 6 9 7 9-7" /></>,
     check: <path d="M4 12.5l5 5L20 6.5" />,
     link: <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />,
@@ -173,7 +174,7 @@ export default function Home() {
       <div className="identity-bottom"><nav aria-label="Main navigation">{SECTIONS.map((id, i) => <Link key={id} to={id === 'about' ? '/' : `/?view=${id}`} aria-current={view === id ? 'page' : undefined}>{LABELS[i]}</Link>)}</nav>
         <div className="social-links" aria-label="social links">
           {[
-            ['github', 'github', 'https://github.com/monishramj'], ['linkedin', 'linkedin', 'https://www.linkedin.com/in/monish-rj'],
+            ['github', 'github', 'https://github.com/monishramj'], ['linkedin', 'linkedin', 'https://www.linkedin.com/in/monish-rj'], ['x', 'x (twitter)', 'https://x.com/monishramj'],
           ].map(([icon, label, href]) => <a key={icon} href={href} aria-label={label} title={label} target="_blank" rel="noopener noreferrer"><Icon name={icon} /></a>)}
           <EmailButton />
           <a href={`${base}resume.pdf`} aria-label="résumé" title="résumé" target="_blank" rel="noopener noreferrer"><Icon name="resume" /></a>
