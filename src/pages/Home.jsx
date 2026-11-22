@@ -1,4 +1,5 @@
 import { Component, lazy, Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { CaretLeft, CaretRight, GithubLogo, LinkedinLogo, XLogo, EnvelopeSimple, Check, LinkSimple, FileText, X } from '@phosphor-icons/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'motion/react';
 // import ContributionGraph from '../components/ContributionGraph'; // hidden for now; see the commented usage below
@@ -18,20 +19,8 @@ const ABOUT = { id: 'about', title: 'About me', img: `${base}images/monish.jpeg`
 const CHANNELS = PROJECTS.map(project => ({ ...project, id: project.title.toLowerCase().replace(/[^a-z0-9]+/g, '-') }));
 const projectUrl = index => `/?view=projects&channel=${CHANNELS[index].id}`;
 
-function Icon({ name }) {
-  const paths = {
-    prev: <path d="M15 18l-6-6 6-6" />,
-    next: <path d="M9 18l6-6-6-6" />,
-    github: <path d="M9 19c-4.3 1.3-4.3-2.2-6-2.7M15 22v-3.5c0-1 .1-1.4-.5-2 3.3-.4 6.7-1.6 6.7-7.3A5.7 5.7 0 0 0 19.7 5a5.3 5.3 0 0 0-.1-4s-1.3-.4-4.3 1.6a14.8 14.8 0 0 0-7.8 0C4.5.6 3.2 1 3.2 1a5.3 5.3 0 0 0-.1 4A5.7 5.7 0 0 0 1.6 9c0 5.7 3.4 6.9 6.7 7.3-.6.6-.6 1.2-.5 2V22" />,
-    linkedin: <><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M7 10v7m0-10v.1M11 17v-7m0 3a3 3 0 0 1 6 0v4" /></>,
-    x: <><path d="M4 4l11.7 16H20L8.3 4H4z" /><path d="M4 20l6.8-6.8m2.4-2.4L20 4" /></>,
-    mail: <><rect x="2" y="4" width="20" height="16" rx="3" /><path d="m3 6 9 7 9-7" /></>,
-    check: <path d="M4 12.5l5 5L20 6.5" />,
-    link: <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />,
-    resume: <><path d="M14 2H5v20h14V7zM14 2v5h5M8 12h8M8 16h6" /></>,
-  };
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>;
-}
+const ICONS = { prev: CaretLeft, next: CaretRight, github: GithubLogo, linkedin: LinkedinLogo, x: XLogo, mail: EnvelopeSimple, check: Check, link: LinkSimple, resume: FileText, close: X };
+const Icon = ({ name, size = 20 }) => { const Glyph = ICONS[name]; return <Glyph size={size} weight="light" aria-hidden="true" />; };
 
 // brand logo in its own colour (black ones flipped to white so they show on the dark page)
 const SkillIcon = ({ skill }) => <svg viewBox="0 0 24 24" aria-hidden="true"><path d={skill.icon.path} fill={`#${skill.icon.hex === '000000' ? 'ffffff' : skill.icon.hex}`} /></svg>;
@@ -213,7 +202,7 @@ export default function Home() {
           </div>}
         </div>
         {view === 'projects' && <div className="project-links">{[['github', channel.github, 'source on github'], ['link', channel.devpost, 'devpost'], ['link', channel.store, 'app store']].filter(l => l[1]).map(([icon, href, label]) => <a key={label} href={href} target="_blank" rel="noopener noreferrer" aria-label={label} title={label}><Icon name={icon} /></a>)}</div>}
-        {view === 'projects' && <div className="channels"><Link to={previous} aria-label="previous project">‹</Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick">{i === index && <motion.span layoutId="tick-active" className="tick-active" transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }} />}</Link>)}<Link to={next} aria-label="next project">›</Link></div>}
+        {view === 'projects' && <div className="channels"><Link to={previous} aria-label="previous project"><Icon name="prev" size={22} /></Link>{CHANNELS.map((item, i) => <Link key={item.id} to={projectUrl(i)} aria-label={item.title} aria-current={i === index ? 'true' : undefined} className="tick">{i === index && <motion.span layoutId="tick-active" className="tick-active" transition={reducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 38 }} />}</Link>)}<Link to={next} aria-label="next project"><Icon name="next" size={22} /></Link></div>}
       </div>
       <div className="corner">
         {!mobile && <Suspense fallback={null}><Egg reducedMotion={reducedMotion} /></Suspense>}
@@ -224,7 +213,7 @@ export default function Home() {
       <div className="preview-body">
         <img src={channel.img} alt={channel.title} />
         <div className="preview-caption"><span>{channel.title}</span>{channel.tech && <span>{channel.tech.join(' · ')}</span>}</div>
-        <button className="preview-close" onClick={() => preview.current.close()} aria-label="close image preview"><svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true"><path d="M1.5 1.5l9 9M10.5 1.5l-9 9" /></svg></button>
+        <button className="preview-close" onClick={() => preview.current.close()} aria-label="close image preview"><Icon name="close" size={16} /></button>
       </div>
     </dialog>
   </main>;
